@@ -1,13 +1,13 @@
 import type { NextConfig } from "next";
 
 const isGithubPages = process.env.GITHUB_PAGES === "true";
-const repoName = "ahgnodmik.github.io";
+const repoName = "developer";
 
 const nextConfig: NextConfig = {
   output: "export",
   images: { unoptimized: true },
-  basePath: undefined,
-  assetPrefix: undefined,
+  basePath: isGithubPages ? `/${repoName}` : undefined,
+  assetPrefix: isGithubPages ? `/${repoName}/` : undefined,
 };
 
 export default nextConfig;

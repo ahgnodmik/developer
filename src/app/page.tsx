@@ -12,7 +12,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="text-xl font-bold text-slate-900 dark:text-white">
-              Portfolio
+              Web Developer
             </div>
             <div className="hidden md:flex space-x-8">
               <a href="#about" className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors">
@@ -41,11 +41,12 @@ export default function Home() {
               <AvatarFallback className="text-2xl">DP</AvatarFallback>
             </Avatar>
             <h1 className="text-4xl sm:text-6xl font-bold text-slate-900 dark:text-white mb-6">
-              안녕하세요, 개발자입니다
+              웹 개발 전문가
             </h1>
             <p className="text-xl text-slate-600 dark:text-slate-300 mb-8 max-w-2xl mx-auto">
-              창의적이고 혁신적인 웹 애플리케이션을 개발하는 풀스택 개발자입니다.
-              사용자 경험을 최우선으로 생각하며, 최신 기술을 활용한 솔루션을 제공합니다.
+              React, Tailwind CSS, TypeScript를 활용한 현대적인 웹 애플리케이션 개발과 
+              서버리스 아키텍처, SSR 렌더링 기술을 연구하고 제공합니다. 
+              AI와 함께 Flutter로 앱을 만들어가는 혁신적인 개발자입니다.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" className="bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100">
@@ -74,19 +75,20 @@ export default function Home() {
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
               <h3 className="text-2xl font-semibold text-slate-900 dark:text-white mb-6">
-                개발자로서의 여정
+                웹 개발 전문가로서의 여정
               </h3>
               <p className="text-slate-600 dark:text-slate-300 mb-4">
-                저는 5년 이상의 개발 경험을 가진 풀스택 개발자입니다. 
-                프론트엔드부터 백엔드, 데이터베이스까지 전체적인 개발 과정을 이해하고 있습니다.
+                React, Tailwind CSS, TypeScript를 기반으로 한 현대적인 웹 애플리케이션 개발에 
+                전문성을 가지고 있습니다. 서버리스 아키텍처와 SSR 렌더링 기술을 연구하며 
+                최적의 성능과 사용자 경험을 제공합니다.
               </p>
               <p className="text-slate-600 dark:text-slate-300 mb-4">
-                사용자 중심의 설계와 성능 최적화에 중점을 두며, 
-                팀워크와 소통을 중요하게 생각합니다.
+                AI 기술과 Flutter를 활용한 크로스 플랫폼 앱 개발에 집중하며, 
+                웹 서비스와 모바일 앱을 통합한 디지털 솔루션을 제공합니다.
               </p>
               <p className="text-slate-600 dark:text-slate-300">
-                지속적인 학습과 새로운 기술에 대한 열정으로 
-                더 나은 개발자가 되기 위해 노력하고 있습니다.
+                디자인 중심의 개발 철학으로 사용자 친화적인 인터페이스를 구현하고, 
+                지속적인 기술 연구와 혁신을 통해 더 나은 디지털 경험을 만들어갑니다.
               </p>
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -128,7 +130,7 @@ export default function Home() {
           <div className="grid md:grid-cols-3 gap-8">
             <Card>
               <CardHeader>
-                <CardTitle className="text-blue-600">Frontend</CardTitle>
+                <CardTitle className="text-blue-600">Frontend & Web</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-2">
@@ -136,38 +138,38 @@ export default function Home() {
                   <Badge variant="secondary">Next.js</Badge>
                   <Badge variant="secondary">TypeScript</Badge>
                   <Badge variant="secondary">Tailwind CSS</Badge>
-                  <Badge variant="secondary">Vue.js</Badge>
-                  <Badge variant="secondary">Svelte</Badge>
+                  <Badge variant="secondary">JavaScript</Badge>
+                  <Badge variant="secondary">SSR</Badge>
                 </div>
               </CardContent>
             </Card>
             <Card>
               <CardHeader>
-                <CardTitle className="text-green-600">Backend</CardTitle>
+                <CardTitle className="text-green-600">Serverless & Backend</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-2">
-                  <Badge variant="secondary">Node.js</Badge>
-                  <Badge variant="secondary">Python</Badge>
-                  <Badge variant="secondary">Express</Badge>
-                  <Badge variant="secondary">FastAPI</Badge>
-                  <Badge variant="secondary">PostgreSQL</Badge>
-                  <Badge variant="secondary">MongoDB</Badge>
+                  <Badge variant="secondary">Vercel</Badge>
+                  <Badge variant="secondary">Netlify</Badge>
+                  <Badge variant="secondary">AWS Lambda</Badge>
+                  <Badge variant="secondary">Firebase</Badge>
+                  <Badge variant="secondary">Supabase</Badge>
+                  <Badge variant="secondary">Edge Functions</Badge>
                 </div>
               </CardContent>
             </Card>
             <Card>
               <CardHeader>
-                <CardTitle className="text-purple-600">DevOps & Tools</CardTitle>
+                <CardTitle className="text-purple-600">Mobile & AI</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-2">
-                  <Badge variant="secondary">Docker</Badge>
-                  <Badge variant="secondary">AWS</Badge>
-                  <Badge variant="secondary">Git</Badge>
-                  <Badge variant="secondary">CI/CD</Badge>
-                  <Badge variant="secondary">Kubernetes</Badge>
-                  <Badge variant="secondary">Terraform</Badge>
+                  <Badge variant="secondary">Flutter</Badge>
+                  <Badge variant="secondary">Dart</Badge>
+                  <Badge variant="secondary">AI Integration</Badge>
+                  <Badge variant="secondary">Machine Learning</Badge>
+                  <Badge variant="secondary">Cross Platform</Badge>
+                  <Badge variant="secondary">App Design</Badge>
                 </div>
               </CardContent>
             </Card>
@@ -184,16 +186,17 @@ export default function Home() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             <Card className="group hover:shadow-lg transition-shadow">
               <CardHeader>
-                <CardTitle>E-Commerce Platform</CardTitle>
+                <CardTitle>Modern Web Application</CardTitle>
                 <CardDescription>
-                  React와 Node.js를 사용한 풀스택 전자상거래 플랫폼
+                  React, TypeScript, Tailwind CSS를 활용한 서버리스 웹 애플리케이션
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-2 mb-4">
                   <Badge>React</Badge>
-                  <Badge>Node.js</Badge>
-                  <Badge>MongoDB</Badge>
+                  <Badge>TypeScript</Badge>
+                  <Badge>Tailwind CSS</Badge>
+                  <Badge>Vercel</Badge>
                 </div>
                 <Button variant="outline" size="sm" className="group-hover:bg-slate-900 group-hover:text-white">
                   <ExternalLink className="w-4 h-4 mr-2" />
@@ -203,16 +206,17 @@ export default function Home() {
             </Card>
             <Card className="group hover:shadow-lg transition-shadow">
               <CardHeader>
-                <CardTitle>Task Management App</CardTitle>
+                <CardTitle>SSR Web Service</CardTitle>
                 <CardDescription>
-                  팀 협업을 위한 실시간 작업 관리 애플리케이션
+                  Next.js SSR 렌더링을 활용한 고성능 웹 서비스 플랫폼
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-2 mb-4">
                   <Badge>Next.js</Badge>
-                  <Badge>TypeScript</Badge>
-                  <Badge>PostgreSQL</Badge>
+                  <Badge>SSR</Badge>
+                  <Badge>Serverless</Badge>
+                  <Badge>Edge Functions</Badge>
                 </div>
                 <Button variant="outline" size="sm" className="group-hover:bg-slate-900 group-hover:text-white">
                   <ExternalLink className="w-4 h-4 mr-2" />
@@ -222,16 +226,17 @@ export default function Home() {
             </Card>
             <Card className="group hover:shadow-lg transition-shadow">
               <CardHeader>
-                <CardTitle>Data Analytics Dashboard</CardTitle>
+                <CardTitle>AI-Powered Flutter App</CardTitle>
                 <CardDescription>
-                  실시간 데이터 시각화 및 분석 대시보드
+                  AI 기술과 Flutter를 결합한 크로스 플랫폼 모바일 애플리케이션
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-2 mb-4">
-                  <Badge>Vue.js</Badge>
-                  <Badge>Python</Badge>
-                  <Badge>D3.js</Badge>
+                  <Badge>Flutter</Badge>
+                  <Badge>Dart</Badge>
+                  <Badge>AI Integration</Badge>
+                  <Badge>Cross Platform</Badge>
                 </div>
                 <Button variant="outline" size="sm" className="group-hover:bg-slate-900 group-hover:text-white">
                   <ExternalLink className="w-4 h-4 mr-2" />
@@ -250,7 +255,7 @@ export default function Home() {
             연락처
           </h2>
           <p className="text-xl text-slate-600 dark:text-slate-300 mb-12">
-            새로운 프로젝트나 협업에 관심이 있으시다면 언제든 연락주세요!
+            웹 개발, 앱 디자인, 서버리스 아키텍처 구축에 관심이 있으시다면 언제든 연락주세요!
           </p>
           <div className="grid md:grid-cols-3 gap-8">
             <Card>
