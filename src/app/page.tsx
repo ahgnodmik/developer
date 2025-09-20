@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Github, Linkedin, Mail, ExternalLink } from "lucide-react";
+import { Github, Mail, ExternalLink } from "lucide-react";
 
 export default function Home() {
   return (
@@ -41,21 +41,17 @@ export default function Home() {
               <AvatarFallback className="text-2xl">DP</AvatarFallback>
             </Avatar>
             <h1 className="text-4xl sm:text-6xl font-bold text-slate-900 dark:text-white mb-6">
-              웹 개발 전문가
+              주니어 웹 개발자
             </h1>
             <p className="text-xl text-slate-600 dark:text-slate-300 mb-8 max-w-2xl mx-auto">
-              React, Tailwind CSS, TypeScript를 활용한 현대적인 웹 애플리케이션 개발과 
-              서버리스 아키텍처, SSR 렌더링 기술을 연구하고 제공합니다. 
-              AI와 함께 Flutter로 앱을 만들어가는 혁신적인 개발자입니다.
+              React, Tailwind CSS, TypeScript를 기반으로 현대적인 웹 애플리케이션 개발에 
+              전문성을 가지고 있습니다. 서버리스 아키텍처와 SSR 렌더링 기술을 연구하며 
+              최적의 성능과 사용자 경험을 제공합니다.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" className="bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100">
                 <Github className="w-5 h-5 mr-2" />
                 GitHub
-              </Button>
-              <Button size="lg" variant="outline">
-                <Linkedin className="w-5 h-5 mr-2" />
-                LinkedIn
               </Button>
               <Button size="lg" variant="outline">
                 <Mail className="w-5 h-5 mr-2" />
@@ -75,10 +71,10 @@ export default function Home() {
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
               <h3 className="text-2xl font-semibold text-slate-900 dark:text-white mb-6">
-                웹 개발 전문가로서의 여정
+                주니어 개발자로서의 여정
               </h3>
               <p className="text-slate-600 dark:text-slate-300 mb-4">
-                React, Tailwind CSS, TypeScript를 기반으로 한 현대적인 웹 애플리케이션 개발에 
+                React, Tailwind CSS, TypeScript를 기반으로 현대적인 웹 애플리케이션 개발에 
                 전문성을 가지고 있습니다. 서버리스 아키텍처와 SSR 렌더링 기술을 연구하며 
                 최적의 성능과 사용자 경험을 제공합니다.
               </p>
@@ -139,7 +135,6 @@ export default function Home() {
                   <Badge variant="secondary">TypeScript</Badge>
                   <Badge variant="secondary">Tailwind CSS</Badge>
                   <Badge variant="secondary">JavaScript</Badge>
-                  <Badge variant="secondary">SSR</Badge>
                 </div>
               </CardContent>
             </Card>
@@ -150,11 +145,11 @@ export default function Home() {
               <CardContent>
                 <div className="flex flex-wrap gap-2">
                   <Badge variant="secondary">Vercel</Badge>
+                  <Badge variant="secondary">Bolt.new</Badge>
                   <Badge variant="secondary">Netlify</Badge>
-                  <Badge variant="secondary">AWS Lambda</Badge>
+                  <Badge variant="secondary">AWS CloudFront</Badge>
+                  <Badge variant="secondary">AWS S3</Badge>
                   <Badge variant="secondary">Firebase</Badge>
-                  <Badge variant="secondary">Supabase</Badge>
-                  <Badge variant="secondary">Edge Functions</Badge>
                 </div>
               </CardContent>
             </Card>
@@ -164,10 +159,7 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-2">
-                  <Badge variant="secondary">Flutter</Badge>
-                  <Badge variant="secondary">Dart</Badge>
                   <Badge variant="secondary">AI Integration</Badge>
-                  <Badge variant="secondary">Machine Learning</Badge>
                   <Badge variant="secondary">Cross Platform</Badge>
                   <Badge variant="secondary">App Design</Badge>
                 </div>
@@ -198,10 +190,9 @@ export default function Home() {
                   <Badge>Tailwind CSS</Badge>
                   <Badge>Vercel</Badge>
                 </div>
-                <Button variant="outline" size="sm" className="group-hover:bg-slate-900 group-hover:text-white">
-                  <ExternalLink className="w-4 h-4 mr-2" />
-                  살펴보기
-                </Button>
+                <p className="text-sm text-slate-500 dark:text-slate-400">
+                  대부분의 프로젝트는 대외비가 설정되어 있어 직접적으로 이미지가 제공될 수 없습니다.
+                </p>
               </CardContent>
             </Card>
             <Card className="group hover:shadow-lg transition-shadow">
@@ -218,10 +209,9 @@ export default function Home() {
                   <Badge>Serverless</Badge>
                   <Badge>Edge Functions</Badge>
                 </div>
-                <Button variant="outline" size="sm" className="group-hover:bg-slate-900 group-hover:text-white">
-                  <ExternalLink className="w-4 h-4 mr-2" />
-                  살펴보기
-                </Button>
+                <p className="text-sm text-slate-500 dark:text-slate-400">
+                  대부분의 프로젝트는 대외비가 설정되어 있어 직접적으로 이미지가 제공될 수 없습니다.
+                </p>
               </CardContent>
             </Card>
             <Card className="group hover:shadow-lg transition-shadow">
@@ -238,10 +228,9 @@ export default function Home() {
                   <Badge>AI Integration</Badge>
                   <Badge>Cross Platform</Badge>
                 </div>
-                <Button variant="outline" size="sm" className="group-hover:bg-slate-900 group-hover:text-white">
-                  <ExternalLink className="w-4 h-4 mr-2" />
-                  살펴보기
-                </Button>
+                <p className="text-sm text-slate-500 dark:text-slate-400">
+                  대부분의 프로젝트는 대외비가 설정되어 있어 직접적으로 이미지가 제공될 수 없습니다.
+                </p>
               </CardContent>
             </Card>
           </div>
@@ -262,21 +251,14 @@ export default function Home() {
               <CardContent className="pt-6">
                 <Mail className="w-8 h-8 mx-auto mb-4 text-blue-600" />
                 <h3 className="font-semibold mb-2">이메일</h3>
-                <p className="text-slate-600 dark:text-slate-300">developer@example.com</p>
+                <p className="text-slate-600 dark:text-slate-300">samdongpm@gmail.com</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="pt-6">
                 <Github className="w-8 h-8 mx-auto mb-4 text-gray-600" />
                 <h3 className="font-semibold mb-2">GitHub</h3>
-                <p className="text-slate-600 dark:text-slate-300">github.com/developer</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-6">
-                <Linkedin className="w-8 h-8 mx-auto mb-4 text-blue-700" />
-                <h3 className="font-semibold mb-2">LinkedIn</h3>
-                <p className="text-slate-600 dark:text-slate-300">linkedin.com/in/developer</p>
+                <p className="text-slate-600 dark:text-slate-300">github.com/ahgnodmik</p>
               </CardContent>
             </Card>
           </div>
