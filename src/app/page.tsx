@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Carousel } from "@/components/ui/carousel";
 import { Github, Mail, ExternalLink } from "lucide-react";
 
 export default function Home() {
@@ -20,6 +21,9 @@ export default function Home() {
               </a>
               <a href="#skills" className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors">
                 스킬
+              </a>
+              <a href="#gallery" className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors">
+                갤러리
               </a>
               <a href="#projects" className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors">
                 프로젝트
@@ -169,6 +173,88 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Gallery Section */}
+      <section id="gallery" className="py-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-3xl font-bold text-center text-slate-900 dark:text-white mb-12">
+            작업 갤러리
+          </h2>
+          <div className="max-w-4xl mx-auto">
+            <Carousel className="h-96">
+              <div className="h-96 relative rounded-lg overflow-hidden">
+                <img 
+                  src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=400&fit=crop&crop=center" 
+                  alt="웹 개발" 
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                  <div className="text-center text-white">
+                    <h3 className="text-2xl font-bold mb-2">웹 애플리케이션</h3>
+                    <p className="text-lg opacity-90">React & TypeScript</p>
+                  </div>
+                </div>
+              </div>
+              <div className="h-96 relative rounded-lg overflow-hidden">
+                <img 
+                  src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=800&h=400&fit=crop&crop=center" 
+                  alt="모바일 앱" 
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                  <div className="text-center text-white">
+                    <h3 className="text-2xl font-bold mb-2">모바일 앱</h3>
+                    <p className="text-lg opacity-90">Flutter & Dart</p>
+                  </div>
+                </div>
+              </div>
+              <div className="h-96 relative rounded-lg overflow-hidden">
+                <img 
+                  src="https://images.unsplash.com/photo-1558655146-d09347e92766?w=800&h=400&fit=crop&crop=center" 
+                  alt="UI/UX 디자인" 
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                  <div className="text-center text-white">
+                    <h3 className="text-2xl font-bold mb-2">UI/UX 디자인</h3>
+                    <p className="text-lg opacity-90">사용자 경험 중심</p>
+                  </div>
+                </div>
+              </div>
+              <div className="h-96 relative rounded-lg overflow-hidden">
+                <img 
+                  src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&h=400&fit=crop&crop=center" 
+                  alt="서버리스 아키텍처" 
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                  <div className="text-center text-white">
+                    <h3 className="text-2xl font-bold mb-2">서버리스 아키텍처</h3>
+                    <p className="text-lg opacity-90">Vercel & AWS</p>
+                  </div>
+                </div>
+              </div>
+              <div className="h-96 relative rounded-lg overflow-hidden">
+                <img 
+                  src="https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&h=400&fit=crop&crop=center" 
+                  alt="AI 통합" 
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                  <div className="text-center text-white">
+                    <h3 className="text-2xl font-bold mb-2">AI 통합</h3>
+                    <p className="text-lg opacity-90">인공지능 기술</p>
+                  </div>
+                </div>
+              </div>
+            </Carousel>
+          </div>
+          <p className="text-center text-slate-600 dark:text-slate-300 mt-8 max-w-2xl mx-auto">
+            다양한 프로젝트에서 작업한 웹 애플리케이션, 모바일 앱, UI/UX 디자인 등의 결과물을 확인할 수 있습니다.
+            대부분의 프로젝트는 대외비가 설정되어 있어 상세한 내용은 직접 문의해 주세요.
+          </p>
+        </div>
+      </section>
+
       {/* Projects Section */}
       <section id="projects" className="py-20 px-4 sm:px-6 lg:px-8 bg-white dark:bg-slate-800">
         <div className="max-w-6xl mx-auto">
@@ -246,7 +332,7 @@ export default function Home() {
           <p className="text-xl text-slate-600 dark:text-slate-300 mb-12">
             웹 개발, 앱 디자인, 서버리스 아키텍처 구축에 관심이 있으시다면 언제든 연락주세요!
           </p>
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 gap-8 max-w-2xl mx-auto">
             <Card>
               <CardContent className="pt-6">
                 <Mail className="w-8 h-8 mx-auto mb-4 text-blue-600" />
