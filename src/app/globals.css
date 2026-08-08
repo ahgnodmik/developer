@@ -44,6 +44,21 @@
 }
 
 :root {
+  /* Notion palette — page.tsx references these via arbitrary values */
+  --n-bg: #ffffff;
+  --n-bg-sidebar: #fbfbfa;
+  --n-bg-callout: #f7f7f5;
+  --n-bg-hover: #f1f1ef;
+  --n-bg-active: #e9e9e7;
+  --n-border: #e9e9e7;
+  --n-divide: #f1f1ef;
+  --n-text: #37352f;
+  --n-text-secondary: #787774;
+  --n-text-tertiary: #acaba8;
+  --n-cover-a: #f0f0ef;
+  --n-cover-b: #e2e2df;
+  --n-cover-c: #d4d4d0;
+
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.129 0.042 264.695);
@@ -79,6 +94,20 @@
 }
 
 .dark {
+  --n-bg: #191919;
+  --n-bg-sidebar: #202020;
+  --n-bg-callout: #252525;
+  --n-bg-hover: #2c2c2c;
+  --n-bg-active: #373737;
+  --n-border: #313131;
+  --n-divide: #2a2a2a;
+  --n-text: #e6e6e4;
+  --n-text-secondary: #9b9b98;
+  --n-text-tertiary: #6f6f6c;
+  --n-cover-a: #232323;
+  --n-cover-b: #2b2b2b;
+  --n-cover-c: #333333;
+
   --background: oklch(0.129 0.042 264.695);
   --foreground: oklch(0.984 0.003 247.858);
   --card: oklch(0.208 0.042 265.755);
@@ -117,9 +146,11 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-white text-[#37352f];
+    background-color: var(--n-bg);
+    color: var(--n-text);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
   html {
     scroll-behavior: smooth;
@@ -127,5 +158,9 @@
   ::selection {
     background-color: #d3e5ef;
     color: #37352f;
+  }
+  .dark ::selection {
+    background-color: #2f4a5c;
+    color: #e6e6e4;
   }
 }

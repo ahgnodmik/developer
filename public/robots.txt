@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://samdong.xyz/sitemap.xml

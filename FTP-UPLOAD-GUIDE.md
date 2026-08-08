@@ -1,5 +1,26 @@
 # FTP 업로드 가이드
 
+## 🤖 자동 배포 (현재 방식) — GitHub Pages + 커스텀 도메인
+
+`main` 브랜치에 push하면 GitHub Actions가 빌드 후 GitHub Pages로 배포합니다.
+`samdong.xyz` 도메인이 GitHub Pages에 연결되어 있어 FTP 업로드가 필요 없습니다.
+
+### 1회 설정
+
+1. **DNS** (도메인 관리처에서):
+   - A 레코드: `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153`
+   - `www` CNAME → `ahgnodmik.github.io` (선택)
+2. **GitHub repo** → Settings → Pages:
+   - Source: GitHub Actions
+   - Custom domain: `samdong.xyz` 입력
+   - Enforce HTTPS 체크 (인증서 발급 최대 24시간)
+
+`public/CNAME` 파일(내용: `samdong.xyz`)이 빌드에 포함되어 도메인 설정이 유지됩니다.
+
+배포: `git push origin main` 끝. 아래 FTP 수동 방법은 백업용(다른 호스팅 이전 시).
+
+---
+
 ## 📁 빌드된 파일들
 
 웹 호스팅 FTP 업로드를 위한 정적 파일들이 준비되었습니다.
