@@ -102,44 +102,56 @@ const skills = [
     ],
   },
   {
-    category: "Mobile & AI",
+    category: "Mobile",
     tags: [
       { label: "Flutter", color: "blue" },
       { label: "Dart", color: "blue" },
-      { label: "AI Integration", color: "pink" },
       { label: "Cross Platform", color: "green" },
+    ],
+  },
+  {
+    category: "AI",
+    tags: [
+      { label: "Claude API", color: "pink" },
+      { label: "OpenAI API", color: "green" },
+      { label: "Cursor", color: "blue" },
+      { label: "Bolt.new", color: "purple" },
+      { label: "v0", color: "gray" },
+      { label: "AI Integration", color: "pink" },
+    ],
+  },
+  {
+    category: "UX/UI Design",
+    tags: [
+      { label: "Figma", color: "purple" },
+      { label: "Prototyping", color: "orange" },
+      { label: "User Research", color: "blue" },
+      { label: "Design System", color: "gray" },
     ],
   },
 ] satisfies { category: string; tags: { label: string; color: TagColor }[] }[];
 
 const career = [
   {
-    period: "2023 — 현재",
-    title: "프리랜서 웹 & 모바일 개발",
-    desc: "React/Next.js 기반 웹 서비스와 Flutter 크로스 플랫폼 앱 개발. AI 연동 기능 구현.",
+    period: "2025 — 현재",
+    title: "AI Builder",
+    desc: "Claude, OpenAI API 등 AI를 활용한 웹 서비스 및 앱 기획·개발. Cursor, Bolt.new 등 AI 도구 기반 고속 프로토타이핑.",
     tags: [
-      { label: "Next.js", color: "gray" },
-      { label: "Flutter", color: "blue" },
+      { label: "Claude API", color: "pink" },
+      { label: "OpenAI API", color: "green" },
       { label: "AI Integration", color: "pink" },
+      { label: "Next.js", color: "gray" },
     ],
   },
   {
-    period: "2021 — 2023",
-    title: "웹 서비스 개발",
-    desc: "서버리스 아키텍처 기반 웹 애플리케이션 구축 및 운영. 정적 사이트 최적화와 배포 자동화.",
+    period: "2020 — 2025",
+    title: "UX/UI 디자이너",
+    desc: "모바일·웹 서비스 UX 리서치, UI 디자인, 프로토타이핑. 디자인 시스템 구축 및 개발팀 협업.",
     tags: [
-      { label: "React", color: "blue" },
-      { label: "Serverless", color: "orange" },
-      { label: "Vercel", color: "gray" },
-    ],
-  },
-  {
-    period: "2020 — 2021",
-    title: "웹 개발 시작",
-    desc: "HTML/CSS/JavaScript 기초부터 React 생태계까지 학습하며 개인 프로젝트 다수 진행.",
-    tags: [
-      { label: "JavaScript", color: "yellow" },
-      { label: "React", color: "blue" },
+      { label: "Figma", color: "purple" },
+      { label: "Prototyping", color: "orange" },
+      { label: "User Research", color: "blue" },
+      { label: "Design System", color: "gray" },
     ],
   },
 ] satisfies {
@@ -258,7 +270,7 @@ export default function Home() {
 
         {/* Cover */}
         <div
-          className="h-44 w-full relative overflow-hidden"
+          className="h-52 md:h-44 w-full relative overflow-hidden"
           style={{
             background:
               "linear-gradient(135deg, var(--n-cover-a) 0%, var(--n-cover-b) 50%, var(--n-cover-c) 100%)",
@@ -285,7 +297,7 @@ export default function Home() {
 
           {/* Title */}
           <h1 className="text-4xl font-bold text-[var(--n-text)] mb-1 tracking-tight">김동하</h1>
-          <p className="text-[var(--n-text-secondary)] text-base mb-6">Junior Web & Mobile Developer</p>
+          <p className="text-[var(--n-text-secondary)] text-base mb-6">AI Builder · UX/UI Designer</p>
 
           {/* Properties */}
           <div className="text-sm space-y-2 mb-6">
@@ -331,8 +343,8 @@ export default function Home() {
             {/* Stats */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6">
               {[
-                { value: "5+", label: "년 경력" },
-                { value: "50+", label: "프로젝트" },
+                { value: "5+", label: "UX/UI 경력" },
+                { value: "1+", label: "AI Builder" },
                 { value: "10+", label: "기술 스택" },
                 { value: "100%", label: "성실함" },
               ].map((stat) => (
