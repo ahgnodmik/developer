@@ -376,32 +376,10 @@ export default function Home() {
           <ThemeToggle />
         </header>
 
-        {/* Cover */}
-        <div
-          className="h-52 md:h-44 w-full relative overflow-hidden"
-          style={{
-            background:
-              "linear-gradient(135deg, var(--n-cover-a) 0%, var(--n-cover-b) 50%, var(--n-cover-c) 100%)",
-          }}
-        >
-          {/* Subtle dot pattern */}
-          <svg
-            className="absolute inset-0 w-full h-full opacity-20 text-[#37352f] dark:text-[#e6e6e4]"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <defs>
-              <pattern id="dots" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-                <circle cx="2" cy="2" r="1.5" fill="currentColor" />
-              </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#dots)" />
-          </svg>
-        </div>
-
         {/* Page content */}
         <div className="max-w-3xl mx-auto px-6 sm:px-10 pb-32 animate-in fade-in slide-in-from-bottom-2 duration-500">
           {/* Page icon */}
-          <div className="-mt-7 mb-3 text-6xl select-none">🧑‍💻</div>
+          <div className="mt-12 mb-3 text-6xl select-none">🧑‍💻</div>
 
           {/* Title */}
           <h1 className="text-4xl font-bold text-[var(--n-text)] mb-1 tracking-tight">김동하</h1>
