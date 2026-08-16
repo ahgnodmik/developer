@@ -98,7 +98,6 @@ const skills = [
       { label: "Netlify", color: "green" },
       { label: "AWS S3", color: "orange" },
       { label: "Firebase", color: "yellow" },
-      { label: "Bolt.new", color: "purple" },
     ],
   },
   {
@@ -115,8 +114,6 @@ const skills = [
       { label: "Claude API", color: "pink" },
       { label: "OpenAI API", color: "green" },
       { label: "Cursor", color: "blue" },
-      { label: "Bolt.new", color: "purple" },
-      { label: "v0", color: "gray" },
       { label: "AI Integration", color: "pink" },
     ],
   },
@@ -124,9 +121,17 @@ const skills = [
     category: "UX/UI Design",
     tags: [
       { label: "Figma", color: "purple" },
+      { label: "Adobe", color: "red" },
       { label: "Prototyping", color: "orange" },
       { label: "User Research", color: "blue" },
       { label: "Design System", color: "gray" },
+    ],
+  },
+  {
+    category: "CMS",
+    tags: [
+      { label: "WordPress", color: "blue" },
+      { label: "Divi Theme", color: "purple" },
     ],
   },
 ] satisfies { category: string; tags: { label: string; color: TagColor }[] }[];
@@ -135,7 +140,7 @@ const career = [
   {
     period: "2025 — 현재",
     title: "AI Builder",
-    desc: "Claude, OpenAI API 등 AI를 활용한 웹 서비스 및 앱 기획·개발. Cursor, Bolt.new 등 AI 도구 기반 고속 프로토타이핑.",
+    desc: "Claude, OpenAI API 등 AI를 활용한 웹 서비스 및 앱 기획·개발. Cursor 등 AI 도구 기반 고속 프로토타이핑.",
     tags: [
       { label: "Claude API", color: "pink" },
       { label: "OpenAI API", color: "green" },
@@ -161,49 +166,152 @@ const career = [
   tags: { label: string; color: TagColor }[];
 }[];
 
+type ProjectStatus = "live" | "dev" | "case";
+
+const statusMeta: Record<ProjectStatus, { label: string; dot: string; text: string }> = {
+  live: {
+    label: "LIVE",
+    dot: "bg-green-500 animate-pulse",
+    text: "text-green-700 dark:text-green-400 bg-green-100 dark:bg-green-950",
+  },
+  dev: {
+    label: "개발 중",
+    dot: "bg-yellow-500",
+    text: "text-yellow-700 dark:text-yellow-400 bg-yellow-100 dark:bg-yellow-950",
+  },
+  case: {
+    label: "케이스 스터디",
+    dot: "bg-gray-400",
+    text: "text-gray-600 dark:text-neutral-400 bg-gray-100 dark:bg-neutral-800",
+  },
+};
+
+function StatusBadge({ status }: { status: ProjectStatus }) {
+  const meta = statusMeta[status];
+  return (
+    <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium ${meta.text}`}>
+      <span className={`w-1.5 h-1.5 rounded-full ${meta.dot}`} />
+      {meta.label}
+    </span>
+  );
+}
+
 const projects = [
   {
-    title: "Modern Web Application",
-    desc: "React, TypeScript, Tailwind CSS를 활용한 서버리스 웹 애플리케이션",
-    tags: [
-      { label: "React", color: "blue" },
-      { label: "TypeScript", color: "blue" },
-      { label: "Tailwind CSS", color: "purple" },
-      { label: "Vercel", color: "gray" },
-    ],
-    status: { label: "완료", color: "green" },
-    link: null,
-  },
-  {
-    title: "SSR Web Service",
-    desc: "Next.js SSR 렌더링을 활용한 고성능 웹 서비스 플랫폼",
-    tags: [
-      { label: "Next.js", color: "gray" },
-      { label: "SSR", color: "blue" },
-      { label: "Serverless", color: "orange" },
-      { label: "Edge Functions", color: "purple" },
-    ],
-    status: { label: "완료", color: "green" },
-    link: null,
-  },
-  {
-    title: "AI-Powered Flutter App",
-    desc: "AI 기술과 Flutter를 결합한 크로스 플랫폼 모바일 애플리케이션",
+    title: "OCR 기반 노트 생성 앱",
+    desc: "촬영·스캔 문서를 구조화된 노트로 변환하는 모바일 앱. 스토어 출시 및 운영 중.",
     tags: [
       { label: "Flutter", color: "blue" },
-      { label: "Dart", color: "blue" },
-      { label: "AI Integration", color: "pink" },
-      { label: "Cross Platform", color: "green" },
+      { label: "OCR", color: "orange" },
+      { label: "AdMob", color: "yellow" },
     ],
-    status: { label: "진행 중", color: "yellow" },
-    link: null,
+    status: "live" as ProjectStatus,
+  },
+  {
+    title: "실시간 환율 변환 앱",
+    desc: "20개 통화 실시간 환율 조회·변환. 스토어 출시 및 운영 중.",
+    tags: [
+      { label: "Flutter", color: "blue" },
+      { label: "REST API", color: "green" },
+      { label: "AdMob", color: "yellow" },
+    ],
+    status: "live" as ProjectStatus,
+  },
+  {
+    title: "장소 기록 모바일 앱",
+    desc: "장소를 카드로 기록·탐색. 필드 암호화, 다국어, 지도 연동 포함 프로덕션 운영.",
+    tags: [
+      { label: "Flutter", color: "blue" },
+      { label: "Firebase", color: "yellow" },
+      { label: "Google Maps", color: "green" },
+    ],
+    status: "live" as ProjectStatus,
+  },
+  {
+    title: "블로그 콘텐츠 자동 발행 파이프라인",
+    desc: "키워드 수집부터 원고 생성·발행까지 무인 운영한 일일 자동 발행 시스템.",
+    tags: [
+      { label: "Python", color: "blue" },
+      { label: "LLM", color: "pink" },
+      { label: "Automation", color: "purple" },
+    ],
+    status: "case" as ProjectStatus,
+  },
+  {
+    title: "SNS 카드뉴스 자동화 파이프라인",
+    desc: "소재 수집 → 카드 렌더링 → 게시까지 이어지는 멀티 계정 콘텐츠 자동화.",
+    tags: [
+      { label: "Node.js", color: "green" },
+      { label: "Supabase", color: "green" },
+      { label: "Automation", color: "purple" },
+    ],
+    status: "dev" as ProjectStatus,
+  },
+  {
+    title: "해외 신상품 모니터링 시스템",
+    desc: "해외 커머스 신상품을 수집·필터링해 메신저로 발송하는 소싱 레이더.",
+    tags: [
+      { label: "Node.js", color: "green" },
+      { label: "Apify", color: "gray" },
+      { label: "Telegram Bot", color: "blue" },
+    ],
+    status: "dev" as ProjectStatus,
+  },
+  {
+    title: "멀티 에이전트 협업 시각화 도구",
+    desc: "AI 에이전트들이 논의·합의해 작업을 수행하는 과정을 실시간 캔버스로 보여주는 웹 도구.",
+    tags: [
+      { label: "React", color: "blue" },
+      { label: "FastAPI", color: "green" },
+      { label: "Supabase", color: "green" },
+      { label: "LLM", color: "pink" },
+    ],
+    status: "dev" as ProjectStatus,
+  },
+  {
+    title: "구어 코퍼스 기반 영어 학습 플랫폼",
+    desc: "팟캐스트 전사 코퍼스를 구축해 실사용 영어 빈도를 데이터로 증명하는 파이프라인.",
+    tags: [
+      { label: "Python", color: "blue" },
+      { label: "Whisper", color: "pink" },
+      { label: "SQLite FTS5", color: "gray" },
+    ],
+    status: "dev" as ProjectStatus,
+  },
+  {
+    title: "단체 주문 자동화 앱",
+    desc: "링크 공유로 참여자 주문을 자동 집계. 비회원 참여, 실시간 동기화 설계.",
+    tags: [
+      { label: "Flutter", color: "blue" },
+      { label: "Firestore", color: "yellow" },
+      { label: "Riverpod", color: "purple" },
+    ],
+    status: "case" as ProjectStatus,
+  },
+  {
+    title: "주간 식단·장보기 리스트 생성기",
+    desc: "가구 제약(알레르기·예산·조리 실력)을 반영한 7일 식단과 합산 장보기 리스트 MVP.",
+    tags: [
+      { label: "Next.js", color: "gray" },
+      { label: "Supabase", color: "green" },
+      { label: "LLM", color: "pink" },
+    ],
+    status: "case" as ProjectStatus,
+  },
+  {
+    title: "앱 마켓 분석 내부 도구",
+    desc: "스토어 상위 앱을 기능 단위로 분해해 구현 난이도·시장성 점수를 산출하는 분석 도구.",
+    tags: [
+      { label: "TypeScript", color: "blue" },
+      { label: "Data Analysis", color: "orange" },
+    ],
+    status: "case" as ProjectStatus,
   },
 ] satisfies {
   title: string;
   desc: string;
   tags: { label: string; color: TagColor }[];
-  status: { label: string; color: TagColor };
-  link: string | null;
+  status: ProjectStatus;
 }[];
 
 const navLinks = [
@@ -408,49 +516,42 @@ export default function Home() {
           <section id="projects">
             <SectionHeading emoji="📋" title="프로젝트" />
 
+            <div className="flex items-center gap-4 mt-2 mb-3 pl-3 text-[11px] text-[var(--n-text-tertiary)]">
+              <span>
+                총 {projects.length}개 · LIVE {projects.filter((p) => p.status === "live").length} · 개발 중{" "}
+                {projects.filter((p) => p.status === "dev").length} · 케이스 스터디{" "}
+                {projects.filter((p) => p.status === "case").length}
+              </span>
+            </div>
+
             <div className="space-y-1 mt-1">
-              {projects.map((project) => {
-                const inner = (
-                  <>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-sm font-medium text-[var(--n-text)]">{project.title}</span>
-                        <Tag label={project.status.label} color={project.status.color} />
-                        {project.link && (
-                          <ExternalLink className="w-3.5 h-3.5 text-[var(--n-text-tertiary)] opacity-0 group-hover:opacity-100 transition-opacity" />
-                        )}
+              {(["live", "dev", "case"] as ProjectStatus[]).flatMap((group) =>
+                projects
+                  .filter((p) => p.status === group)
+                  .map((project) => (
+                    <div
+                      key={project.title}
+                      className="group flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 px-3 py-3 rounded-md hover:bg-[var(--n-bg-callout)] transition-colors"
+                    >
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-sm font-medium text-[var(--n-text)]">{project.title}</span>
+                          <StatusBadge status={project.status} />
+                        </div>
+                        <p className="text-xs text-[var(--n-text-secondary)] mt-0.5">{project.desc}</p>
                       </div>
-                      <p className="text-xs text-[var(--n-text-secondary)] mt-0.5">{project.desc}</p>
+                      <div className="flex flex-wrap gap-1 shrink-0">
+                        {project.tags.map((t) => (
+                          <Tag key={t.label} label={t.label} color={t.color} />
+                        ))}
+                      </div>
                     </div>
-                    <div className="flex flex-wrap gap-1 shrink-0">
-                      {project.tags.map((t) => (
-                        <Tag key={t.label} label={t.label} color={t.color} />
-                      ))}
-                    </div>
-                  </>
-                );
-                const className =
-                  "group flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 px-3 py-3 rounded-md hover:bg-[var(--n-bg-callout)] transition-colors";
-                return project.link ? (
-                  <a
-                    key={project.title}
-                    href={project.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={className}
-                  >
-                    {inner}
-                  </a>
-                ) : (
-                  <div key={project.title} className={className}>
-                    {inner}
-                  </div>
-                );
-              })}
+                  ))
+              )}
             </div>
 
             <p className="text-xs text-[var(--n-text-tertiary)] mt-4 pl-3 italic">
-              대부분의 프로젝트는 대외비로 설정되어 있습니다. 상세 내용은 직접 문의해 주세요.
+              모든 프로젝트는 비공개로 운영됩니다. 상세 케이스 스터디와 시연은 문의 시 공유 가능합니다.
             </p>
           </section>
 
