@@ -55,9 +55,6 @@
   --n-text: #37352f;
   --n-text-secondary: #787774;
   --n-text-tertiary: #acaba8;
-  --n-cover-a: #f0f0ef;
-  --n-cover-b: #e2e2df;
-  --n-cover-c: #d4d4d0;
 
   --radius: 0.625rem;
   --background: oklch(1 0 0);
@@ -104,9 +101,6 @@
   --n-text: #e6e6e4;
   --n-text-secondary: #9b9b98;
   --n-text-tertiary: #6f6f6c;
-  --n-cover-a: #232323;
-  --n-cover-b: #2b2b2b;
-  --n-cover-c: #333333;
 
   --background: oklch(0.129 0.042 264.695);
   --foreground: oklch(0.984 0.003 247.858);
