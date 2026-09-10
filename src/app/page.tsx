@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import {
   Github,
   Mail,
@@ -12,6 +13,7 @@ import {
   Home as HomeIcon,
   Briefcase,
   Languages,
+  Palette,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 
@@ -425,6 +427,13 @@ export default function Home() {
           {t.nav.map((label, i) => (
             <NavItem key={label} href={navHrefs[i]} icon={navIcons[i]} label={label} active={i === 0} />
           ))}
+          <Link
+            href="/design"
+            className="flex items-center gap-2 px-3 py-1.5 rounded text-sm transition-colors text-[var(--n-text-secondary)] hover:bg-[var(--n-bg-hover)] hover:text-[var(--n-text)]"
+          >
+            <Palette className="w-4 h-4" />
+            {lang === "ko" ? "디자인" : "Design"}
+          </Link>
         </nav>
 
         <div className="px-4 py-3 border-t border-[var(--n-border)]">
@@ -450,6 +459,12 @@ export default function Home() {
                 {label}
               </a>
             ))}
+            <Link
+              href="/design"
+              className="px-2 py-1 rounded text-xs whitespace-nowrap text-[var(--n-text-secondary)] hover:bg-[var(--n-bg-hover)] hover:text-[var(--n-text)] transition-colors"
+            >
+              {lang === "ko" ? "디자인" : "Design"}
+            </Link>
           </nav>
           <LangToggle lang={lang} onToggle={toggleLang} />
           <ThemeToggle />
