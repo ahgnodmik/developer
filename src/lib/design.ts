@@ -2,6 +2,8 @@
 // Drop real images into /public/design/<slug>/ and set `cover` / `gallery` paths to use them;
 // otherwise the gradient + emoji placeholder renders.
 
+import { generated } from "./design.generated";
+
 export type Lang = "ko" | "en";
 
 export type DesignProject = {
@@ -21,7 +23,7 @@ export type DesignProject = {
   gallery?: string[];
 };
 
-export const designProjects: DesignProject[] = [
+const fallbackProjects: DesignProject[] = [
   {
     slug: "mobile-banking-redesign",
     year: "2024",
@@ -159,6 +161,11 @@ export const designProjects: DesignProject[] = [
     tags: ["AI", "Conversational UI", "Figma", "Accessibility"],
   },
 ];
+
+// Prefer Notion-sourced data (written at build time by scripts/fetch-notion.mjs).
+// Falls back to the static list above when Notion isn't configured.
+export const designProjects: DesignProject[] =
+  generated.length > 0 ? generated : fallbackProjects;
 
 export function getDesignProject(slug: string): DesignProject | undefined {
   return designProjects.find((p) => p.slug === slug);

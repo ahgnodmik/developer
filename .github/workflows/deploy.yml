@@ -3,7 +3,9 @@ name: Deploy
 on:
   push:
     branches: [ main ]
-  workflow_dispatch:
+  workflow_dispatch:        # manual "Run workflow" button — click after editing Notion
+  schedule:
+    - cron: '0 * * * *'     # hourly rebuild so Notion edits reflect without manual trigger
 
 permissions:
   contents: read
@@ -31,8 +33,12 @@ jobs:
         run: npm ci
 
       # custom domain (samdong.xyz) serves from root — no basePath
+      # NOTION_* absent => scripts/fetch-notion.mjs falls back to static data
       - name: Build
         run: npm run build
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_DATA_SOURCE_ID: ${{ secrets.NOTION_DATA_SOURCE_ID }}
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

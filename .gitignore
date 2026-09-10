@@ -16,6 +16,9 @@
 # production
 /build
 
+# notion build-time downloaded design images
+/public/design/
+
 # misc
 .DS_Store
 *.pem
