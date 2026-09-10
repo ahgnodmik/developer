@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { motion } from "motion/react";
 import { ArrowLeft, Languages } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { designProjects, type DesignBlock, type DesignProject, type Lang } from "@/lib/design";
@@ -55,7 +56,14 @@ function BodyRenderer({ blocks }: { blocks: DesignBlock[] }) {
             return <hr key={i} className="border-t border-[var(--n-border)] my-8" />;
           case "image":
             return (
-              <figure key={i} className="my-5">
+              <motion.figure
+                key={i}
+                className="my-5"
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-80px" }}
+                transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+              >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={b.src}
@@ -67,7 +75,7 @@ function BodyRenderer({ blocks }: { blocks: DesignBlock[] }) {
                     {b.caption}
                   </figcaption>
                 )}
-              </figure>
+              </motion.figure>
             );
           default:
             return null;
@@ -162,9 +170,14 @@ export function DesignDetail({ project }: { project: DesignProject }) {
       </header>
 
       {/* ── Content ── */}
-      <main className="max-w-3xl mx-auto px-6 sm:px-10 pb-32 animate-in fade-in slide-in-from-bottom-2 duration-500">
+      <main className="max-w-3xl mx-auto px-6 sm:px-10 pb-32">
         {/* Hero */}
-        <div className="mt-8 relative aspect-[16/9] rounded-2xl overflow-hidden border border-[var(--n-border)]">
+        <motion.div
+          className="mt-8 relative aspect-[16/9] rounded-2xl overflow-hidden border border-[var(--n-border)]"
+          initial={{ opacity: 0, scale: 1.04 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        >
           {project.cover ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={project.cover} alt={project.title[lang]} className="absolute inset-0 w-full h-full object-cover" />
@@ -173,7 +186,7 @@ export function DesignDetail({ project }: { project: DesignProject }) {
               <span className="text-7xl sm:text-8xl select-none drop-shadow-lg">{project.emoji}</span>
             </div>
           )}
-        </div>
+        </motion.div>
 
         <h1 className="text-3xl sm:text-4xl font-bold text-[var(--n-text)] tracking-tight mt-8">{project.title[lang]}</h1>
         <p className="text-[var(--n-text-secondary)] text-base mt-2 leading-relaxed">{project.summary[lang]}</p>
@@ -244,7 +257,12 @@ export function DesignDetail({ project }: { project: DesignProject }) {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {others.map((p) => (
             <Link key={p.slug} href={`/design/${p.slug}`} className="group block" aria-label={p.title[lang]}>
-              <div className="relative aspect-square rounded-lg overflow-hidden border border-[var(--n-border)] transition-transform duration-200 group-hover:-translate-y-1">
+              <motion.div
+                whileHover={{ y: -5 }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ type: "spring", stiffness: 300, damping: 22 }}
+                className="relative aspect-square rounded-lg overflow-hidden border border-[var(--n-border)]"
+              >
                 {p.cover ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={p.cover} alt={p.title[lang]} className="absolute inset-0 w-full h-full object-cover" />
@@ -253,7 +271,7 @@ export function DesignDetail({ project }: { project: DesignProject }) {
                     <span className="text-3xl select-none drop-shadow">{p.emoji}</span>
                   </div>
                 )}
-              </div>
+              </motion.div>
               <p className="text-xs font-medium text-[var(--n-text)] mt-1.5 line-clamp-2 group-hover:underline underline-offset-2">
                 {p.title[lang]}
               </p>

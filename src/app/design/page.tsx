@@ -2,9 +2,19 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { motion } from "motion/react";
 import { ArrowLeft, Languages } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { designProjects, type Lang } from "@/lib/design";
+
+const gridContainer = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.05, delayChildren: 0.1 } },
+};
+const gridItem = {
+  hidden: { opacity: 0, y: 16 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] as const } },
+};
 
 const copy = {
   ko: {
@@ -80,7 +90,7 @@ export default function DesignGrid() {
       </header>
 
       {/* ── Content ── */}
-      <main className="max-w-5xl mx-auto px-4 sm:px-8 pb-32 animate-in fade-in slide-in-from-bottom-2 duration-500">
+      <main className="max-w-5xl mx-auto px-4 sm:px-8 pb-32">
         <div className="mt-10 mb-1 text-5xl select-none">🎨</div>
         <h1 className="text-3xl sm:text-4xl font-bold text-[var(--n-text)] tracking-tight">{t.title}</h1>
         <p className="text-[var(--n-text-secondary)] text-base mt-1">{t.subtitle}</p>
@@ -88,15 +98,25 @@ export default function DesignGrid() {
         <p className="text-[11px] text-[var(--n-text-tertiary)] mt-2">{t.count(designProjects.length)}</p>
 
         {/* ── Responsive square grid ── */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 mt-6">
+        <motion.div
+          variants={gridContainer}
+          initial="hidden"
+          animate="show"
+          className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 mt-6"
+        >
           {designProjects.map((p) => (
+            <motion.div key={p.slug} variants={gridItem}>
             <Link
-              key={p.slug}
               href={`/design/${p.slug}`}
               className="group block"
               aria-label={p.title[lang]}
             >
-              <div className="relative aspect-square rounded-xl overflow-hidden border border-[var(--n-border)] transition-transform duration-200 group-hover:-translate-y-1 group-hover:shadow-lg">
+              <motion.div
+                whileHover={{ y: -6 }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ type: "spring", stiffness: 300, damping: 22 }}
+                className="relative aspect-square rounded-xl overflow-hidden border border-[var(--n-border)] group-hover:shadow-lg"
+              >
                 {p.cover ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
@@ -115,7 +135,7 @@ export default function DesignGrid() {
                 <span className="absolute top-2 right-2 px-1.5 py-0.5 rounded bg-black/30 text-white text-[10px] font-medium backdrop-blur-sm">
                   {p.year}
                 </span>
-              </div>
+              </motion.div>
               <div className="mt-2 px-0.5">
                 <p className="text-sm font-medium text-[var(--n-text)] leading-snug line-clamp-2 group-hover:underline underline-offset-2">
                   {p.title[lang]}
@@ -123,8 +143,9 @@ export default function DesignGrid() {
                 <p className="text-xs text-[var(--n-text-tertiary)] mt-0.5 truncate">{p.role[lang]}</p>
               </div>
             </Link>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
         <Link
           href="/"
