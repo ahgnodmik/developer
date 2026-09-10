@@ -6,6 +6,16 @@ import { generated } from "./design.generated";
 
 export type Lang = "ko" | "en";
 
+/** One rendered block from a Notion page body, in document order. */
+export type DesignBlock =
+  | { type: "heading"; level: 1 | 2 | 3; text: string }
+  | { type: "paragraph"; text: string }
+  | { type: "bullet"; text: string }
+  | { type: "number"; text: string }
+  | { type: "quote"; text: string }
+  | { type: "divider" }
+  | { type: "image"; src: string; caption?: string };
+
 export type DesignProject = {
   slug: string;
   year: string;
@@ -21,6 +31,8 @@ export type DesignProject = {
   tags: string[];
   /** Optional detail-page gallery image paths under /public. */
   gallery?: string[];
+  /** Notion page body rendered in document order. Primary detail content. */
+  body?: DesignBlock[];
 };
 
 const fallbackProjects: DesignProject[] = [

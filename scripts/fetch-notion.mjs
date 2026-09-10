@@ -69,6 +69,76 @@ async function download(url, destDir, baseName) {
   return file;
 }
 
+const rt = (arr) => (arr ?? []).map((t) => t.plain_text).join("").trim();
+
+async function notionGet(url) {
+  const res = await fetch(url, {
+    headers: { Authorization: `Bearer ${TOKEN}`, "Notion-Version": NOTION_VERSION },
+  });
+  if (!res.ok) throw new Error(`Notion GET ${res.status}: ${await res.text()}`);
+  return res.json();
+}
+
+// Fetch a page's body blocks (top level), download inline images, and map to DesignBlock[].
+async function fetchBody(pageId, dir, slug) {
+  const blocks = [];
+  let cursor;
+  do {
+    const q = cursor ? `?start_cursor=${cursor}&page_size=100` : "?page_size=100";
+    const json = await notionGet(`https://api.notion.com/v1/blocks/${pageId}/children${q}`);
+    blocks.push(...json.results);
+    cursor = json.has_more ? json.next_cursor : undefined;
+  } while (cursor);
+
+  const out = [];
+  let imgN = 0;
+  for (const b of blocks) {
+    switch (b.type) {
+      case "heading_1":
+        out.push({ type: "heading", level: 1, text: rt(b.heading_1.rich_text) });
+        break;
+      case "heading_2":
+        out.push({ type: "heading", level: 2, text: rt(b.heading_2.rich_text) });
+        break;
+      case "heading_3":
+        out.push({ type: "heading", level: 3, text: rt(b.heading_3.rich_text) });
+        break;
+      case "paragraph": {
+        const text = rt(b.paragraph.rich_text);
+        if (text) out.push({ type: "paragraph", text });
+        break;
+      }
+      case "bulleted_list_item":
+        out.push({ type: "bullet", text: rt(b.bulleted_list_item.rich_text) });
+        break;
+      case "numbered_list_item":
+        out.push({ type: "number", text: rt(b.numbered_list_item.rich_text) });
+        break;
+      case "quote":
+        out.push({ type: "quote", text: rt(b.quote.rich_text) });
+        break;
+      case "callout":
+        out.push({ type: "quote", text: rt(b.callout.rich_text) });
+        break;
+      case "divider":
+        out.push({ type: "divider" });
+        break;
+      case "image": {
+        const src = b.image?.file?.url ?? b.image?.external?.url;
+        if (!src) break;
+        imgN += 1;
+        const file = await download(src, dir, `body-${imgN}`);
+        const caption = rt(b.image.caption);
+        out.push({ type: "image", src: `/design/${slug}/${file}`, ...(caption ? { caption } : {}) });
+        break;
+      }
+      default:
+        break; // skip unsupported block types
+    }
+  }
+  return out;
+}
+
 async function queryAll() {
   const pages = [];
   let cursor;
@@ -141,6 +211,9 @@ async function main() {
       gallery.push(`/design/${slug}/${file}`);
     }
 
+    // page body (text + inline images, in order)
+    const body = await fetchBody(page.id, dir, slug);
+
     projects.push({
       slug,
       year: plain(p["Year"]),
@@ -154,6 +227,7 @@ async function main() {
       overview: { ko: plain(p["Overview KO"]), en: plain(p["Overview EN"]) || plain(p["Overview KO"]) },
       tags: multi(p["Tags"]),
       ...(gallery.length ? { gallery } : {}),
+      ...(body.length ? { body } : {}),
     });
   }
 

@@ -4,7 +4,78 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, Languages } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { designProjects, type DesignProject, type Lang } from "@/lib/design";
+import { designProjects, type DesignBlock, type DesignProject, type Lang } from "@/lib/design";
+
+function BodyRenderer({ blocks }: { blocks: DesignBlock[] }) {
+  return (
+    <div className="mt-2">
+      {blocks.map((b, i) => {
+        switch (b.type) {
+          case "heading": {
+            const cls =
+              b.level === 1
+                ? "text-2xl font-bold mt-10 mb-3"
+                : b.level === 2
+                  ? "text-xl font-semibold mt-8 mb-2"
+                  : "text-lg font-semibold mt-6 mb-2";
+            return (
+              <p key={i} className={`text-[var(--n-text)] ${cls}`}>
+                {b.text}
+              </p>
+            );
+          }
+          case "paragraph":
+            return (
+              <p key={i} className="text-sm text-[var(--n-text)] leading-7 my-3">
+                {b.text}
+              </p>
+            );
+          case "bullet":
+            return (
+              <li key={i} className="text-sm text-[var(--n-text)] leading-7 ml-5 list-disc">
+                {b.text}
+              </li>
+            );
+          case "number":
+            return (
+              <li key={i} className="text-sm text-[var(--n-text)] leading-7 ml-5 list-decimal">
+                {b.text}
+              </li>
+            );
+          case "quote":
+            return (
+              <blockquote
+                key={i}
+                className="border-l-2 border-[var(--n-border)] pl-4 my-4 text-sm text-[var(--n-text-secondary)] italic"
+              >
+                {b.text}
+              </blockquote>
+            );
+          case "divider":
+            return <hr key={i} className="border-t border-[var(--n-border)] my-8" />;
+          case "image":
+            return (
+              <figure key={i} className="my-5">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={b.src}
+                  alt={b.caption ?? ""}
+                  className="w-full rounded-lg border border-[var(--n-border)]"
+                />
+                {b.caption && (
+                  <figcaption className="text-xs text-[var(--n-text-tertiary)] mt-2 text-center">
+                    {b.caption}
+                  </figcaption>
+                )}
+              </figure>
+            );
+          default:
+            return null;
+        }
+      })}
+    </div>
+  );
+}
 
 const copy = {
   ko: {
@@ -132,26 +203,33 @@ export function DesignDetail({ project }: { project: DesignProject }) {
           </div>
         </div>
 
-        {/* Overview */}
+        {/* Overview / Body */}
         <div className="flex items-center gap-2 mt-10 mb-3">
           <span className="text-lg">📝</span>
           <h2 className="text-lg font-semibold text-[var(--n-text)]">{t.overview}</h2>
         </div>
-        <p className="text-sm text-[var(--n-text)] leading-7">{project.overview[lang]}</p>
 
-        {/* Gallery */}
-        {project.gallery && project.gallery.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6">
-            {project.gallery.map((src, i) => (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                key={src}
-                src={src}
-                alt={`${project.title[lang]} ${i + 1}`}
-                className="w-full rounded-lg border border-[var(--n-border)]"
-              />
-            ))}
-          </div>
+        {project.body && project.body.length > 0 ? (
+          <BodyRenderer blocks={project.body} />
+        ) : (
+          <>
+            <p className="text-sm text-[var(--n-text)] leading-7">{project.overview[lang]}</p>
+
+            {/* Gallery (property-based fallback) */}
+            {project.gallery && project.gallery.length > 0 && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6">
+                {project.gallery.map((src, i) => (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    key={src}
+                    src={src}
+                    alt={`${project.title[lang]} ${i + 1}`}
+                    className="w-full rounded-lg border border-[var(--n-border)]"
+                  />
+                ))}
+              </div>
+            )}
+          </>
         )}
 
         <p className="text-xs text-[var(--n-text-tertiary)] mt-6 italic">{t.note}</p>
