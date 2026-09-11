@@ -214,6 +214,12 @@ async function main() {
     // page body (text + inline images, in order)
     const body = await fetchBody(page.id, dir, slug);
 
+    // thumbnail fallback: first body image when no Cover set
+    if (!cover) {
+      const firstImg = body.find((b) => b.type === "image");
+      if (firstImg) cover = firstImg.src;
+    }
+
     projects.push({
       slug,
       year: plain(p["Year"]),
