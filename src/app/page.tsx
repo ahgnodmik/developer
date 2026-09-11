@@ -409,9 +409,8 @@ export default function Home() {
       <aside className="hidden md:flex flex-col w-60 shrink-0 border-r border-[var(--n-border)] h-screen sticky top-0 bg-[var(--n-bg-sidebar)] overflow-y-auto">
         {/* Workspace header */}
         <div className="flex items-center gap-1.5 px-4 h-14 border-b border-[var(--n-border)]">
-          <div className="w-6 h-6 rounded bg-[#37352f] dark:bg-[#e6e6e4] flex items-center justify-center text-white dark:text-[#191919] text-xs font-bold shrink-0">
-            K
-          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.jpeg" alt="Kim Dongha" className="w-6 h-6 rounded object-cover shrink-0" />
           <span className="text-sm font-semibold text-[var(--n-text)] truncate">Kim Dongha</span>
           <div className="ml-auto flex items-center">
             <LangToggle lang={lang} onToggle={toggleLang} />
@@ -445,9 +444,8 @@ export default function Home() {
       <main className="flex-1 overflow-y-auto">
         {/* Mobile top bar */}
         <header className="md:hidden sticky top-0 z-20 flex items-center gap-2 px-4 h-14 bg-[var(--n-bg-sidebar)]/90 backdrop-blur border-b border-[var(--n-border)]">
-          <div className="w-6 h-6 rounded bg-[#37352f] dark:bg-[#e6e6e4] flex items-center justify-center text-white dark:text-[#191919] text-xs font-bold shrink-0">
-            K
-          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.jpeg" alt="Kim Dongha" className="w-6 h-6 rounded object-cover shrink-0" />
           <span className="text-sm font-semibold text-[var(--n-text)]">Kim Dongha</span>
           <nav className="ml-auto flex items-center gap-1 overflow-x-auto">
             {t.nav.slice(1).map((label, i) => (
