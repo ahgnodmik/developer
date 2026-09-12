@@ -50,6 +50,32 @@ const fileUrls = (prop) =>
     .map((f) => f?.file?.url ?? f?.external?.url)
     .filter(Boolean);
 
+// YouTube watch/short/embed URL -> canonical embed URL. Returns null for non-YouTube.
+function youtubeEmbed(url) {
+  try {
+    const u = new URL(url);
+    const host = u.hostname.replace(/^www\./, "");
+    let id;
+    if (host === "youtu.be") id = u.pathname.slice(1);
+    else if (host.endsWith("youtube.com")) {
+      if (u.pathname.startsWith("/embed/")) id = u.pathname.split("/")[2];
+      else if (u.pathname.startsWith("/shorts/")) id = u.pathname.split("/")[2];
+      else id = u.searchParams.get("v");
+    }
+    return id ? `https://www.youtube.com/embed/${id}` : null;
+  } catch {
+    return null;
+  }
+}
+
+function slugify(s) {
+  return String(s)
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9가-힣]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 function extFromUrl(url, fallback = ".jpg") {
   try {
     const p = new URL(url).pathname;
@@ -80,7 +106,9 @@ async function notionGet(url) {
 }
 
 // Fetch a page's body blocks (top level), download inline images, and map to DesignBlock[].
-async function fetchBody(pageId, dir, slug) {
+// Any inline child databases found get their block ids pushed onto `childDbs` (out-param)
+// so the caller can pull their rows in as separate sub-cases.
+async function fetchBody(pageId, dir, slug, childDbs = []) {
   const blocks = [];
   let cursor;
   do {
@@ -132,6 +160,22 @@ async function fetchBody(pageId, dir, slug) {
         out.push({ type: "image", src: `/design/${slug}/${file}`, ...(caption ? { caption } : {}) });
         break;
       }
+      case "video": {
+        const src = b.video?.external?.url ?? b.video?.file?.url;
+        const embedUrl = src ? youtubeEmbed(src) : null;
+        if (!embedUrl) break; // only YouTube embeds supported (uploaded video files skipped)
+        const caption = rt(b.video.caption);
+        out.push({ type: "video", provider: "youtube", embedUrl, ...(caption ? { caption } : {}) });
+        break;
+      }
+      case "code": {
+        const text = rt(b.code.rich_text);
+        if (text) out.push({ type: "code", text, ...(b.code.language ? { language: b.code.language } : {}) });
+        break;
+      }
+      case "child_database":
+        childDbs.push(b.id); // block id == database id; resolved to a data source later
+        break;
       default:
         break; // skip unsupported block types
     }
@@ -139,12 +183,24 @@ async function fetchBody(pageId, dir, slug) {
   return out;
 }
 
-async function queryAll() {
+// Resolve a database id to its first data source id (Notion API 2025-09-03).
+async function firstDataSourceId(databaseId) {
+  const json = await notionGet(`https://api.notion.com/v1/databases/${databaseId}`);
+  return json.data_sources?.[0]?.id ?? null;
+}
+
+// Year from a Notion date property, e.g. "2014-01-01" -> "2014".
+function yearOf(prop) {
+  const start = prop?.date?.start;
+  return start ? String(start).slice(0, 4) : "";
+}
+
+async function queryAll(dataSourceId = DATA_SOURCE_ID) {
   const pages = [];
   let cursor;
   do {
     const res = await fetch(
-      `https://api.notion.com/v1/data_sources/${DATA_SOURCE_ID}/query`,
+      `https://api.notion.com/v1/data_sources/${dataSourceId}/query`,
       {
         method: "POST",
         headers: {
@@ -180,6 +236,9 @@ async function main() {
   await mkdir(PUBLIC_DESIGN, { recursive: true });
 
   const projects = [];
+  const subProjects = []; // nested sub-cases (hidden from grid, own routes)
+  let subColor = 1; // gradient index for sub-cases
+
   for (const page of pages) {
     const p = page.properties;
     if (!checkbox(p["Published"])) continue;
@@ -194,6 +253,8 @@ async function main() {
     const emoji = page.icon?.type === "emoji" ? page.icon.emoji : "🎨";
     const dir = path.join(PUBLIC_DESIGN, slug);
     await mkdir(dir, { recursive: true });
+
+    const title = { ko: plain(p["Title KO"]), en: plain(p["Title EN"]) || plain(p["Title KO"]) };
 
     // cover
     let cover;
@@ -211,13 +272,67 @@ async function main() {
       gallery.push(`/design/${slug}/${file}`);
     }
 
-    // page body (text + inline images, in order)
-    const body = await fetchBody(page.id, dir, slug);
+    // page body (text + inline images + YouTube + code, in order); collect inline DBs
+    const childDbs = [];
+    const body = await fetchBody(page.id, dir, slug, childDbs);
 
     // thumbnail fallback: first body image when no Cover set
     if (!cover) {
       const firstImg = body.find((b) => b.type === "image");
       if (firstImg) cover = firstImg.src;
+    }
+
+    // nested sub-cases: each inline-DB row becomes its own routed detail page
+    const subpages = [];
+    for (const dbId of childDbs) {
+      const dsId = await firstDataSourceId(dbId);
+      if (!dsId) continue;
+      const rows = await queryAll(dsId);
+      for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
+        const rp = row.properties;
+        const name = plain(rp["Name"]) || `${title.ko || slug} ${i + 1}`;
+        const subSlug = `${slug}-${slugify(name) || i + 1}`;
+        const subDir = path.join(PUBLIC_DESIGN, subSlug);
+        await mkdir(subDir, { recursive: true });
+
+        const subChildDbs = []; // one level deep only; ignore any deeper nesting
+        const subBody = await fetchBody(row.id, subDir, subSlug, subChildDbs);
+
+        let subCover;
+        const rowCover = fileUrls(rp["Cover"])[0];
+        if (rowCover) {
+          const f = await download(rowCover, subDir, "cover");
+          subCover = `/design/${subSlug}/${f}`;
+        }
+        if (!subCover) {
+          const fi = subBody.find((b) => b.type === "image");
+          if (fi) subCover = fi.src;
+        }
+
+        const subEmoji = row.icon?.type === "emoji" ? row.icon.emoji : emoji;
+        const subGradient = GRADIENTS[subColor++ % GRADIENTS.length];
+        const subTitle = { ko: name, en: name };
+        const firstPara = subBody.find((b) => b.type === "paragraph");
+        const sum = firstPara ? firstPara.text.slice(0, 120) : "";
+
+        subProjects.push({
+          slug: subSlug,
+          year: yearOf(rp["Work Period"]),
+          cover: subCover,
+          gradient: subGradient,
+          emoji: subEmoji,
+          role: { ko: "", en: "" },
+          title: subTitle,
+          summary: { ko: sum, en: sum },
+          overview: { ko: "", en: "" },
+          tags: multi(rp["Tags"]),
+          ...(subBody.length ? { body: subBody } : {}),
+          parent: { slug, title },
+          hidden: true,
+        });
+        subpages.push({ slug: subSlug, title: subTitle, cover: subCover, gradient: subGradient, emoji: subEmoji });
+      }
     }
 
     projects.push({
@@ -228,20 +343,24 @@ async function main() {
       gradient: GRADIENTS[idx % GRADIENTS.length],
       emoji,
       role: { ko: plain(p["Role KO"]), en: plain(p["Role EN"]) || plain(p["Role KO"]) },
-      title: { ko: plain(p["Title KO"]), en: plain(p["Title EN"]) || plain(p["Title KO"]) },
+      title,
       summary: { ko: plain(p["Summary KO"]), en: plain(p["Summary EN"]) || plain(p["Summary KO"]) },
       overview: { ko: plain(p["Overview KO"]), en: plain(p["Overview EN"]) || plain(p["Overview KO"]) },
       tags: multi(p["Tags"]),
       ...(gallery.length ? { gallery } : {}),
       ...(body.length ? { body } : {}),
+      ...(subpages.length ? { subpages } : {}),
     });
   }
 
   projects.sort((a, b) => a.order - b.order);
   projects.forEach((p) => delete p.order); // strip helper field
 
-  await writeGenerated(projects);
-  console.log(`[fetch-notion] wrote ${projects.length} published case(s).`);
+  const all = [...projects, ...subProjects];
+  await writeGenerated(all);
+  console.log(
+    `[fetch-notion] wrote ${projects.length} published case(s) + ${subProjects.length} sub-case(s).`
+  );
 }
 
 main().catch((err) => {

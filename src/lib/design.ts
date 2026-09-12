@@ -14,7 +14,18 @@ export type DesignBlock =
   | { type: "number"; text: string }
   | { type: "quote"; text: string }
   | { type: "divider" }
-  | { type: "image"; src: string; caption?: string };
+  | { type: "image"; src: string; caption?: string }
+  | { type: "video"; provider: "youtube"; embedUrl: string; caption?: string }
+  | { type: "code"; text: string; language?: string };
+
+/** Link to a nested sub-case (own detail route). Rendered as a card on the parent. */
+export type DesignSubpageRef = {
+  slug: string;
+  title: Record<Lang, string>;
+  cover?: string;
+  gradient: string;
+  emoji: string;
+};
 
 export type DesignProject = {
   slug: string;
@@ -33,6 +44,12 @@ export type DesignProject = {
   gallery?: string[];
   /** Notion page body rendered in document order. Primary detail content. */
   body?: DesignBlock[];
+  /** Nested sub-cases (inline DB rows) that get their own detail route. Shown as cards. */
+  subpages?: DesignSubpageRef[];
+  /** Set on a sub-case: breadcrumb back to its parent case. */
+  parent?: { slug: string; title: Record<Lang, string> };
+  /** Sub-cases are hidden from the /design grid but still get a route. */
+  hidden?: boolean;
 };
 
 const fallbackProjects: DesignProject[] = [
@@ -178,6 +195,9 @@ const fallbackProjects: DesignProject[] = [
 // Falls back to the static list above when Notion isn't configured.
 export const designProjects: DesignProject[] =
   generated.length > 0 ? generated : fallbackProjects;
+
+/** Grid-visible cases only (excludes nested sub-cases, which still have routes). */
+export const visibleDesignProjects: DesignProject[] = designProjects.filter((p) => !p.hidden);
 
 export function getDesignProject(slug: string): DesignProject | undefined {
   return designProjects.find((p) => p.slug === slug);

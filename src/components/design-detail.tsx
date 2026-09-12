@@ -5,7 +5,7 @@ import Link from "next/link";
 import { motion } from "motion/react";
 import { ArrowLeft, Languages } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { designProjects, type DesignBlock, type DesignProject, type Lang } from "@/lib/design";
+import { visibleDesignProjects, type DesignBlock, type DesignProject, type Lang } from "@/lib/design";
 
 function BodyRenderer({ blocks }: { blocks: DesignBlock[] }) {
   return (
@@ -54,6 +54,42 @@ function BodyRenderer({ blocks }: { blocks: DesignBlock[] }) {
             );
           case "divider":
             return <hr key={i} className="border-t border-[var(--n-border)] my-8" />;
+          case "video":
+            return (
+              <motion.figure
+                key={i}
+                className="my-6"
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-80px" }}
+                transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <div className="relative w-full aspect-video rounded-lg overflow-hidden border border-[var(--n-border)]">
+                  <iframe
+                    src={b.embedUrl}
+                    title={b.caption ?? "video"}
+                    className="absolute inset-0 w-full h-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    loading="lazy"
+                  />
+                </div>
+                {b.caption && (
+                  <figcaption className="text-xs text-[var(--n-text-tertiary)] mt-2 text-center">
+                    {b.caption}
+                  </figcaption>
+                )}
+              </motion.figure>
+            );
+          case "code":
+            return (
+              <pre
+                key={i}
+                className="my-4 p-4 rounded-lg border border-[var(--n-border)] bg-[var(--n-bg-callout)] overflow-x-auto text-xs leading-6 text-[var(--n-text)]"
+              >
+                <code>{b.text}</code>
+              </pre>
+            );
           case "image":
             return (
               <motion.figure
@@ -93,6 +129,7 @@ const copy = {
     year: "연도",
     stack: "도구·방법",
     overview: "개요",
+    subs: "세부 케이스",
     more: "다른 케이스",
     back: "디자인 목록으로",
     note: "실제 화면과 상세 자료는 비공개이며, 문의 시 공유 가능합니다.",
@@ -104,6 +141,7 @@ const copy = {
     year: "Year",
     stack: "Tools & Methods",
     overview: "Overview",
+    subs: "Detail cases",
     more: "More cases",
     back: "Back to Design",
     note: "Actual screens and full materials are private and available on request.",
@@ -143,7 +181,7 @@ export function DesignDetail({ project }: { project: DesignProject }) {
   }
 
   const t = copy[lang];
-  const others = designProjects.filter((p) => p.slug !== project.slug).slice(0, 4);
+  const others = visibleDesignProjects.filter((p) => p.slug !== project.slug).slice(0, 4);
 
   return (
     <div className="min-h-screen bg-[var(--n-bg)]" style={{ fontFamily: "'Inter', 'Segoe UI', system-ui, sans-serif" }}>
@@ -159,6 +197,17 @@ export function DesignDetail({ project }: { project: DesignProject }) {
           <Link href="/design" className="text-[var(--n-text-secondary)] hover:text-[var(--n-text)] transition-colors shrink-0">
             {t.crumb}
           </Link>
+          {project.parent && (
+            <>
+              <span className="text-[var(--n-text-tertiary)]">/</span>
+              <Link
+                href={`/design/${project.parent.slug}`}
+                className="text-[var(--n-text-secondary)] hover:text-[var(--n-text)] transition-colors shrink-0 truncate"
+              >
+                {project.parent.title[lang]}
+              </Link>
+            </>
+          )}
           <span className="text-[var(--n-text-tertiary)]">/</span>
           <span className="text-[var(--n-text)] font-medium truncate">{project.title[lang]}</span>
         </nav>
@@ -245,6 +294,41 @@ export function DesignDetail({ project }: { project: DesignProject }) {
         )}
 
         <p className="text-xs text-[var(--n-text-tertiary)] mt-6 italic">{t.note}</p>
+
+        {/* Sub-cases (nested inline-DB rows, each its own route) */}
+        {project.subpages && project.subpages.length > 0 && (
+          <>
+            <hr className="border-t border-[var(--n-border)] my-10" />
+            <div className="flex items-center gap-2 mb-4">
+              <span className="text-lg">📂</span>
+              <h2 className="text-lg font-semibold text-[var(--n-text)]">{t.subs}</h2>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {project.subpages.map((s) => (
+                <Link key={s.slug} href={`/design/${s.slug}`} className="group block" aria-label={s.title[lang]}>
+                  <motion.div
+                    whileHover={{ y: -5 }}
+                    whileTap={{ scale: 0.98 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 22 }}
+                    className="relative aspect-[4/3] rounded-lg overflow-hidden border border-[var(--n-border)]"
+                  >
+                    {s.cover ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={s.cover} alt={s.title[lang]} className="absolute inset-0 w-full h-full object-cover" />
+                    ) : (
+                      <div className={`absolute inset-0 bg-gradient-to-br ${s.gradient} flex items-center justify-center`}>
+                        <span className="text-3xl select-none drop-shadow">{s.emoji}</span>
+                      </div>
+                    )}
+                  </motion.div>
+                  <p className="text-xs font-medium text-[var(--n-text)] mt-1.5 line-clamp-2 group-hover:underline underline-offset-2">
+                    {s.title[lang]}
+                  </p>
+                </Link>
+              ))}
+            </div>
+          </>
+        )}
 
         <hr className="border-t border-[var(--n-border)] my-10" />
 

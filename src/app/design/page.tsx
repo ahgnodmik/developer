@@ -5,7 +5,7 @@ import Link from "next/link";
 import { motion } from "motion/react";
 import { ArrowLeft, ArrowUpRight, Languages } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { designProjects, type Lang } from "@/lib/design";
+import { visibleDesignProjects as designProjects, type Lang } from "@/lib/design";
 
 const gridContainer = {
   hidden: {},
