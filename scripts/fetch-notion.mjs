@@ -68,11 +68,14 @@ function youtubeEmbed(url) {
   }
 }
 
+// ASCII-only slug. Non-ASCII (e.g. Korean) is dropped — GitHub Pages 404s on
+// non-ASCII file paths, so sub-case routes must stay ASCII. Callers fall back to
+// an index suffix when the result is empty.
 function slugify(s) {
   return String(s)
     .trim()
     .toLowerCase()
-    .replace(/[^a-z0-9가-힣]+/g, "-")
+    .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
 }
 
