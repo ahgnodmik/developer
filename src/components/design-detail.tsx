@@ -27,39 +27,49 @@ function BodyImage({ b }: { b: ImageBlock }) {
   );
 }
 
-function BodyRenderer({ blocks }: { blocks: DesignBlock[] }) {
-  // Group consecutive image blocks so runs of ≥2 render as a 2-column grid
-  // (single images stay full width). Non-image blocks render one per row.
-  const nodes: ReactNode[] = [];
-  let run: { block: ImageBlock; i: number }[] = [];
+// Notion column count -> static Tailwind grid class (kept literal so Tailwind keeps them).
+function gridColsClass(cols: number) {
+  if (cols >= 4) return "sm:grid-cols-4";
+  if (cols === 3) return "sm:grid-cols-3";
+  return "sm:grid-cols-2";
+}
 
-  const flush = () => {
-    if (run.length === 0) return;
-    if (run.length === 1) {
-      const { block, i } = run[0];
-      nodes.push(
-        <div key={`img-${i}`} className="my-5">
-          <BodyImage b={block} />
-        </div>
-      );
-    } else {
-      nodes.push(
-        <div key={`grid-${run[0].i}`} className="grid grid-cols-1 sm:grid-cols-2 gap-3 my-5">
-          {run.map(({ block, i }) => (
-            <BodyImage key={i} b={block} />
+function BodyRenderer({ blocks }: { blocks: DesignBlock[] }) {
+  // Consecutive list items are wrapped in a single <ol>/<ul> so numbering matches
+  // Notion (a run of numbered items counts 1..n; items separated by other blocks
+  // each restart at 1). Galleries preserve the Notion column count.
+  const nodes: ReactNode[] = [];
+  let list: { kind: "bullet" | "number"; items: { text: string; i: number }[] } | null = null;
+
+  const flushList = () => {
+    if (!list) return;
+    const cls = "text-sm text-[var(--n-text)] leading-7 ml-5 my-3 space-y-1";
+    nodes.push(
+      list.kind === "number" ? (
+        <ol key={`ol-${list.items[0].i}`} className={`list-decimal ${cls}`}>
+          {list.items.map((it) => (
+            <li key={it.i}>{it.text}</li>
           ))}
-        </div>
-      );
-    }
-    run = [];
+        </ol>
+      ) : (
+        <ul key={`ul-${list.items[0].i}`} className={`list-disc ${cls}`}>
+          {list.items.map((it) => (
+            <li key={it.i}>{it.text}</li>
+          ))}
+        </ul>
+      )
+    );
+    list = null;
   };
 
   blocks.forEach((b, i) => {
-    if (b.type === "image") {
-      run.push({ block: b, i });
+    if (b.type === "bullet" || b.type === "number") {
+      if (list && list.kind !== b.type) flushList();
+      if (!list) list = { kind: b.type, items: [] };
+      list.items.push({ text: b.text, i });
       return;
     }
-    flush();
+    flushList();
     switch (b.type) {
       case "heading": {
         const cls =
@@ -82,20 +92,6 @@ function BodyRenderer({ blocks }: { blocks: DesignBlock[] }) {
           </p>
         );
         break;
-      case "bullet":
-        nodes.push(
-          <li key={i} className="text-sm text-[var(--n-text)] leading-7 ml-5 list-disc">
-            {b.text}
-          </li>
-        );
-        break;
-      case "number":
-        nodes.push(
-          <li key={i} className="text-sm text-[var(--n-text)] leading-7 ml-5 list-decimal">
-            {b.text}
-          </li>
-        );
-        break;
       case "quote":
         nodes.push(
           <blockquote
@@ -108,6 +104,22 @@ function BodyRenderer({ blocks }: { blocks: DesignBlock[] }) {
         break;
       case "divider":
         nodes.push(<hr key={i} className="border-t border-[var(--n-border)] my-8" />);
+        break;
+      case "image":
+        nodes.push(
+          <div key={i} className="my-5">
+            <BodyImage b={b} />
+          </div>
+        );
+        break;
+      case "gallery":
+        nodes.push(
+          <div key={i} className={`grid grid-cols-1 ${gridColsClass(b.cols)} gap-3 my-5`}>
+            {b.images.map((img, j) => (
+              <BodyImage key={j} b={{ type: "image", ...img }} />
+            ))}
+          </div>
+        );
         break;
       case "video":
         nodes.push(
@@ -149,7 +161,7 @@ function BodyRenderer({ blocks }: { blocks: DesignBlock[] }) {
         break;
     }
   });
-  flush();
+  flushList();
 
   return <div className="mt-2">{nodes}</div>;
 }

@@ -187,9 +187,30 @@ async function fetchBody(pageId, dir, slug, childDbs = []) {
         case "child_database":
           childDbs.push(b.id); // block id == database id; resolved to a data source later
           break;
-        // layout containers: no content of their own — recurse into children so their
-        // images/text land inline in reading order (multi-column layout is flattened).
-        case "column_list":
+        // multi-column layout: emit a gallery block that preserves the Notion column
+        // count so the site renders the same N-wide grid. Images across all columns are
+        // collected in reading order. If the columns hold no images, fall back to walking
+        // them inline (so any text still shows).
+        case "column_list": {
+          const columns = b.has_children ? await fetchChildren(b.id) : [];
+          const images = [];
+          for (const col of columns) {
+            const kids = col.has_children ? await fetchChildren(col.id) : [];
+            for (const k of kids) {
+              if (k.type !== "image") continue;
+              const src = k.image?.file?.url ?? k.image?.external?.url;
+              if (!src) continue;
+              ctx.imgN += 1;
+              const file = await download(src, dir, `body-${ctx.imgN}`);
+              const caption = rt(k.image.caption);
+              images.push({ src: `/design/${slug}/${file}`, ...(caption ? { caption } : {}) });
+            }
+          }
+          if (images.length) out.push({ type: "gallery", cols: columns.length || images.length, images });
+          else if (columns.length) await walk(columns);
+          break;
+        }
+        // other containers: no layout of their own — recurse inline in reading order.
         case "column":
         case "toggle":
         case "synced_block": {

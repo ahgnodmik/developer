@@ -15,6 +15,7 @@ export type DesignBlock =
   | { type: "quote"; text: string }
   | { type: "divider" }
   | { type: "image"; src: string; caption?: string }
+  | { type: "gallery"; cols: number; images: { src: string; caption?: string }[] }
   | { type: "video"; provider: "youtube"; embedUrl: string; caption?: string }
   | { type: "code"; text: string; language?: string };
 
