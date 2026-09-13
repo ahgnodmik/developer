@@ -100,12 +100,30 @@ async function download(url, destDir, baseName) {
 
 const rt = (arr) => (arr ?? []).map((t) => t.plain_text).join("").trim();
 
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+// Notion request with 429 handling. Recursing into columns fans out many GETs;
+// the public API rate-limits (~3 req/s), so honor Retry-After and back off.
+async function notionFetch(url, init, label = "request") {
+  for (let attempt = 0; attempt < 6; attempt++) {
+    const res = await fetch(url, init);
+    if (res.status === 429) {
+      const retryAfter = Number(res.headers.get("retry-after")) || 2 ** attempt;
+      await sleep((retryAfter + 0.5) * 1000);
+      continue;
+    }
+    if (!res.ok) throw new Error(`Notion ${label} ${res.status}: ${await res.text()}`);
+    return res.json();
+  }
+  throw new Error(`Notion ${label} failed after retries (429): ${url}`);
+}
+
 async function notionGet(url) {
-  const res = await fetch(url, {
-    headers: { Authorization: `Bearer ${TOKEN}`, "Notion-Version": NOTION_VERSION },
-  });
-  if (!res.ok) throw new Error(`Notion GET ${res.status}: ${await res.text()}`);
-  return res.json();
+  return notionFetch(
+    url,
+    { headers: { Authorization: `Bearer ${TOKEN}`, "Notion-Version": NOTION_VERSION } },
+    "GET"
+  );
 }
 
 // Fetch all children of a block/page, following pagination.
@@ -243,7 +261,7 @@ async function queryAll(dataSourceId = DATA_SOURCE_ID) {
   const pages = [];
   let cursor;
   do {
-    const res = await fetch(
+    const json = await notionFetch(
       `https://api.notion.com/v1/data_sources/${dataSourceId}/query`,
       {
         method: "POST",
@@ -253,12 +271,9 @@ async function queryAll(dataSourceId = DATA_SOURCE_ID) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(cursor ? { start_cursor: cursor, page_size: 100 } : { page_size: 100 }),
-      }
+      },
+      "query"
     );
-    if (!res.ok) {
-      throw new Error(`Notion query failed ${res.status}: ${await res.text()}`);
-    }
-    const json = await res.json();
     pages.push(...json.results);
     cursor = json.has_more ? json.next_cursor : undefined;
   } while (cursor);
