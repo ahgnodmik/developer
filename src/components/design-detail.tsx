@@ -1,124 +1,157 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { motion } from "motion/react";
 import { ArrowLeft, Languages } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { visibleDesignProjects, type DesignBlock, type DesignProject, type Lang } from "@/lib/design";
 
-function BodyRenderer({ blocks }: { blocks: DesignBlock[] }) {
+type ImageBlock = Extract<DesignBlock, { type: "image" }>;
+
+function BodyImage({ b }: { b: ImageBlock }) {
   return (
-    <div className="mt-2">
-      {blocks.map((b, i) => {
-        switch (b.type) {
-          case "heading": {
-            const cls =
-              b.level === 1
-                ? "text-2xl font-bold mt-10 mb-3"
-                : b.level === 2
-                  ? "text-xl font-semibold mt-8 mb-2"
-                  : "text-lg font-semibold mt-6 mb-2";
-            return (
-              <p key={i} className={`text-[var(--n-text)] ${cls}`}>
-                {b.text}
-              </p>
-            );
-          }
-          case "paragraph":
-            return (
-              <p key={i} className="text-sm text-[var(--n-text)] leading-7 my-3">
-                {b.text}
-              </p>
-            );
-          case "bullet":
-            return (
-              <li key={i} className="text-sm text-[var(--n-text)] leading-7 ml-5 list-disc">
-                {b.text}
-              </li>
-            );
-          case "number":
-            return (
-              <li key={i} className="text-sm text-[var(--n-text)] leading-7 ml-5 list-decimal">
-                {b.text}
-              </li>
-            );
-          case "quote":
-            return (
-              <blockquote
-                key={i}
-                className="border-l-2 border-[var(--n-border)] pl-4 my-4 text-sm text-[var(--n-text-secondary)] italic"
-              >
-                {b.text}
-              </blockquote>
-            );
-          case "divider":
-            return <hr key={i} className="border-t border-[var(--n-border)] my-8" />;
-          case "video":
-            return (
-              <motion.figure
-                key={i}
-                className="my-6"
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-80px" }}
-                transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-              >
-                <div className="relative w-full aspect-video rounded-lg overflow-hidden border border-[var(--n-border)]">
-                  <iframe
-                    src={b.embedUrl}
-                    title={b.caption ?? "video"}
-                    className="absolute inset-0 w-full h-full"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                    loading="lazy"
-                  />
-                </div>
-                {b.caption && (
-                  <figcaption className="text-xs text-[var(--n-text-tertiary)] mt-2 text-center">
-                    {b.caption}
-                  </figcaption>
-                )}
-              </motion.figure>
-            );
-          case "code":
-            return (
-              <pre
-                key={i}
-                className="my-4 p-4 rounded-lg border border-[var(--n-border)] bg-[var(--n-bg-callout)] overflow-x-auto text-xs leading-6 text-[var(--n-text)]"
-              >
-                <code>{b.text}</code>
-              </pre>
-            );
-          case "image":
-            return (
-              <motion.figure
-                key={i}
-                className="my-5"
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-80px" }}
-                transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={b.src}
-                  alt={b.caption ?? ""}
-                  className="w-full rounded-lg border border-[var(--n-border)]"
-                />
-                {b.caption && (
-                  <figcaption className="text-xs text-[var(--n-text-tertiary)] mt-2 text-center">
-                    {b.caption}
-                  </figcaption>
-                )}
-              </motion.figure>
-            );
-          default:
-            return null;
-        }
-      })}
-    </div>
+    <motion.figure
+      className="my-0"
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-80px" }}
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={b.src} alt={b.caption ?? ""} className="w-full rounded-lg border border-[var(--n-border)]" />
+      {b.caption && (
+        <figcaption className="text-xs text-[var(--n-text-tertiary)] mt-2 text-center">{b.caption}</figcaption>
+      )}
+    </motion.figure>
   );
+}
+
+function BodyRenderer({ blocks }: { blocks: DesignBlock[] }) {
+  // Group consecutive image blocks so runs of ≥2 render as a 2-column grid
+  // (single images stay full width). Non-image blocks render one per row.
+  const nodes: ReactNode[] = [];
+  let run: { block: ImageBlock; i: number }[] = [];
+
+  const flush = () => {
+    if (run.length === 0) return;
+    if (run.length === 1) {
+      const { block, i } = run[0];
+      nodes.push(
+        <div key={`img-${i}`} className="my-5">
+          <BodyImage b={block} />
+        </div>
+      );
+    } else {
+      nodes.push(
+        <div key={`grid-${run[0].i}`} className="grid grid-cols-1 sm:grid-cols-2 gap-3 my-5">
+          {run.map(({ block, i }) => (
+            <BodyImage key={i} b={block} />
+          ))}
+        </div>
+      );
+    }
+    run = [];
+  };
+
+  blocks.forEach((b, i) => {
+    if (b.type === "image") {
+      run.push({ block: b, i });
+      return;
+    }
+    flush();
+    switch (b.type) {
+      case "heading": {
+        const cls =
+          b.level === 1
+            ? "text-2xl font-bold mt-10 mb-3"
+            : b.level === 2
+              ? "text-xl font-semibold mt-8 mb-2"
+              : "text-lg font-semibold mt-6 mb-2";
+        nodes.push(
+          <p key={i} className={`text-[var(--n-text)] ${cls}`}>
+            {b.text}
+          </p>
+        );
+        break;
+      }
+      case "paragraph":
+        nodes.push(
+          <p key={i} className="text-sm text-[var(--n-text)] leading-7 my-3">
+            {b.text}
+          </p>
+        );
+        break;
+      case "bullet":
+        nodes.push(
+          <li key={i} className="text-sm text-[var(--n-text)] leading-7 ml-5 list-disc">
+            {b.text}
+          </li>
+        );
+        break;
+      case "number":
+        nodes.push(
+          <li key={i} className="text-sm text-[var(--n-text)] leading-7 ml-5 list-decimal">
+            {b.text}
+          </li>
+        );
+        break;
+      case "quote":
+        nodes.push(
+          <blockquote
+            key={i}
+            className="border-l-2 border-[var(--n-border)] pl-4 my-4 text-sm text-[var(--n-text-secondary)] italic"
+          >
+            {b.text}
+          </blockquote>
+        );
+        break;
+      case "divider":
+        nodes.push(<hr key={i} className="border-t border-[var(--n-border)] my-8" />);
+        break;
+      case "video":
+        nodes.push(
+          <motion.figure
+            key={i}
+            className="my-6"
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <div className="relative w-full aspect-video rounded-lg overflow-hidden border border-[var(--n-border)]">
+              <iframe
+                src={b.embedUrl}
+                title={b.caption ?? "video"}
+                className="absolute inset-0 w-full h-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                loading="lazy"
+              />
+            </div>
+            {b.caption && (
+              <figcaption className="text-xs text-[var(--n-text-tertiary)] mt-2 text-center">{b.caption}</figcaption>
+            )}
+          </motion.figure>
+        );
+        break;
+      case "code":
+        nodes.push(
+          <pre
+            key={i}
+            className="my-4 p-4 rounded-lg border border-[var(--n-border)] bg-[var(--n-bg-callout)] overflow-x-auto text-xs leading-6 text-[var(--n-text)]"
+          >
+            <code>{b.text}</code>
+          </pre>
+        );
+        break;
+      default:
+        break;
+    }
+  });
+  flush();
+
+  return <div className="mt-2">{nodes}</div>;
 }
 
 const copy = {
