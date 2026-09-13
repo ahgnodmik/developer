@@ -108,81 +108,101 @@ async function notionGet(url) {
   return res.json();
 }
 
-// Fetch a page's body blocks (top level), download inline images, and map to DesignBlock[].
-// Any inline child databases found get their block ids pushed onto `childDbs` (out-param)
-// so the caller can pull their rows in as separate sub-cases.
-async function fetchBody(pageId, dir, slug, childDbs = []) {
+// Fetch all children of a block/page, following pagination.
+async function fetchChildren(blockId) {
   const blocks = [];
   let cursor;
   do {
     const q = cursor ? `?start_cursor=${cursor}&page_size=100` : "?page_size=100";
-    const json = await notionGet(`https://api.notion.com/v1/blocks/${pageId}/children${q}`);
+    const json = await notionGet(`https://api.notion.com/v1/blocks/${blockId}/children${q}`);
     blocks.push(...json.results);
     cursor = json.has_more ? json.next_cursor : undefined;
   } while (cursor);
+  return blocks;
+}
 
+// Fetch a page's body blocks, download inline images, and map to DesignBlock[].
+// Recurses into layout containers (column_list/column/toggle/synced_block) so images
+// placed inside Notion multi-column layouts are captured, not silently dropped.
+// Any inline child databases found get their block ids pushed onto `childDbs` (out-param)
+// so the caller can pull their rows in as separate sub-cases.
+async function fetchBody(pageId, dir, slug, childDbs = []) {
   const out = [];
-  let imgN = 0;
-  for (const b of blocks) {
-    switch (b.type) {
-      case "heading_1":
-        out.push({ type: "heading", level: 1, text: rt(b.heading_1.rich_text) });
-        break;
-      case "heading_2":
-        out.push({ type: "heading", level: 2, text: rt(b.heading_2.rich_text) });
-        break;
-      case "heading_3":
-        out.push({ type: "heading", level: 3, text: rt(b.heading_3.rich_text) });
-        break;
-      case "paragraph": {
-        const text = rt(b.paragraph.rich_text);
-        if (text) out.push({ type: "paragraph", text });
-        break;
+  const ctx = { imgN: 0 };
+
+  async function walk(blocks) {
+    for (const b of blocks) {
+      switch (b.type) {
+        case "heading_1":
+          out.push({ type: "heading", level: 1, text: rt(b.heading_1.rich_text) });
+          break;
+        case "heading_2":
+          out.push({ type: "heading", level: 2, text: rt(b.heading_2.rich_text) });
+          break;
+        case "heading_3":
+          out.push({ type: "heading", level: 3, text: rt(b.heading_3.rich_text) });
+          break;
+        case "paragraph": {
+          const text = rt(b.paragraph.rich_text);
+          if (text) out.push({ type: "paragraph", text });
+          break;
+        }
+        case "bulleted_list_item":
+          out.push({ type: "bullet", text: rt(b.bulleted_list_item.rich_text) });
+          break;
+        case "numbered_list_item":
+          out.push({ type: "number", text: rt(b.numbered_list_item.rich_text) });
+          break;
+        case "quote":
+          out.push({ type: "quote", text: rt(b.quote.rich_text) });
+          break;
+        case "callout":
+          out.push({ type: "quote", text: rt(b.callout.rich_text) });
+          break;
+        case "divider":
+          out.push({ type: "divider" });
+          break;
+        case "image": {
+          const src = b.image?.file?.url ?? b.image?.external?.url;
+          if (!src) break;
+          ctx.imgN += 1;
+          const file = await download(src, dir, `body-${ctx.imgN}`);
+          const caption = rt(b.image.caption);
+          out.push({ type: "image", src: `/design/${slug}/${file}`, ...(caption ? { caption } : {}) });
+          break;
+        }
+        case "video": {
+          const src = b.video?.external?.url ?? b.video?.file?.url;
+          const embedUrl = src ? youtubeEmbed(src) : null;
+          if (!embedUrl) break; // only YouTube embeds supported (uploaded video files skipped)
+          const caption = rt(b.video.caption);
+          out.push({ type: "video", provider: "youtube", embedUrl, ...(caption ? { caption } : {}) });
+          break;
+        }
+        case "code": {
+          const text = rt(b.code.rich_text);
+          if (text) out.push({ type: "code", text, ...(b.code.language ? { language: b.code.language } : {}) });
+          break;
+        }
+        case "child_database":
+          childDbs.push(b.id); // block id == database id; resolved to a data source later
+          break;
+        // layout containers: no content of their own — recurse into children so their
+        // images/text land inline in reading order (multi-column layout is flattened).
+        case "column_list":
+        case "column":
+        case "toggle":
+        case "synced_block": {
+          if (b.has_children) await walk(await fetchChildren(b.id));
+          break;
+        }
+        default:
+          break; // skip unsupported block types
       }
-      case "bulleted_list_item":
-        out.push({ type: "bullet", text: rt(b.bulleted_list_item.rich_text) });
-        break;
-      case "numbered_list_item":
-        out.push({ type: "number", text: rt(b.numbered_list_item.rich_text) });
-        break;
-      case "quote":
-        out.push({ type: "quote", text: rt(b.quote.rich_text) });
-        break;
-      case "callout":
-        out.push({ type: "quote", text: rt(b.callout.rich_text) });
-        break;
-      case "divider":
-        out.push({ type: "divider" });
-        break;
-      case "image": {
-        const src = b.image?.file?.url ?? b.image?.external?.url;
-        if (!src) break;
-        imgN += 1;
-        const file = await download(src, dir, `body-${imgN}`);
-        const caption = rt(b.image.caption);
-        out.push({ type: "image", src: `/design/${slug}/${file}`, ...(caption ? { caption } : {}) });
-        break;
-      }
-      case "video": {
-        const src = b.video?.external?.url ?? b.video?.file?.url;
-        const embedUrl = src ? youtubeEmbed(src) : null;
-        if (!embedUrl) break; // only YouTube embeds supported (uploaded video files skipped)
-        const caption = rt(b.video.caption);
-        out.push({ type: "video", provider: "youtube", embedUrl, ...(caption ? { caption } : {}) });
-        break;
-      }
-      case "code": {
-        const text = rt(b.code.rich_text);
-        if (text) out.push({ type: "code", text, ...(b.code.language ? { language: b.code.language } : {}) });
-        break;
-      }
-      case "child_database":
-        childDbs.push(b.id); // block id == database id; resolved to a data source later
-        break;
-      default:
-        break; // skip unsupported block types
     }
   }
+
+  await walk(await fetchChildren(pageId));
   return out;
 }
 
