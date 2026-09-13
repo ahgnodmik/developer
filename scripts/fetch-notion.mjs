@@ -242,6 +242,37 @@ async function fetchBody(pageId, dir, slug, childDbs = []) {
   }
 
   await walk(await fetchChildren(pageId));
+  return groupLabeledImages(out);
+}
+
+// Post-process: a run of numbered-label → image pairs (Notion "1. caption" above a
+// full-width image, repeated) becomes a 2-column gallery with each label as the image's
+// caption. Leaves single labeled images and existing galleries untouched.
+function groupLabeledImages(blocks) {
+  const out = [];
+  let i = 0;
+  while (i < blocks.length) {
+    const run = [];
+    let j = i;
+    while (j + 1 < blocks.length && blocks[j].type === "number" && blocks[j + 1].type === "image") {
+      run.push({ label: blocks[j].text, img: blocks[j + 1] });
+      j += 2;
+    }
+    if (run.length >= 2) {
+      out.push({
+        type: "gallery",
+        cols: 2,
+        images: run.map((r) => {
+          const caption = r.img.caption || r.label;
+          return { src: r.img.src, ...(caption ? { caption } : {}) };
+        }),
+      });
+      i = j;
+    } else {
+      out.push(blocks[i]);
+      i += 1;
+    }
+  }
   return out;
 }
 
