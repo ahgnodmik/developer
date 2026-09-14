@@ -27,5 +27,5 @@ const copy: CaseGridCopy = {
 };
 
 export default function ArchiveGrid() {
-  return <CaseGrid projects={archivedDesignProjects} copy={copy} />;
+  return <CaseGrid projects={archivedDesignProjects} copy={copy} active="archive" />;
 }

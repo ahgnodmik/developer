@@ -27,5 +27,5 @@ const copy: CaseGridCopy = {
 };
 
 export default function DesignGrid() {
-  return <CaseGrid projects={visibleDesignProjects} copy={copy} />;
+  return <CaseGrid projects={visibleDesignProjects} copy={copy} active="design" />;
 }

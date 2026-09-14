@@ -2,23 +2,9 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import {
-  Github,
-  Mail,
-  ExternalLink,
-  Code2,
-  Layers,
-  Phone,
-  FileText,
-  Home as HomeIcon,
-  Briefcase,
-  Languages,
-  Palette,
-  Archive,
-} from "lucide-react";
+import { Github, Mail, ExternalLink, Languages } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
-
-const SITE_VERSION = "v1.1.0";
+import { SideNav } from "@/components/side-nav";
 
 const tagColors = {
   blue: "bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300",
@@ -63,32 +49,6 @@ function SectionHeading({ emoji, title }: { emoji: string; title: string }) {
 
 function Divider() {
   return <hr className="border-t border-[var(--n-border)] my-6" />;
-}
-
-function NavItem({
-  icon,
-  label,
-  href,
-  active,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  href: string;
-  active?: boolean;
-}) {
-  return (
-    <a
-      href={href}
-      className={`flex items-center gap-2 px-3 py-1.5 rounded text-sm transition-colors ${
-        active
-          ? "bg-[var(--n-bg-active)] text-[var(--n-text)] font-medium"
-          : "text-[var(--n-text-secondary)] hover:bg-[var(--n-bg-hover)] hover:text-[var(--n-text)]"
-      }`}
-    >
-      {icon}
-      {label}
-    </a>
-  );
 }
 
 function LangToggle({ lang, onToggle }: { lang: Lang; onToggle: () => void }) {
@@ -388,15 +348,6 @@ function StatusBadge({ status, label }: { status: ProjectStatus; label: string }
   );
 }
 
-const navIcons = [
-  <HomeIcon key="home" className="w-4 h-4" />,
-  <FileText key="about" className="w-4 h-4" />,
-  <Code2 key="skills" className="w-4 h-4" />,
-  <Briefcase key="career" className="w-4 h-4" />,
-  <Layers key="projects" className="w-4 h-4" />,
-  <Phone key="contact" className="w-4 h-4" />,
-];
-
 const navHrefs = ["#", "#about", "#skills", "#career", "#projects", "#contact"];
 
 export default function Home() {
@@ -425,52 +376,7 @@ export default function Home() {
   return (
     <div className="flex min-h-screen bg-[var(--n-bg)]" style={{ fontFamily: "'Inter', 'Segoe UI', system-ui, sans-serif" }}>
       {/* ── Sidebar ── */}
-      <aside className="hidden md:flex flex-col w-60 shrink-0 border-r border-[var(--n-border)] h-screen sticky top-0 bg-[var(--n-bg-sidebar)] overflow-y-auto">
-        {/* Workspace header */}
-        <div className="flex items-center gap-1.5 px-4 h-14 border-b border-[var(--n-border)]">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.jpeg" alt="Kim Dongha" className="w-6 h-6 rounded object-cover shrink-0" />
-          <span className="text-sm font-semibold text-[var(--n-text)] truncate">Kim Dongha</span>
-          <div className="ml-auto flex items-center">
-            <LangToggle lang={lang} onToggle={toggleLang} />
-            <ThemeToggle />
-          </div>
-        </div>
-
-        {/* Navigation */}
-        <nav className="flex-1 px-2 py-4 space-y-0.5">
-          <p className="px-3 mb-2 text-[11px] font-medium text-[var(--n-text-tertiary)] uppercase tracking-widest">
-            Pages
-          </p>
-          {t.nav.map((label, i) => (
-            <NavItem key={label} href={navHrefs[i]} icon={navIcons[i]} label={label} active={i === 0} />
-          ))}
-        </nav>
-
-        <div className="px-2 py-3 mb-[200px] border-t border-[var(--n-border)]">
-          <p className="px-3 mb-2 text-[11px] font-medium text-[var(--n-text-tertiary)] uppercase tracking-widest">
-            {lang === "ko" ? "더 알아보기" : "More"}
-          </p>
-          <Link
-            href="/design"
-            className="flex items-center gap-2 px-3 py-1.5 rounded text-sm transition-colors text-[var(--n-text-secondary)] hover:bg-[var(--n-bg-hover)] hover:text-[var(--n-text)]"
-          >
-            <Palette className="w-4 h-4" />
-            {lang === "ko" ? "디자인" : "Design"}
-          </Link>
-          <Link
-            href="/archive"
-            className="flex items-center gap-2 px-3 py-1.5 rounded text-sm transition-colors text-[var(--n-text-secondary)] hover:bg-[var(--n-bg-hover)] hover:text-[var(--n-text)]"
-          >
-            <Archive className="w-4 h-4" />
-            Extra Proj
-          </Link>
-        </div>
-
-        <div className="px-4 py-3 border-t border-[var(--n-border)]">
-          <p className="text-[11px] text-[var(--n-text-tertiary)]">© 2026 Kim Dongha · {SITE_VERSION}</p>
-        </div>
-      </aside>
+      <SideNav lang={lang} onToggleLang={toggleLang} active="home" />
 
       {/* ── Main ── */}
       <main className="flex-1 overflow-y-auto">

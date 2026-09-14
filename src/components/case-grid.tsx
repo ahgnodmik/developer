@@ -8,6 +8,7 @@ import Link from "next/link";
 import { motion } from "motion/react";
 import { ArrowLeft, ArrowUpRight, Languages } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { SideNav, type SideNavActive } from "@/components/side-nav";
 import type { DesignProject, Lang } from "@/lib/design";
 
 export type CaseGridCopy = Record<
@@ -67,7 +68,15 @@ function LangToggle({ lang, onToggle }: { lang: Lang; onToggle: () => void }) {
   );
 }
 
-export function CaseGrid({ projects, copy }: { projects: DesignProject[]; copy: CaseGridCopy }) {
+export function CaseGrid({
+  projects,
+  copy,
+  active,
+}: {
+  projects: DesignProject[];
+  copy: CaseGridCopy;
+  active: SideNavActive;
+}) {
   const [lang, setLang] = useState<Lang>("ko");
 
   useEffect(() => {
@@ -102,9 +111,13 @@ export function CaseGrid({ projects, copy }: { projects: DesignProject[]; copy: 
   );
 
   return (
-    <div className="min-h-screen bg-[var(--n-bg)]" style={{ fontFamily: "'Inter', 'Segoe UI', system-ui, sans-serif" }}>
-      {/* ── Top bar ── */}
-      <header className="sticky top-0 z-20 flex items-center gap-2 px-4 sm:px-6 h-14 bg-[var(--n-bg-sidebar)]/90 backdrop-blur border-b border-[var(--n-border)]">
+    <div className="flex min-h-screen bg-[var(--n-bg)]" style={{ fontFamily: "'Inter', 'Segoe UI', system-ui, sans-serif" }}>
+      {/* ── Sidebar (desktop) ── */}
+      <SideNav lang={lang} onToggleLang={toggleLang} active={active} />
+
+      <div className="flex-1 min-w-0">
+      {/* ── Top bar (mobile) ── */}
+      <header className="md:hidden sticky top-0 z-20 flex items-center gap-2 px-4 sm:px-6 h-14 bg-[var(--n-bg-sidebar)]/90 backdrop-blur border-b border-[var(--n-border)]">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/logo.jpeg" alt="Kim Dongha" className="w-6 h-6 rounded object-cover shrink-0" />
         <nav className="flex items-center gap-1.5 text-sm min-w-0">
@@ -214,6 +227,7 @@ export function CaseGrid({ projects, copy }: { projects: DesignProject[]; copy: 
           {t.home}
         </Link>
       </main>
+      </div>
     </div>
   );
 }
