@@ -198,7 +198,7 @@ export const designProjects: DesignProject[] =
   generated.length > 0 ? generated : fallbackProjects;
 
 // Cases moved to /archive. Matched by slug or title (Notion-sourced slugs vary).
-const ARCHIVE_PATTERNS = [/dnd/i, /walkwing/i];
+const ARCHIVE_PATTERNS = [/dnd/i, /walk[\s-]?wing/i];
 
 function isArchived(p: DesignProject): boolean {
   const haystack = `${p.slug} ${p.title.ko} ${p.title.en}`;
