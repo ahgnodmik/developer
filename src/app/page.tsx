@@ -14,6 +14,7 @@ import {
   Briefcase,
   Languages,
   Palette,
+  Archive,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 
@@ -104,61 +105,87 @@ function LangToggle({ lang, onToggle }: { lang: Lang; onToggle: () => void }) {
   );
 }
 
-const skills = [
+const skillGroups = [
   {
-    category: "Frontend & Web",
-    tags: [
-      { label: "React", color: "blue" },
-      { label: "Next.js", color: "gray" },
-      { label: "TypeScript", color: "blue" },
-      { label: "Tailwind CSS", color: "purple" },
-      { label: "JavaScript", color: "yellow" },
+    heading: "AI Build",
+    items: [
+      {
+        category: "Frontend & Web",
+        tags: [
+          { label: "React", color: "blue" },
+          { label: "TypeScript", color: "blue" },
+          { label: "Tailwind CSS", color: "purple" },
+          { label: "JavaScript", color: "yellow" },
+        ],
+      },
+      {
+        category: "Serverless & Backend",
+        tags: [
+          { label: "Netlify", color: "green" },
+          { label: "AWS", color: "orange" },
+          { label: "Firebase", color: "yellow" },
+        ],
+      },
+      {
+        category: "Mobile",
+        tags: [
+          { label: "Flutter", color: "blue" },
+          { label: "Dart", color: "blue" },
+        ],
+      },
+      {
+        category: "AI",
+        tags: [
+          { label: "Claude API", color: "pink" },
+          { label: "OpenAI API", color: "green" },
+          { label: "Cursor", color: "blue" },
+          { label: "AI Integration", color: "pink" },
+        ],
+      },
     ],
   },
   {
-    category: "Serverless & Backend",
-    tags: [
-      { label: "Vercel", color: "gray" },
-      { label: "Netlify", color: "green" },
-      { label: "AWS S3", color: "orange" },
-      { label: "Firebase", color: "yellow" },
+    heading: "Skills",
+    items: [
+      {
+        category: "UX/UI Design",
+        tags: [
+          { label: "Figma", color: "purple" },
+          { label: "Adobe", color: "red" },
+          { label: "Prototyping", color: "orange" },
+          { label: "User Research", color: "blue" },
+          { label: "Design System", color: "gray" },
+        ],
+      },
+      {
+        category: "CMS Publishing",
+        tags: [
+          { label: "WordPress", color: "blue" },
+          { label: "Divi Theme", color: "purple" },
+        ],
+      },
+      {
+        category: "Work Tools",
+        tags: [
+          { label: "Google Workspace", color: "green" },
+          { label: "Docswave", color: "blue" },
+          { label: "Monday.com", color: "red" },
+        ],
+      },
+      {
+        category: "Documentation",
+        tags: [
+          { label: "Notion", color: "gray" },
+          { label: "Jira", color: "blue" },
+          { label: "Confluence", color: "blue" },
+        ],
+      },
     ],
   },
-  {
-    category: "Mobile",
-    tags: [
-      { label: "Flutter", color: "blue" },
-      { label: "Dart", color: "blue" },
-      { label: "Cross Platform", color: "green" },
-    ],
-  },
-  {
-    category: "AI",
-    tags: [
-      { label: "Claude API", color: "pink" },
-      { label: "OpenAI API", color: "green" },
-      { label: "Cursor", color: "blue" },
-      { label: "AI Integration", color: "pink" },
-    ],
-  },
-  {
-    category: "UX/UI Design",
-    tags: [
-      { label: "Figma", color: "purple" },
-      { label: "Adobe", color: "red" },
-      { label: "Prototyping", color: "orange" },
-      { label: "User Research", color: "blue" },
-      { label: "Design System", color: "gray" },
-    ],
-  },
-  {
-    category: "CMS",
-    tags: [
-      { label: "WordPress", color: "blue" },
-      { label: "Divi Theme", color: "purple" },
-    ],
-  },
-] satisfies { category: string; tags: { label: string; color: TagColor }[] }[];
+] satisfies {
+  heading: string | null;
+  items: { category: string; tags: { label: string; color: TagColor }[] }[];
+}[];
 
 const careerTags = [
   [
@@ -172,6 +199,12 @@ const careerTags = [
     { label: "Prototyping", color: "orange" },
     { label: "User Research", color: "blue" },
     { label: "Design System", color: "gray" },
+  ],
+  [
+    { label: "Marketing Design", color: "red" },
+    { label: "UX/UI", color: "purple" },
+    { label: "Adobe", color: "red" },
+    { label: "Branding", color: "orange" },
   ],
 ] satisfies { label: string; color: TagColor }[][];
 
@@ -207,17 +240,6 @@ const projectTags = [
     { label: "Telegram Bot", color: "blue" },
   ],
   [
-    { label: "React", color: "blue" },
-    { label: "FastAPI", color: "green" },
-    { label: "Supabase", color: "green" },
-    { label: "LLM", color: "pink" },
-  ],
-  [
-    { label: "Python", color: "blue" },
-    { label: "Whisper", color: "pink" },
-    { label: "SQLite FTS5", color: "gray" },
-  ],
-  [
     { label: "Flutter", color: "blue" },
     { label: "Firestore", color: "yellow" },
     { label: "Riverpod", color: "purple" },
@@ -226,10 +248,6 @@ const projectTags = [
     { label: "Next.js", color: "gray" },
     { label: "Supabase", color: "green" },
     { label: "LLM", color: "pink" },
-  ],
-  [
-    { label: "TypeScript", color: "blue" },
-    { label: "Data Analysis", color: "orange" },
   ],
 ] satisfies { label: string; color: TagColor }[][];
 
@@ -240,9 +258,6 @@ const projectStatuses: ProjectStatus[] = [
   "case",
   "dev",
   "dev",
-  "dev",
-  "dev",
-  "case",
   "case",
   "case",
 ];
@@ -251,17 +266,17 @@ const content = {
   ko: {
     name: "김동하",
     subtitle: "AI Builder · UX/UI Designer",
-    nav: ["홈", "소개", "기술 스택", "경력", "프로젝트", "연락처"],
+    nav: ["홈", "소개", "사용하는 도구", "경력", "프로젝트", "연락처"],
     props: { email: "이메일", github: "GitHub", experience: "경력", experienceValue: "5+ 년", status: "상태", statusValue: "구직 중" },
-    sections: { about: "소개", skills: "기술 스택", career: "경력", projects: "프로젝트", contact: "연락처" },
+    sections: { about: "소개", skills: "사용하는 도구", career: "경력", projects: "프로젝트", contact: "연락처" },
     aboutCallout:
-      "React, Tailwind CSS, TypeScript를 기반으로 현대적인 웹 애플리케이션을 개발합니다. 서버리스 아키텍처와 SSR 렌더링 기술을 연구하며 최적의 성능과 사용자 경험을 제공합니다.",
+      "프로덕트 기획부터 프로토타입 개발, 서비스 환경 구축까지 전 과정을 제공합니다.",
     aboutBody:
       "AI 기술과 Flutter를 활용한 크로스 플랫폼 앱 개발에 집중하며, 웹 서비스와 모바일 앱을 통합한 디지털 솔루션을 제공합니다. 디자인 중심의 개발 철학으로 사용자 친화적인 인터페이스를 구현하고, 지속적인 기술 연구와 혁신을 통해 더 나은 디지털 경험을 만들어갑니다.",
     stats: [
       { value: "5+", label: "UX/UI 경력" },
       { value: "1+", label: "AI Builder" },
-      { value: "10+", label: "기술 스택" },
+      { value: "10+", label: "사용하는 도구" },
       { value: "100%", label: "성실함" },
     ],
     career: [
@@ -275,8 +290,13 @@ const content = {
         title: "UX/UI 디자이너",
         desc: "모바일·웹 서비스 UX 리서치, UI 디자인, 프로토타이핑. 디자인 시스템 구축 및 개발팀 협업.",
       },
+      {
+        period: "2019 — 2020",
+        title: "마케팅 디자인 · UX/UI 디자인 매니저",
+        desc: "헬스케어 회사에서 마케팅 디자인과 UX/UI 디자인 매니저로 브랜드·프로덕트 디자인 전반을 담당.",
+      },
     ],
-    statusLabels: { live: "LIVE", dev: "개발 중", case: "케이스 스터디" },
+    statusLabels: { live: "LIVE", dev: "In dev", case: "Study" },
     projectSummary: (total: number, live: number, dev: number, cs: number) =>
       `총 ${total}개 · LIVE ${live} · 개발 중 ${dev} · 케이스 스터디 ${cs}`,
     projects: [
@@ -286,11 +306,8 @@ const content = {
       { title: "블로그 콘텐츠 자동 발행 파이프라인", desc: "키워드 수집부터 원고 생성·발행까지 무인 운영한 일일 자동 발행 시스템." },
       { title: "SNS 카드뉴스 자동화 파이프라인", desc: "소재 수집 → 카드 렌더링 → 게시까지 이어지는 멀티 계정 콘텐츠 자동화." },
       { title: "해외 신상품 모니터링 시스템", desc: "해외 커머스 신상품을 수집·필터링해 메신저로 발송하는 소싱 레이더." },
-      { title: "멀티 에이전트 협업 시각화 도구", desc: "AI 에이전트들이 논의·합의해 작업을 수행하는 과정을 실시간 캔버스로 보여주는 웹 도구." },
-      { title: "구어 코퍼스 기반 영어 학습 플랫폼", desc: "팟캐스트 전사 코퍼스를 구축해 실사용 영어 빈도를 데이터로 증명하는 파이프라인." },
       { title: "단체 주문 자동화 앱", desc: "링크 공유로 참여자 주문을 자동 집계. 비회원 참여, 실시간 동기화 설계." },
       { title: "주간 식단·장보기 리스트 생성기", desc: "가구 제약(알레르기·예산·조리 실력)을 반영한 7일 식단과 합산 장보기 리스트 MVP." },
-      { title: "앱 마켓 분석 내부 도구", desc: "스토어 상위 앱을 기능 단위로 분해해 구현 난이도·시장성 점수를 산출하는 분석 도구." },
     ],
     projectsNote: "모든 프로젝트는 비공개로 운영됩니다. 상세 케이스 스터디와 시연은 문의 시 공유 가능합니다.",
     contactEmail: "이메일",
@@ -302,7 +319,7 @@ const content = {
     props: { email: "Email", github: "GitHub", experience: "Experience", experienceValue: "5+ years", status: "Status", statusValue: "Open to work" },
     sections: { about: "About", skills: "Skills", career: "Career", projects: "Projects", contact: "Contact" },
     aboutCallout:
-      "I build modern web applications with React, Tailwind CSS, and TypeScript, focusing on serverless architecture and SSR for optimal performance and user experience.",
+      "I cover the full journey from product planning to prototype development and service infrastructure setup.",
     aboutBody:
       "I focus on cross-platform app development combining AI and Flutter, delivering digital solutions that unify web services and mobile apps. With a design-driven development philosophy, I craft user-friendly interfaces and keep improving digital experiences through continuous research and innovation.",
     stats: [
@@ -322,8 +339,13 @@ const content = {
         title: "UX/UI Designer",
         desc: "UX research, UI design, and prototyping for mobile and web services. Built design systems and collaborated with engineering teams.",
       },
+      {
+        period: "2019 — 2020",
+        title: "Marketing Design · UX/UI Design Manager",
+        desc: "Led marketing design and UX/UI as design manager at a healthcare company, covering brand and product design.",
+      },
     ],
-    statusLabels: { live: "LIVE", dev: "In Development", case: "Case Study" },
+    statusLabels: { live: "LIVE", dev: "In dev", case: "Study" },
     projectSummary: (total: number, live: number, dev: number, cs: number) =>
       `${total} total · ${live} live · ${dev} in development · ${cs} case studies`,
     projects: [
@@ -333,11 +355,8 @@ const content = {
       { title: "Automated Blog Publishing Pipeline", desc: "Daily publishing system that ran unattended from keyword research to article generation and posting." },
       { title: "Social Card-News Automation Pipeline", desc: "Multi-account content automation covering sourcing, card rendering, and posting." },
       { title: "Overseas New-Product Monitoring System", desc: "Sourcing radar that collects and filters new overseas commerce products and delivers them via messenger." },
-      { title: "Multi-Agent Collaboration Visualizer", desc: "Web tool that shows AI agents discussing, reaching consensus, and executing tasks on a real-time canvas." },
-      { title: "Spoken-Corpus English Learning Platform", desc: "Pipeline that builds a podcast-transcript corpus to prove real-world English usage frequency with data." },
       { title: "Group Ordering Automation App", desc: "Auto-aggregates participant orders via shared link. Designed for guest participation and real-time sync." },
       { title: "Weekly Meal Plan & Grocery List Generator", desc: "MVP generating 7-day meal plans and consolidated grocery lists that respect allergies, budget, and cooking skill." },
-      { title: "App Market Analysis Tool (Internal)", desc: "Analysis tool that decomposes top store apps into features and scores implementation difficulty and market potential." },
     ],
     projectsNote: "All projects are privately operated. Detailed case studies and demos are available on request.",
     contactEmail: "Email",
@@ -362,7 +381,7 @@ const statusMeta: Record<ProjectStatus, { dot: string; text: string }> = {
 function StatusBadge({ status, label }: { status: ProjectStatus; label: string }) {
   const meta = statusMeta[status];
   return (
-    <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium ${meta.text}`}>
+    <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium whitespace-nowrap ${meta.text}`}>
       <span className={`w-1.5 h-1.5 rounded-full ${meta.dot}`} />
       {label}
     </span>
@@ -426,6 +445,12 @@ export default function Home() {
           {t.nav.map((label, i) => (
             <NavItem key={label} href={navHrefs[i]} icon={navIcons[i]} label={label} active={i === 0} />
           ))}
+        </nav>
+
+        <div className="px-2 py-3 mb-[200px] border-t border-[var(--n-border)]">
+          <p className="px-3 mb-2 text-[11px] font-medium text-[var(--n-text-tertiary)] uppercase tracking-widest">
+            {lang === "ko" ? "더 알아보기" : "More"}
+          </p>
           <Link
             href="/design"
             className="flex items-center gap-2 px-3 py-1.5 rounded text-sm transition-colors text-[var(--n-text-secondary)] hover:bg-[var(--n-bg-hover)] hover:text-[var(--n-text)]"
@@ -433,7 +458,14 @@ export default function Home() {
             <Palette className="w-4 h-4" />
             {lang === "ko" ? "디자인" : "Design"}
           </Link>
-        </nav>
+          <Link
+            href="/archive"
+            className="flex items-center gap-2 px-3 py-1.5 rounded text-sm transition-colors text-[var(--n-text-secondary)] hover:bg-[var(--n-bg-hover)] hover:text-[var(--n-text)]"
+          >
+            <Archive className="w-4 h-4" />
+            Extra Proj
+          </Link>
+        </div>
 
         <div className="px-4 py-3 border-t border-[var(--n-border)]">
           <p className="text-[11px] text-[var(--n-text-tertiary)]">© 2026 Kim Dongha · {SITE_VERSION}</p>
@@ -531,13 +563,22 @@ export default function Home() {
           <section id="skills">
             <SectionHeading emoji="⚙️" title={t.sections.skills} />
 
-            <div className="divide-y divide-[var(--n-divide)]">
-              {skills.map((group) => (
-                <div key={group.category} className="flex items-start gap-4 py-3">
-                  <span className="w-44 shrink-0 text-xs text-[var(--n-text-tertiary)] pt-0.5">{group.category}</span>
-                  <div className="flex flex-wrap gap-1.5">
-                    {group.tags.map((tag) => (
-                      <Tag key={tag.label} label={tag.label} color={tag.color} />
+            <div className="space-y-4">
+              {skillGroups.map((group, gi) => (
+                <div key={gi}>
+                  {group.heading && (
+                    <p className="text-sm font-medium text-[var(--n-text)] mb-1">{group.heading}</p>
+                  )}
+                  <div className="divide-y divide-[var(--n-divide)]">
+                    {group.items.map((item) => (
+                      <div key={item.category} className="flex items-start gap-4 py-3">
+                        <span className="w-44 shrink-0 text-xs text-[var(--n-text-tertiary)] pt-0.5">{item.category}</span>
+                        <div className="flex flex-wrap gap-1.5">
+                          {item.tags.map((tag) => (
+                            <Tag key={tag.label} label={tag.label} color={tag.color} />
+                          ))}
+                        </div>
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -578,7 +619,7 @@ export default function Home() {
               <span>{t.projectSummary(t.projects.length, liveCount, devCount, caseCount)}</span>
             </div>
 
-            <div className="space-y-1 mt-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-1">
               {(["live", "dev", "case"] as ProjectStatus[]).flatMap((group) =>
                 t.projects
                   .map((project, i) => ({ ...project, status: projectStatuses[i], tags: projectTags[i] }))
@@ -586,17 +627,15 @@ export default function Home() {
                   .map((project) => (
                     <div
                       key={project.title}
-                      className="group flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 px-3 py-3 rounded-md hover:bg-[var(--n-bg-callout)] transition-colors"
+                      className="flex flex-col gap-2 p-4 rounded-lg border border-[var(--n-border)] hover:bg-[var(--n-bg-callout)] transition-colors"
                     >
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="text-sm font-medium text-[var(--n-text)]">{project.title}</span>
-                          <StatusBadge status={project.status} label={t.statusLabels[project.status]} />
-                        </div>
-                        <p className="text-xs text-[var(--n-text-secondary)] mt-0.5">{project.desc}</p>
+                      <div className="flex items-start justify-between gap-2">
+                        <span className="text-sm font-medium text-[var(--n-text)] leading-5">{project.title}</span>
+                        <StatusBadge status={project.status} label={t.statusLabels[project.status]} />
                       </div>
-                      <div className="flex flex-wrap gap-1 shrink-0">
-                        {project.tags.map((tag) => (
+                      <p className="text-xs text-[var(--n-text-secondary)] leading-5 line-clamp-2">{project.desc}</p>
+                      <div className="flex flex-wrap gap-1 mt-auto pt-1">
+                        {project.tags.slice(0, 3).map((tag) => (
                           <Tag key={tag.label} label={tag.label} color={tag.color} />
                         ))}
                       </div>
@@ -614,7 +653,7 @@ export default function Home() {
           <section id="contact">
             <SectionHeading emoji="📬" title={t.sections.contact} />
 
-            <div className="space-y-1 mt-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-1">
               <a
                 href="mailto:samdongpm@gmail.com"
                 className="flex items-center gap-3 px-3 py-3 rounded-md hover:bg-[var(--n-bg-callout)] transition-colors group"

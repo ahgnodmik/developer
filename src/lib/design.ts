@@ -197,8 +197,23 @@ const fallbackProjects: DesignProject[] = [
 export const designProjects: DesignProject[] =
   generated.length > 0 ? generated : fallbackProjects;
 
-/** Grid-visible cases only (excludes nested sub-cases, which still have routes). */
-export const visibleDesignProjects: DesignProject[] = designProjects.filter((p) => !p.hidden);
+// Cases moved to /archive. Matched by slug or title (Notion-sourced slugs vary).
+const ARCHIVE_PATTERNS = [/dnd/i, /walkwing/i];
+
+function isArchived(p: DesignProject): boolean {
+  const haystack = `${p.slug} ${p.title.ko} ${p.title.en}`;
+  return ARCHIVE_PATTERNS.some((re) => re.test(haystack));
+}
+
+/** Grid-visible cases only (excludes nested sub-cases and archived cases). */
+export const visibleDesignProjects: DesignProject[] = designProjects.filter(
+  (p) => !p.hidden && !isArchived(p)
+);
+
+/** Archived cases shown on /archive (still routed under /design/[slug]). */
+export const archivedDesignProjects: DesignProject[] = designProjects.filter(
+  (p) => !p.hidden && isArchived(p)
+);
 
 export function getDesignProject(slug: string): DesignProject | undefined {
   return designProjects.find((p) => p.slug === slug);
