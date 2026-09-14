@@ -229,7 +229,13 @@ export function DesignDetail({ project }: { project: DesignProject }) {
   const others = visibleDesignProjects.filter((p) => p.slug !== project.slug).slice(0, 4);
 
   return (
-    <div className="min-h-screen bg-[var(--n-bg)]" style={{ fontFamily: "'Inter', 'Segoe UI', system-ui, sans-serif" }}>
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+      className="min-h-screen bg-[var(--n-bg)]"
+      style={{ fontFamily: "'Inter', 'Segoe UI', system-ui, sans-serif" }}
+    >
       {/* ── Top bar ── */}
       <header className="sticky top-0 z-20 flex items-center gap-2 px-4 sm:px-6 h-14 bg-[var(--n-bg-sidebar)]/90 backdrop-blur border-b border-[var(--n-border)]">
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -415,6 +421,6 @@ export function DesignDetail({ project }: { project: DesignProject }) {
           {t.back}
         </Link>
       </main>
-    </div>
+    </motion.div>
   );
 }

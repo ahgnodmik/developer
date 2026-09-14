@@ -5,7 +5,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { motion } from "motion/react";
+import { MotionConfig, motion } from "motion/react";
 import { ArrowLeft, ArrowUpRight, Languages } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { SideNav, type SideNavActive } from "@/components/side-nav";
@@ -115,7 +115,13 @@ export function CaseGrid({
       {/* ── Sidebar (desktop) ── */}
       <SideNav lang={lang} onToggleLang={toggleLang} active={active} />
 
-      <div className="flex-1 min-w-0">
+      <MotionConfig reducedMotion="user">
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+        className="flex-1 min-w-0"
+      >
       {/* ── Top bar (mobile) ── */}
       <header className="md:hidden sticky top-0 z-20 flex items-center gap-2 px-4 sm:px-6 h-14 bg-[var(--n-bg-sidebar)]/90 backdrop-blur border-b border-[var(--n-border)]">
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -227,7 +233,8 @@ export function CaseGrid({
           {t.home}
         </Link>
       </main>
-      </div>
+      </motion.div>
+      </MotionConfig>
     </div>
   );
 }
