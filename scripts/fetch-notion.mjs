@@ -6,8 +6,19 @@
 // the build never breaks.
 
 import { writeFile, mkdir, rm } from "node:fs/promises";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
+
+// Load .env.local for local runs (CI passes env directly). Real env wins.
+const ENV_LOCAL = path.join(process.cwd(), ".env.local");
+if (existsSync(ENV_LOCAL)) {
+  for (const line of readFileSync(ENV_LOCAL, "utf8").split("\n")) {
+    const m = line.match(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)\s*$/);
+    if (m && !(m[1] in process.env)) {
+      process.env[m[1]] = m[2].replace(/^["']|["']$/g, "");
+    }
+  }
+}
 
 const TOKEN = process.env.NOTION_TOKEN;
 const DATA_SOURCE_ID = process.env.NOTION_DATA_SOURCE_ID;
