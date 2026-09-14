@@ -10,15 +10,6 @@ import { ArrowLeft, ArrowUpRight, Languages } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import type { DesignProject, Lang } from "@/lib/design";
 
-const gridContainer = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.05, delayChildren: 0.1 } },
-};
-const gridItem = {
-  hidden: { opacity: 0, y: 16 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] as const } },
-};
-
 export type CaseGridCopy = Record<
   Lang,
   {
@@ -159,15 +150,9 @@ export function CaseGrid({ projects, copy }: { projects: DesignProject[]; copy: 
         <p className="text-xs text-[var(--n-text-tertiary)] mt-4 max-w-2xl leading-5">{t.note}</p>
 
         {/* ── Responsive square grid ── */}
-        <motion.div
-          key={activeTag ?? "all"}
-          variants={gridContainer}
-          initial="hidden"
-          animate="show"
-          className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 mt-6"
-        >
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 mt-6">
           {filtered.map((p, i) => (
-            <motion.div key={p.slug} variants={gridItem}>
+            <div key={p.slug}>
             <Link
               href={`/design/${p.slug}`}
               className="group block"
@@ -217,9 +202,9 @@ export function CaseGrid({ projects, copy }: { projects: DesignProject[]; copy: 
                 <p className="text-[11px] text-[var(--n-text-tertiary)] mt-1 truncate">{p.role[lang]}</p>
               </div>
             </Link>
-            </motion.div>
+            </div>
           ))}
-        </motion.div>
+        </div>
 
         <Link
           href="/"
