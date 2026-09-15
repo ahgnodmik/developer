@@ -215,10 +215,9 @@ export function CaseGrid({
                 <p className="text-sm font-medium text-[var(--n-text)] leading-snug line-clamp-1 group-hover:underline underline-offset-2">
                   {p.title[lang]}
                 </p>
-                <p className="text-xs text-[var(--n-text-secondary)] mt-0.5 line-clamp-2 leading-snug">
+                <p className="text-xs text-[var(--n-text-secondary)] mt-0.5 line-clamp-1 leading-snug">
                   {p.summary[lang]}
                 </p>
-                <p className="text-[11px] text-[var(--n-text-tertiary)] mt-1 truncate">{p.role[lang]}</p>
               </div>
             </Link>
             </div>
