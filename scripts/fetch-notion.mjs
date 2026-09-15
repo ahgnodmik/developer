@@ -174,19 +174,24 @@ async function fetchBody(pageId, dir, slug, childDbs = []) {
         case "paragraph": {
           const text = rt(b.paragraph.rich_text);
           if (text) out.push({ type: "paragraph", text });
+          if (b.has_children) await walk(await fetchChildren(b.id));
           break;
         }
         case "bulleted_list_item":
           out.push({ type: "bullet", text: rt(b.bulleted_list_item.rich_text) });
+          if (b.has_children) await walk(await fetchChildren(b.id));
           break;
         case "numbered_list_item":
           out.push({ type: "number", text: rt(b.numbered_list_item.rich_text) });
+          if (b.has_children) await walk(await fetchChildren(b.id));
           break;
         case "quote":
           out.push({ type: "quote", text: rt(b.quote.rich_text) });
+          if (b.has_children) await walk(await fetchChildren(b.id));
           break;
         case "callout":
           out.push({ type: "quote", text: rt(b.callout.rich_text) });
+          if (b.has_children) await walk(await fetchChildren(b.id));
           break;
         case "divider":
           out.push({ type: "divider" });
@@ -223,17 +228,24 @@ async function fetchBody(pageId, dir, slug, childDbs = []) {
         case "column_list": {
           const columns = b.has_children ? await fetchChildren(b.id) : [];
           const images = [];
-          for (const col of columns) {
-            const kids = col.has_children ? await fetchChildren(col.id) : [];
-            for (const k of kids) {
-              if (k.type !== "image") continue;
-              const src = k.image?.file?.url ?? k.image?.external?.url;
-              if (!src) continue;
-              ctx.imgN += 1;
-              const file = await download(src, dir, `body-${ctx.imgN}`);
-              const caption = rt(k.image.caption);
-              images.push({ src: `/design/${slug}/${file}`, ...(caption ? { caption } : {}) });
+          // Collect images at any nesting depth inside a column (e.g. indented
+          // under a list item), in reading order.
+          async function collectImages(blocks) {
+            for (const k of blocks) {
+              if (k.type === "image") {
+                const src = k.image?.file?.url ?? k.image?.external?.url;
+                if (!src) continue;
+                ctx.imgN += 1;
+                const file = await download(src, dir, `body-${ctx.imgN}`);
+                const caption = rt(k.image.caption);
+                images.push({ src: `/design/${slug}/${file}`, ...(caption ? { caption } : {}) });
+              } else if (k.has_children) {
+                await collectImages(await fetchChildren(k.id));
+              }
             }
+          }
+          for (const col of columns) {
+            if (col.has_children) await collectImages(await fetchChildren(col.id));
           }
           if (images.length) out.push({ type: "gallery", cols: columns.length || images.length, images });
           else if (columns.length) await walk(columns);
