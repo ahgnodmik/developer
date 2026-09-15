@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion } from "motion/react";
 import { ArrowLeft, Languages } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { MobileNav } from "@/components/side-nav";
 import { visibleDesignProjects, type DesignBlock, type DesignProject, type Lang } from "@/lib/design";
 
 type ImageBlock = Extract<DesignBlock, { type: "image" }>;
@@ -238,6 +239,7 @@ export function DesignDetail({ project }: { project: DesignProject }) {
     >
       {/* ── Top bar ── */}
       <header className="sticky top-0 z-20 flex items-center gap-2 px-4 sm:px-6 h-14 bg-[var(--n-bg-sidebar)]/90 backdrop-blur border-b border-[var(--n-border)]">
+        <MobileNav lang={lang} onToggleLang={toggleLang} active="design" />
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/logo.jpeg" alt="Kim Dongha" className="w-6 h-6 rounded object-cover shrink-0" />
         <nav className="flex items-center gap-1.5 text-sm min-w-0">

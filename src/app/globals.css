@@ -158,3 +158,14 @@
     color: #e6e6e4;
   }
 }
+
+/* Mobile readability: enforce a 16px floor for all small text utilities. */
+@media (max-width: 767px) {
+  .text-xs,
+  .text-sm,
+  [class*="text-[10px]"],
+  [class*="text-[11px]"] {
+    font-size: 16px !important;
+    line-height: 1.5 !important;
+  }
+}

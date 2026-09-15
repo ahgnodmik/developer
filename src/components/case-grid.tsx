@@ -8,7 +8,7 @@ import Link from "next/link";
 import { MotionConfig, motion } from "motion/react";
 import { ArrowLeft, ArrowUpRight, Languages } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { SideNav, type SideNavActive } from "@/components/side-nav";
+import { SideNav, MobileNav, type SideNavActive } from "@/components/side-nav";
 import type { DesignProject, Lang } from "@/lib/design";
 
 export type CaseGridCopy = Record<
@@ -124,6 +124,7 @@ export function CaseGrid({
       >
       {/* ── Top bar (mobile) ── */}
       <header className="md:hidden sticky top-0 z-20 flex items-center gap-2 px-4 sm:px-6 h-14 bg-[var(--n-bg-sidebar)]/90 backdrop-blur border-b border-[var(--n-border)]">
+        <MobileNav lang={lang} onToggleLang={toggleLang} active={active} />
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/logo.jpeg" alt="Kim Dongha" className="w-6 h-6 rounded object-cover shrink-0" />
         <nav className="flex items-center gap-1.5 text-sm min-w-0">

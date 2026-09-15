@@ -1,10 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { Github, Mail, ExternalLink, Languages } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { SideNav } from "@/components/side-nav";
+import { SideNav, MobileNav } from "@/components/side-nav";
 
 const tagColors = {
   blue: "bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300",
@@ -348,7 +347,6 @@ function StatusBadge({ status, label }: { status: ProjectStatus; label: string }
   );
 }
 
-const navHrefs = ["#", "#about", "#skills", "#career", "#projects", "#contact"];
 
 export default function Home() {
   const [lang, setLang] = useState<Lang>("ko");
@@ -382,28 +380,14 @@ export default function Home() {
       <main className="flex-1 overflow-y-auto">
         {/* Mobile top bar */}
         <header className="md:hidden sticky top-0 z-20 flex items-center gap-2 px-4 h-14 bg-[var(--n-bg-sidebar)]/90 backdrop-blur border-b border-[var(--n-border)]">
+          <MobileNav lang={lang} onToggleLang={toggleLang} active="home" />
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/logo.jpeg" alt="Kim Dongha" className="w-6 h-6 rounded object-cover shrink-0" />
           <span className="text-sm font-semibold text-[var(--n-text)]">Kim Dongha</span>
-          <nav className="ml-auto flex items-center gap-1 overflow-x-auto">
-            {t.nav.slice(1).map((label, i) => (
-              <a
-                key={label}
-                href={navHrefs[i + 1]}
-                className="px-2 py-1 rounded text-xs whitespace-nowrap text-[var(--n-text-secondary)] hover:bg-[var(--n-bg-hover)] hover:text-[var(--n-text)] transition-colors"
-              >
-                {label}
-              </a>
-            ))}
-            <Link
-              href="/design"
-              className="px-2 py-1 rounded text-xs whitespace-nowrap text-[var(--n-text-secondary)] hover:bg-[var(--n-bg-hover)] hover:text-[var(--n-text)] transition-colors"
-            >
-              {lang === "ko" ? "디자인" : "Design"}
-            </Link>
-          </nav>
-          <LangToggle lang={lang} onToggle={toggleLang} />
-          <ThemeToggle />
+          <div className="ml-auto flex items-center">
+            <LangToggle lang={lang} onToggle={toggleLang} />
+            <ThemeToggle />
+          </div>
         </header>
 
         {/* Page content */}
