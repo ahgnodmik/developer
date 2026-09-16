@@ -170,7 +170,7 @@ function BodyRenderer({ blocks }: { blocks: DesignBlock[] }) {
 const copy = {
   ko: {
     home: "홈",
-    crumb: "디자인",
+    crumb: "서비스 디자인",
     role: "역할",
     year: "연도",
     stack: "도구·방법",
@@ -182,7 +182,7 @@ const copy = {
   },
   en: {
     home: "Home",
-    crumb: "Design",
+    crumb: "Service Design",
     role: "Role",
     year: "Year",
     stack: "Tools & Methods",

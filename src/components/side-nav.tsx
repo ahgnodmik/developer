@@ -102,11 +102,11 @@ export function SideNav({
         </p>
         <Link href="/design" className={itemClass(active === "design")}>
           <Palette className="w-4 h-4" />
-          {lang === "ko" ? "디자인" : "Design"}
+          {lang === "ko" ? "서비스 디자인" : "Service Design"}
         </Link>
         <Link href="/archive" className={itemClass(active === "archive")}>
           <Archive className="w-4 h-4" />
-          Extra Proj
+          More Works
         </Link>
       </div>
 
@@ -201,11 +201,11 @@ export function MobileNav({
               </p>
               <Link href="/design" onClick={() => setOpen(false)} className={itemClass(active === "design")}>
                 <Palette className="w-4 h-4" />
-                {lang === "ko" ? "디자인" : "Design"}
+                {lang === "ko" ? "서비스 디자인" : "Service Design"}
               </Link>
               <Link href="/archive" onClick={() => setOpen(false)} className={itemClass(active === "archive")}>
                 <Archive className="w-4 h-4" />
-                Extra Proj
+                More Works
               </Link>
             </nav>
 

@@ -6,9 +6,9 @@ import { visibleDesignProjects } from "@/lib/design";
 const copy: CaseGridCopy = {
   ko: {
     home: "홈",
-    crumb: "디자인",
+    crumb: "서비스 디자인",
     eyebrow: "SELECTED WORKS",
-    title: "디자인",
+    title: "서비스 디자인",
     subtitle: "UX/UI · 프로덕트 디자인 케이스",
     note: "썸네일을 선택하면 상세 케이스를 볼 수 있습니다. 모든 사례는 비공개로 운영되며 익명화되었습니다.",
     all: "전체",
@@ -16,9 +16,9 @@ const copy: CaseGridCopy = {
   },
   en: {
     home: "Home",
-    crumb: "Design",
+    crumb: "Service Design",
     eyebrow: "SELECTED WORKS",
-    title: "Design",
+    title: "Service Design",
     subtitle: "UX/UI · Product design cases",
     note: "Select a thumbnail to view the full case. All cases are privately operated and anonymized.",
     all: "All",
