@@ -17,6 +17,7 @@ export type DesignBlock =
   | { type: "image"; src: string; caption?: string }
   | { type: "gallery"; cols: number; images: { src: string; caption?: string }[] }
   | { type: "video"; provider: "youtube"; embedUrl: string; caption?: string }
+  | { type: "link"; url: string; title?: string }
   | { type: "code"; text: string; language?: string };
 
 /** Link to a nested sub-case (own detail route). Rendered as a card on the parent. */

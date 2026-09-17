@@ -213,6 +213,32 @@ async function fetchBody(pageId, dir, slug, childDbs = []) {
           out.push({ type: "video", provider: "youtube", embedUrl, ...(caption ? { caption } : {}) });
           break;
         }
+        // External links (e.g. the live service URL) — bookmark/embed/link_preview.
+        case "bookmark": {
+          const url = b.bookmark?.url;
+          if (!url) break;
+          const title = rt(b.bookmark.caption);
+          out.push({ type: "link", url, ...(title ? { title } : {}) });
+          break;
+        }
+        case "link_preview": {
+          const url = b.link_preview?.url;
+          if (url) out.push({ type: "link", url });
+          break;
+        }
+        case "embed": {
+          const url = b.embed?.url;
+          if (!url) break;
+          const yt = youtubeEmbed(url);
+          if (yt) {
+            const caption = rt(b.embed.caption);
+            out.push({ type: "video", provider: "youtube", embedUrl: yt, ...(caption ? { caption } : {}) });
+          } else {
+            const title = rt(b.embed.caption);
+            out.push({ type: "link", url, ...(title ? { title } : {}) });
+          }
+          break;
+        }
         case "code": {
           const text = rt(b.code.rich_text);
           if (text) out.push({ type: "code", text, ...(b.code.language ? { language: b.code.language } : {}) });

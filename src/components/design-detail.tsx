@@ -3,7 +3,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { motion } from "motion/react";
-import { ArrowLeft, Languages } from "lucide-react";
+import { ArrowLeft, ExternalLink, Languages } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { MobileNav } from "@/components/side-nav";
 import { visibleDesignProjects, type DesignBlock, type DesignProject, type Lang } from "@/lib/design";
@@ -146,6 +146,20 @@ function BodyRenderer({ blocks }: { blocks: DesignBlock[] }) {
               <figcaption className="text-xs text-[var(--n-text-tertiary)] mt-2 text-center">{b.caption}</figcaption>
             )}
           </motion.figure>
+        );
+        break;
+      case "link":
+        nodes.push(
+          <a
+            key={i}
+            href={b.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 my-4 px-4 py-3 rounded-lg border border-[var(--n-border)] text-sm text-[var(--n-text)] hover:bg-[var(--n-bg-callout)] transition-colors"
+          >
+            <ExternalLink className="w-4 h-4 shrink-0 text-[var(--n-text-secondary)]" />
+            <span className="truncate">{b.title || b.url}</span>
+          </a>
         );
         break;
       case "code":
