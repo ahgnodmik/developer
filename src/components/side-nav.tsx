@@ -86,7 +86,7 @@ export function SideNav({
       {/* Navigation */}
       <nav className="flex-1 px-2 py-4 space-y-0.5">
         <p className="px-3 mb-2 text-[11px] font-medium text-[var(--n-text-tertiary)] uppercase tracking-widest">
-          Pages
+          Sections
         </p>
         {pageLabels[lang].map((label, i) => (
           <a key={label} href={pageHrefs[i]} className={itemClass(active === "home" && i === 0)}>
@@ -182,7 +182,7 @@ export function MobileNav({
 
             <nav className="flex-1 px-2 py-4 space-y-0.5">
               <p className="px-3 mb-2 text-[11px] font-medium text-[var(--n-text-tertiary)] uppercase tracking-widest">
-                Pages
+                Sections
               </p>
               {pageLabels[lang].map((label, i) => (
                 <a
