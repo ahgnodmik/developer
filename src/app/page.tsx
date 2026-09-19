@@ -121,6 +121,8 @@ const skillGroups = [
         tags: [
           { label: "WordPress", color: "blue" },
           { label: "Divi Theme", color: "purple" },
+          { label: "아임웹", color: "gray" },
+          { label: "카페24", color: "orange" },
         ],
       },
       {

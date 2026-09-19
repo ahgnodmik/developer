@@ -27,7 +27,7 @@ const copy: CaseGridCopy = {
 };
 
 // Grid shows at most 12 cases; extras stay routable but off the grid.
-const MAX_GRID_CASES = 12;
+const MAX_GRID_CASES = 14;
 
 export default function DesignGrid() {
   return (
