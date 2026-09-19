@@ -100,11 +100,43 @@ function extFromUrl(url, fallback = ".jpg") {
   }
 }
 
+// Optional sharp for build-time image optimization (raster -> WebP, resized).
+// Absent locally? Fall back to writing the original bytes.
+let sharp = null;
+try {
+  sharp = (await import("sharp")).default;
+} catch {
+  console.warn("[fetch-notion] sharp not installed — images saved unoptimized.");
+}
+
 async function download(url, destDir, baseName) {
   const res = await fetch(url);
   if (!res.ok) throw new Error(`download ${res.status} ${url}`);
   const buf = Buffer.from(await res.arrayBuffer());
-  const file = `${baseName}${extFromUrl(url)}`;
+  const ext = extFromUrl(url);
+
+  if (sharp && /\.(png|jpe?g|gif|webp)$/.test(ext)) {
+    try {
+      const animated = ext === ".gif" || ext === ".webp";
+      const img = sharp(buf, { animated });
+      const meta = await img.metadata();
+      const width = Math.min(meta.width ?? 1600, animated ? 900 : 1600);
+      const out = await img
+        .resize({ width, withoutEnlargement: true })
+        .webp({ quality: animated ? 70 : 80, effort: 4 })
+        .toBuffer();
+      // keep the original if conversion doesn't actually shrink it
+      if (out.length < buf.length) {
+        const file = `${baseName}.webp`;
+        await writeFile(path.join(destDir, file), out);
+        return file;
+      }
+    } catch (e) {
+      console.warn(`[fetch-notion] optimize failed for ${baseName}${ext}: ${e.message}`);
+    }
+  }
+
+  const file = `${baseName}${ext}`;
   await writeFile(path.join(destDir, file), buf);
   return file;
 }
