@@ -20,7 +20,13 @@ function BodyImage({ b }: { b: ImageBlock }) {
       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={b.src} alt={b.caption ?? ""} className="w-full rounded-lg border border-[var(--n-border)]" />
+      <img
+        src={b.src}
+        alt={b.caption ?? ""}
+        loading="lazy"
+        decoding="async"
+        className="w-full rounded-lg border border-[var(--n-border)]"
+      />
       {b.caption && (
         <figcaption className="text-xs text-[var(--n-text-tertiary)] mt-2 text-center">{b.caption}</figcaption>
       )}
@@ -381,7 +387,7 @@ export function DesignDetail({ project }: { project: DesignProject }) {
                   >
                     {s.cover ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={s.cover} alt={s.title[lang]} className="absolute inset-0 w-full h-full object-cover" />
+                      <img src={s.cover} alt={s.title[lang]} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover" />
                     ) : (
                       <div className={`absolute inset-0 bg-gradient-to-br ${s.gradient} flex items-center justify-center`}>
                         <span className="text-3xl select-none drop-shadow">{s.emoji}</span>
@@ -415,7 +421,7 @@ export function DesignDetail({ project }: { project: DesignProject }) {
               >
                 {p.cover ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={p.cover} alt={p.title[lang]} className="absolute inset-0 w-full h-full object-cover" />
+                  <img src={p.cover} alt={p.title[lang]} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover" />
                 ) : (
                   <div className={`absolute inset-0 bg-gradient-to-br ${p.gradient} flex items-center justify-center`}>
                     <span className="text-3xl select-none drop-shadow">{p.emoji}</span>

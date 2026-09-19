@@ -189,6 +189,8 @@ export function CaseGrid({
                   <img
                     src={p.cover}
                     alt={p.title[lang]}
+                    loading="lazy"
+                    decoding="async"
                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                   />
                 ) : (
