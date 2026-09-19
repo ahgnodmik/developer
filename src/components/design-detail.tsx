@@ -154,6 +154,22 @@ function BodyRenderer({ blocks }: { blocks: DesignBlock[] }) {
           </motion.figure>
         );
         break;
+      case "videofile":
+        nodes.push(
+          <figure key={i} className="my-6">
+            <video
+              src={b.src}
+              controls
+              playsInline
+              preload="metadata"
+              className="w-full rounded-lg border border-[var(--n-border)]"
+            />
+            {b.caption && (
+              <figcaption className="text-xs text-[var(--n-text-tertiary)] mt-2 text-center">{b.caption}</figcaption>
+            )}
+          </figure>
+        );
+        break;
       case "link":
         nodes.push(
           <a

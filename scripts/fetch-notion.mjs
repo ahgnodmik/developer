@@ -93,7 +93,7 @@ function slugify(s) {
 function extFromUrl(url, fallback = ".jpg") {
   try {
     const p = new URL(url).pathname;
-    const m = p.match(/\.(jpg|jpeg|png|webp|gif|svg|avif)$/i);
+    const m = p.match(/\.(jpg|jpeg|png|webp|gif|svg|avif|mp4|mov|webm|m4v)$/i);
     return m ? m[0].toLowerCase() : fallback;
   } catch {
     return fallback;
@@ -239,10 +239,21 @@ async function fetchBody(pageId, dir, slug, childDbs = []) {
         }
         case "video": {
           const src = b.video?.external?.url ?? b.video?.file?.url;
-          const embedUrl = src ? youtubeEmbed(src) : null;
-          if (!embedUrl) break; // only YouTube embeds supported (uploaded video files skipped)
+          if (!src) break;
+          const embedUrl = youtubeEmbed(src);
           const caption = rt(b.video.caption);
-          out.push({ type: "video", provider: "youtube", embedUrl, ...(caption ? { caption } : {}) });
+          if (embedUrl) {
+            out.push({ type: "video", provider: "youtube", embedUrl, ...(caption ? { caption } : {}) });
+          } else if (b.video?.file?.url) {
+            // uploaded video file: download and serve locally
+            try {
+              ctx.vidN = (ctx.vidN ?? 0) + 1;
+              const file = await download(src, dir, `video-${ctx.vidN}`);
+              out.push({ type: "videofile", src: `/design/${slug}/${file}`, ...(caption ? { caption } : {}) });
+            } catch (e) {
+              console.warn(`[fetch-notion] video download failed (${slug}): ${e.message}`);
+            }
+          }
           break;
         }
         // External links (e.g. the live service URL) — bookmark/embed/link_preview.
@@ -467,8 +478,27 @@ async function main() {
         const subDir = path.join(PUBLIC_DESIGN, subSlug);
         await mkdir(subDir, { recursive: true });
 
-        const subChildDbs = []; // one level deep only; ignore any deeper nesting
+        const subChildDbs = [];
         const subBody = await fetchBody(row.id, subDir, subSlug, subChildDbs);
+
+        // Inline databases nested inside a sub-case don't get their own routes;
+        // fold each of their rows into the sub-case body (heading + content).
+        for (const nestedDbId of subChildDbs) {
+          const nestedDsId = await firstDataSourceId(nestedDbId);
+          if (!nestedDsId) continue;
+          const nestedRows = await queryAll(nestedDsId);
+          for (let k = 0; k < nestedRows.length; k++) {
+            const nr = nestedRows[k];
+            const nName = plain(nr.properties["Name"]);
+            if (nName) subBody.push({ type: "heading", level: 3, text: nName });
+            // own asset dir so image filenames can't collide with the sub-case's
+            const nSlug = `${subSlug}--n${k + 1}`;
+            const nDir = path.join(PUBLIC_DESIGN, nSlug);
+            await mkdir(nDir, { recursive: true });
+            const nBody = await fetchBody(nr.id, nDir, nSlug);
+            subBody.push(...nBody);
+          }
+        }
 
         let subCover;
         const rowCover = fileUrls(rp["Cover"])[0];
