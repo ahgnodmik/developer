@@ -10,7 +10,7 @@ import { visibleDesignProjects, type DesignBlock, type DesignProject, type Lang 
 
 type ImageBlock = Extract<DesignBlock, { type: "image" }>;
 
-function BodyImage({ b }: { b: ImageBlock }) {
+function BodyImage({ b, altBase }: { b: ImageBlock; altBase?: string }) {
   return (
     <motion.figure
       className="my-0"
@@ -22,7 +22,7 @@ function BodyImage({ b }: { b: ImageBlock }) {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={b.src}
-        alt={b.caption ?? ""}
+        alt={b.caption ?? altBase ?? ""}
         loading="lazy"
         decoding="async"
         className="w-full rounded-lg border border-[var(--n-border)]"
@@ -41,7 +41,7 @@ function gridColsClass(cols: number) {
   return "sm:grid-cols-2";
 }
 
-function BodyRenderer({ blocks }: { blocks: DesignBlock[] }) {
+function BodyRenderer({ blocks, altBase }: { blocks: DesignBlock[]; altBase?: string }) {
   // Consecutive list items are wrapped in a single <ol>/<ul> so numbering matches
   // Notion (a run of numbered items counts 1..n; items separated by other blocks
   // each restart at 1). Galleries preserve the Notion column count.
@@ -115,7 +115,7 @@ function BodyRenderer({ blocks }: { blocks: DesignBlock[] }) {
       case "image":
         nodes.push(
           <div key={i} className="my-5">
-            <BodyImage b={b} />
+            <BodyImage b={b} altBase={altBase} />
           </div>
         );
         break;
@@ -123,7 +123,7 @@ function BodyRenderer({ blocks }: { blocks: DesignBlock[] }) {
         nodes.push(
           <div key={i} className={`grid grid-cols-1 ${gridColsClass(b.cols)} gap-3 my-5`}>
             {b.images.map((img, j) => (
-              <BodyImage key={j} b={{ type: "image", ...img }} />
+              <BodyImage key={j} b={{ type: "image", ...img }} altBase={altBase} />
             ))}
           </div>
         );
@@ -360,7 +360,7 @@ export function DesignDetail({ project }: { project: DesignProject }) {
         </div>
 
         {project.body && project.body.length > 0 ? (
-          <BodyRenderer blocks={project.body} />
+          <BodyRenderer blocks={project.body} altBase={project.title.ko} />
         ) : (
           <>
             <p className="text-sm text-[var(--n-text)] leading-7">{project.overview[lang]}</p>

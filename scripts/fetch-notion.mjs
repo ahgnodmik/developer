@@ -559,9 +559,36 @@ async function main() {
 
   const all = [...projects, ...subProjects];
   await writeGenerated(all);
+  await writeSitemap(all);
   console.log(
     `[fetch-notion] wrote ${projects.length} published case(s) + ${subProjects.length} sub-case(s).`
   );
+}
+
+// Regenerate public/sitemap.xml with every route (static pages + all cases).
+async function writeSitemap(all) {
+  const today = new Date().toISOString().slice(0, 10);
+  const urls = [
+    { loc: "https://samdong.xyz/", priority: "1.0" },
+    { loc: "https://samdong.xyz/design", priority: "0.8" },
+    { loc: "https://samdong.xyz/archive", priority: "0.6" },
+    ...all.map((p) => ({
+      loc: `https://samdong.xyz/design/${p.slug}`,
+      priority: p.hidden ? "0.4" : "0.7",
+    })),
+  ];
+  const xml =
+    `<?xml version="1.0" encoding="UTF-8"?>\n` +
+    `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
+    urls
+      .map(
+        (u) =>
+          `  <url>\n    <loc>${u.loc}</loc>\n    <lastmod>${today}</lastmod>\n    <priority>${u.priority}</priority>\n  </url>`
+      )
+      .join("\n") +
+    `\n</urlset>\n`;
+  await writeFile(path.join(ROOT, "public", "sitemap.xml"), xml, "utf8");
+  console.log(`[fetch-notion] sitemap: ${urls.length} URLs`);
 }
 
 main().catch((err) => {

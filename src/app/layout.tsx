@@ -41,14 +41,19 @@ export const metadata: Metadata = {
     description:
       "React, Next.js, TypeScript 기반 웹 개발과 Flutter 크로스 플랫폼 앱 개발 포트폴리오",
     locale: "ko_KR",
+    images: [{ url: "/og.png", width: 1200, height: 630 }],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
+    images: ["/og.png"],
     title: "김동하 | Web & Mobile Developer",
     description:
       "React, Next.js, TypeScript 기반 웹 개발과 Flutter 크로스 플랫폼 앱 개발 포트폴리오",
   },
   robots: { index: true, follow: true },
+  verification: {
+    other: { "naver-site-verification": "1146d7fe070eab5b6bd500690bf499482a4b9d52" },
+  },
 };
 
 // runs before paint so the stored/system theme applies without a flash
@@ -62,7 +67,11 @@ const jsonLd = {
   url: siteUrl,
   email: "mailto:samdongpm@gmail.com",
   jobTitle: "Web & Mobile Developer",
-  sameAs: ["https://github.com/ahgnodmik"],
+  sameAs: [
+    "https://github.com/ahgnodmik",
+    "https://www.instagram.com/abroad.now/",
+    "https://www.instagram.com/why.only.now/",
+  ],
   knowsAbout: ["React", "Next.js", "TypeScript", "Tailwind CSS", "Flutter"],
 };
 
