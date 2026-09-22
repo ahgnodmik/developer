@@ -228,7 +228,7 @@ const content = {
     name: "김동하",
     subtitle: "AI Builder · UX/UI Designer",
     nav: ["홈", "소개", "사용하는 도구", "경력", "프로젝트", "연락처"],
-    props: { email: "이메일", github: "GitHub", experience: "경력", experienceValue: "디자인 10+ 년", status: "상태", statusValue: "구직 중" },
+    props: { email: "이메일", github: "GitHub", experience: "경력", experienceValue: "디자인 10+ 년", experienceSub: "UX/UI 5+ · AI Builder 1+", status: "상태", statusValue: "구직 중" },
     sections: { about: "소개", skills: "사용하는 도구", career: "경력", projects: "프로젝트", contact: "연락처" },
     aboutCallout:
       "프로덕트 기획부터 프로토타입 개발, 서비스 환경 구축까지 전 과정을 제공합니다.",
@@ -277,7 +277,7 @@ const content = {
     name: "Kim Dongha",
     subtitle: "AI Builder · UX/UI Designer",
     nav: ["Home", "About", "Skills", "Career", "Projects", "Contact"],
-    props: { email: "Email", github: "GitHub", experience: "Experience", experienceValue: "10+ years in design", status: "Status", statusValue: "Open to work" },
+    props: { email: "Email", github: "GitHub", experience: "Experience", experienceValue: "10+ years in design", experienceSub: "UX/UI 5+ · AI Builder 1+", status: "Status", statusValue: "Open to work" },
     sections: { about: "About", skills: "Skills", career: "Career", projects: "Projects", contact: "Contact" },
     aboutCallout:
       "I cover the full journey from product planning to prototype development and service infrastructure setup.",
@@ -415,7 +415,12 @@ export default function Home() {
                     {prop.value}
                   </a>
                 ) : (
-                  <span className="text-[var(--n-text)]">{prop.value}</span>
+                  <span className="text-[var(--n-text)]">
+                    {prop.value}
+                    {prop.key === t.props.experience && (
+                      <span className="ml-2 text-xs text-[var(--n-text-tertiary)]">{t.props.experienceSub}</span>
+                    )}
+                  </span>
                 )}
               </div>
             ))}
