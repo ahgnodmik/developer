@@ -68,14 +68,70 @@ function LangToggle({ lang, onToggle }: { lang: Lang; onToggle: () => void }) {
   );
 }
 
+function CaseCard({ p, i, lang, open }: { p: DesignProject; i: number; lang: Lang; open: string }) {
+  return (
+    <div>
+      <Link href={`/design/${p.slug}`} className="group block" aria-label={p.title[lang]}>
+        <motion.div
+          whileHover={{ y: -6 }}
+          whileTap={{ scale: 0.98 }}
+          transition={{ type: "spring", stiffness: 300, damping: 22 }}
+          className="relative aspect-square rounded-xl overflow-hidden border border-[var(--n-border)] group-hover:shadow-lg"
+        >
+          {p.cover ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={p.cover}
+              alt={p.title[lang]}
+              loading="lazy"
+              decoding="async"
+              className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+            />
+          ) : (
+            <div className={`absolute inset-0 bg-gradient-to-br ${p.gradient} flex items-center justify-center`}>
+              <span className="text-4xl sm:text-5xl select-none drop-shadow transition-transform duration-300 group-hover:scale-110">
+                {p.emoji}
+              </span>
+            </div>
+          )}
+          {/* index number */}
+          <span className="absolute top-2 left-2 px-1.5 py-0.5 rounded bg-black/30 text-white text-[10px] font-semibold tabular-nums backdrop-blur-sm">
+            {String(i + 1).padStart(2, "0")}
+          </span>
+          {/* year chip */}
+          <span className="absolute bottom-2 right-2 px-1.5 py-0.5 rounded bg-black/30 text-white text-[10px] font-medium backdrop-blur-sm">
+            {p.year}
+          </span>
+          {/* OPEN ↗ on hover */}
+          <span className="absolute top-2 right-2 flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-white/90 text-[#191919] text-[10px] font-semibold opacity-0 -translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200">
+            {open}
+            <ArrowUpRight className="w-3 h-3" />
+          </span>
+        </motion.div>
+        <div className="mt-2 px-0.5">
+          <p className="text-sm font-medium text-[var(--n-text)] leading-snug line-clamp-1 group-hover:underline underline-offset-2">
+            {p.title[lang]}
+          </p>
+          <p className="text-xs text-[var(--n-text-secondary)] mt-0.5 line-clamp-1 leading-snug">
+            {p.summary[lang]}
+          </p>
+        </div>
+      </Link>
+    </div>
+  );
+}
+
 export function CaseGrid({
   projects,
   copy,
   active,
+  subSection,
 }: {
   projects: DesignProject[];
   copy: CaseGridCopy;
   active: SideNavActive;
+  /** Optional extra group rendered below the main grid under its own heading. */
+  subSection?: { title: Record<Lang, string>; projects: DesignProject[] };
 }) {
   const [lang, setLang] = useState<Lang>("ko");
 
@@ -98,16 +154,24 @@ export function CaseGrid({
 
   const [activeTag, setActiveTag] = useState<string | null>(null);
 
+  const subProjects = subSection?.projects ?? [];
+  const allProjects = useMemo(() => [...projects, ...subProjects], [projects, subProjects]);
+
   // tag -> count, sorted by frequency
   const tagCounts = useMemo(() => {
     const m = new Map<string, number>();
-    for (const p of projects) for (const tag of p.tags) m.set(tag, (m.get(tag) ?? 0) + 1);
+    for (const p of allProjects) for (const tag of p.tags) m.set(tag, (m.get(tag) ?? 0) + 1);
     return [...m.entries()].sort((a, b) => b[1] - a[1]);
-  }, [projects]);
+  }, [allProjects]);
 
   const filtered = useMemo(
     () => (activeTag ? projects.filter((p) => p.tags.includes(activeTag)) : projects),
     [activeTag, projects]
+  );
+
+  const filteredSub = useMemo(
+    () => (activeTag ? subProjects.filter((p) => p.tags.includes(activeTag)) : subProjects),
+    [activeTag, subProjects]
   );
 
   return (
@@ -147,13 +211,13 @@ export function CaseGrid({
           <div>
             <p className="flex items-center gap-2 text-[11px] font-semibold tracking-[0.2em] text-[var(--n-text-tertiary)] mb-3">
               <span className="w-1.5 h-1.5 rounded-full bg-[var(--n-text-tertiary)]" />
-              {t.eyebrow} · {String(projects.length).padStart(2, "0")}
+              {t.eyebrow} · {String(allProjects.length).padStart(2, "0")}
             </p>
             <h1 className="text-4xl sm:text-5xl font-bold text-[var(--n-text)] tracking-tight">{t.title}</h1>
             <p className="text-[var(--n-text-secondary)] text-base mt-2">{t.subtitle}</p>
           </div>
           <p className="hidden sm:block shrink-0 text-sm text-[var(--n-text-tertiary)] tabular-nums">
-            {String(filtered.length).padStart(2, "0")} / {String(projects.length).padStart(2, "0")}
+            {String(filtered.length + filteredSub.length).padStart(2, "0")} / {String(allProjects.length).padStart(2, "0")}
           </p>
         </div>
 
@@ -161,7 +225,7 @@ export function CaseGrid({
 
         {/* Filter pills */}
         <div className="flex flex-wrap gap-1.5">
-          <FilterPill active={activeTag === null} label={t.all} count={projects.length} onClick={() => setActiveTag(null)} />
+          <FilterPill active={activeTag === null} label={t.all} count={allProjects.length} onClick={() => setActiveTag(null)} />
           {tagCounts.map(([tag, count]) => (
             <FilterPill key={tag} active={activeTag === tag} label={tag} count={count} onClick={() => setActiveTag(tag)} />
           ))}
@@ -172,60 +236,25 @@ export function CaseGrid({
         {/* ── Responsive square grid ── */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 mt-6">
           {filtered.map((p, i) => (
-            <div key={p.slug}>
-            <Link
-              href={`/design/${p.slug}`}
-              className="group block"
-              aria-label={p.title[lang]}
-            >
-              <motion.div
-                whileHover={{ y: -6 }}
-                whileTap={{ scale: 0.98 }}
-                transition={{ type: "spring", stiffness: 300, damping: 22 }}
-                className="relative aspect-square rounded-xl overflow-hidden border border-[var(--n-border)] group-hover:shadow-lg"
-              >
-                {p.cover ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={p.cover}
-                    alt={p.title[lang]}
-                    loading="lazy"
-                    decoding="async"
-                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                  />
-                ) : (
-                  <div className={`absolute inset-0 bg-gradient-to-br ${p.gradient} flex items-center justify-center`}>
-                    <span className="text-4xl sm:text-5xl select-none drop-shadow transition-transform duration-300 group-hover:scale-110">
-                      {p.emoji}
-                    </span>
-                  </div>
-                )}
-                {/* index number */}
-                <span className="absolute top-2 left-2 px-1.5 py-0.5 rounded bg-black/30 text-white text-[10px] font-semibold tabular-nums backdrop-blur-sm">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                {/* year chip */}
-                <span className="absolute bottom-2 right-2 px-1.5 py-0.5 rounded bg-black/30 text-white text-[10px] font-medium backdrop-blur-sm">
-                  {p.year}
-                </span>
-                {/* OPEN ↗ on hover */}
-                <span className="absolute top-2 right-2 flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-white/90 text-[#191919] text-[10px] font-semibold opacity-0 -translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200">
-                  {t.open}
-                  <ArrowUpRight className="w-3 h-3" />
-                </span>
-              </motion.div>
-              <div className="mt-2 px-0.5">
-                <p className="text-sm font-medium text-[var(--n-text)] leading-snug line-clamp-1 group-hover:underline underline-offset-2">
-                  {p.title[lang]}
-                </p>
-                <p className="text-xs text-[var(--n-text-secondary)] mt-0.5 line-clamp-1 leading-snug">
-                  {p.summary[lang]}
-                </p>
-              </div>
-            </Link>
-            </div>
+            <CaseCard key={p.slug} p={p} i={i} lang={lang} open={t.open} />
           ))}
         </div>
+
+        {/* ── Sub-section (e.g. Extra Activity) ── */}
+        {subSection && filteredSub.length > 0 && (
+          <>
+            <h2 className="flex items-center gap-2 text-[11px] font-semibold tracking-[0.2em] text-[var(--n-text-tertiary)] mt-14 mb-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-[var(--n-text-tertiary)]" />
+              {subSection.title[lang]} · {String(filteredSub.length).padStart(2, "0")}
+            </h2>
+            <hr className="border-t border-[var(--n-border)] my-4" />
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+              {filteredSub.map((p, i) => (
+                <CaseCard key={p.slug} p={p} i={filtered.length + i} lang={lang} open={t.open} />
+              ))}
+            </div>
+          </>
+        )}
 
         <Link
           href="/"

@@ -1,7 +1,7 @@
 "use client";
 
 import { CaseGrid, type CaseGridCopy } from "@/components/case-grid";
-import { archivedDesignProjects } from "@/lib/design";
+import { archivedDesignProjects, extraActivityProjects } from "@/lib/design";
 
 const copy: CaseGridCopy = {
   ko: {
@@ -27,5 +27,15 @@ const copy: CaseGridCopy = {
 };
 
 export default function ArchiveGrid() {
-  return <CaseGrid projects={archivedDesignProjects} copy={copy} active="archive" />;
+  return (
+    <CaseGrid
+      projects={archivedDesignProjects}
+      copy={copy}
+      active="archive"
+      subSection={{
+        title: { ko: "EXTRA ACTIVITY — 개인 운영 채널", en: "EXTRA ACTIVITY — Personal Channels" },
+        projects: extraActivityProjects,
+      }}
+    />
+  );
 }

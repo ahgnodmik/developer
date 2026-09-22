@@ -212,9 +212,17 @@ export const visibleDesignProjects: DesignProject[] = designProjects.filter(
   (p) => !p.hidden && !isArchived(p)
 );
 
+const isExtraActivity = (p: DesignProject) =>
+  /instagram/i.test(`${p.slug} ${p.title.ko} ${p.title.en}`);
+
 /** Archived cases shown on /archive (still routed under /design/[slug]). */
 export const archivedDesignProjects: DesignProject[] = designProjects.filter(
-  (p) => !p.hidden && isArchived(p)
+  (p) => !p.hidden && isArchived(p) && !isExtraActivity(p)
+);
+
+/** Personal channels (Instagram accounts) shown under the Extra Activity heading on /archive. */
+export const extraActivityProjects: DesignProject[] = designProjects.filter(
+  (p) => !p.hidden && isArchived(p) && isExtraActivity(p)
 );
 
 export function getDesignProject(slug: string): DesignProject | undefined {
