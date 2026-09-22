@@ -473,6 +473,7 @@ async function main() {
       for (let i = 0; i < rows.length; i++) {
         const row = rows[i];
         const rp = row.properties;
+        if (rp["Published"] && !checkbox(rp["Published"])) continue;
         const name = plain(rp["Name"]) || `${title.ko || slug} ${i + 1}`;
         const subSlug = `${slug}-${slugify(name) || i + 1}`;
         const subDir = path.join(PUBLIC_DESIGN, subSlug);
