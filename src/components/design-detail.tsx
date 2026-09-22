@@ -403,7 +403,7 @@ export function DesignDetail({ project }: { project: DesignProject }) {
                   >
                     {s.cover ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={s.cover} alt={s.title[lang]} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover" />
+                      <img src={s.cover} alt={s.title[lang]} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover object-left" />
                     ) : (
                       <div className={`absolute inset-0 bg-gradient-to-br ${s.gradient} flex items-center justify-center`}>
                         <span className="text-3xl select-none drop-shadow">{s.emoji}</span>
