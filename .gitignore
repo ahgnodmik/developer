@@ -36,4 +36,7 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
-next-env.d.ts*.tar.gz
+next-env.d.ts
+
+# backups
+*.tar.gz
