@@ -411,7 +411,7 @@ export default function Home() {
               <div key={prop.key} className="flex items-center gap-0">
                 <span className="w-28 shrink-0 text-[var(--n-text-tertiary)]">{prop.key}</span>
                 {prop.href ? (
-                  <a href={prop.href} className="text-[var(--n-text)] hover:underline underline-offset-2">
+                  <a href={prop.href} className="text-[var(--n-text)] hover:text-[var(--n-accent)] hover:underline underline-offset-2 transition-colors">
                     {prop.value}
                   </a>
                 ) : (
@@ -447,7 +447,7 @@ export default function Home() {
                   key={stat.label}
                   className="bg-[var(--n-bg-callout)] border border-[var(--n-border)] rounded-md p-4 text-center"
                 >
-                  <p className="text-2xl font-bold text-[var(--n-text)]">{stat.value}</p>
+                  <p className="text-2xl font-bold text-[var(--n-accent)]">{stat.value}</p>
                   <p className="text-xs text-[var(--n-text-secondary)] mt-1">{stat.label}</p>
                 </div>
               ))}
@@ -492,7 +492,7 @@ export default function Home() {
             <div className="relative pl-6 space-y-8 before:absolute before:left-[5px] before:top-1 before:bottom-1 before:w-px before:bg-[var(--n-border)]">
               {t.career.map((item, i) => (
                 <div key={item.period} className="relative">
-                  <span className="absolute -left-6 top-1.5 w-[11px] h-[11px] rounded-full bg-[var(--n-bg)] border-2 border-[var(--n-text-tertiary)]" />
+                  <span className="absolute -left-6 top-1.5 w-[11px] h-[11px] rounded-full bg-[var(--n-bg)] border-2 border-[var(--n-accent)]" />
                   <p className="text-xs text-[var(--n-text-tertiary)] mb-0.5">{item.period}</p>
                   <p className="text-sm font-medium text-[var(--n-text)]">{item.title}</p>
                   <p className="text-xs text-[var(--n-text-secondary)] mt-1 leading-5">{item.desc}</p>
@@ -555,8 +555,8 @@ export default function Home() {
                 href="mailto:samdongpm@gmail.com"
                 className="flex items-center gap-3 px-3 py-3 rounded-md hover:bg-[var(--n-bg-callout)] transition-colors group"
               >
-                <div className="w-8 h-8 rounded bg-[var(--n-bg-hover)] flex items-center justify-center shrink-0">
-                  <Mail className="w-4 h-4 text-[var(--n-text-secondary)]" />
+                <div className="w-8 h-8 rounded bg-[var(--n-bg-hover)] group-hover:bg-[var(--n-accent-bg)] flex items-center justify-center shrink-0 transition-colors">
+                  <Mail className="w-4 h-4 text-[var(--n-text-secondary)] group-hover:text-[var(--n-accent)] transition-colors" />
                 </div>
                 <div>
                   <p className="text-sm font-medium text-[var(--n-text)]">{t.contactEmail}</p>
@@ -571,8 +571,8 @@ export default function Home() {
                 rel="noopener noreferrer"
                 className="flex items-center gap-3 px-3 py-3 rounded-md hover:bg-[var(--n-bg-callout)] transition-colors group"
               >
-                <div className="w-8 h-8 rounded bg-[var(--n-bg-hover)] flex items-center justify-center shrink-0">
-                  <Github className="w-4 h-4 text-[var(--n-text-secondary)]" />
+                <div className="w-8 h-8 rounded bg-[var(--n-bg-hover)] group-hover:bg-[var(--n-accent-bg)] flex items-center justify-center shrink-0 transition-colors">
+                  <Github className="w-4 h-4 text-[var(--n-text-secondary)] group-hover:text-[var(--n-accent)] transition-colors" />
                 </div>
                 <div>
                   <p className="text-sm font-medium text-[var(--n-text)]">GitHub</p>

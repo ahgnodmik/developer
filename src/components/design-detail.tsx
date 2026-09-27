@@ -103,7 +103,7 @@ function BodyRenderer({ blocks, altBase }: { blocks: DesignBlock[]; altBase?: st
         nodes.push(
           <blockquote
             key={i}
-            className="border-l-2 border-[var(--n-border)] pl-4 my-4 text-sm text-[var(--n-text-secondary)] italic"
+            className="border-l-2 border-[var(--n-accent)] pl-4 my-4 text-sm text-[var(--n-text-secondary)] italic"
           >
             {b.text}
           </blockquote>
@@ -310,7 +310,7 @@ export function DesignDetail({ project }: { project: DesignProject }) {
       <main className="max-w-3xl mx-auto px-6 sm:px-10 pb-32">
         {/* Hero */}
         <motion.div
-          className="mt-8 relative aspect-[16/9] rounded-2xl overflow-hidden border border-[var(--n-border)]"
+          className="mt-8 relative aspect-[16/9] rounded-2xl overflow-hidden border border-[var(--n-border)] bg-[var(--n-accent-bg)]"
           initial={{ opacity: 0, scale: 1.04 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
@@ -399,7 +399,7 @@ export function DesignDetail({ project }: { project: DesignProject }) {
                     whileHover={{ y: -5 }}
                     whileTap={{ scale: 0.98 }}
                     transition={{ type: "spring", stiffness: 300, damping: 22 }}
-                    className="relative aspect-[4/3] rounded-lg overflow-hidden border border-[var(--n-border)]"
+                    className="relative aspect-[4/3] rounded-lg overflow-hidden border border-[var(--n-border)] bg-[var(--n-accent-bg)] shadow-sm transition-all group-hover:shadow-md group-hover:ring-2 group-hover:ring-[var(--n-accent-border)]"
                   >
                     {s.cover ? (
                       // eslint-disable-next-line @next/next/no-img-element
@@ -410,7 +410,7 @@ export function DesignDetail({ project }: { project: DesignProject }) {
                       </div>
                     )}
                   </motion.div>
-                  <p className="text-xs font-medium text-[var(--n-text)] mt-1.5 line-clamp-2 group-hover:underline underline-offset-2">
+                  <p className="text-xs font-medium text-[var(--n-text)] mt-1.5 line-clamp-2 group-hover:text-[var(--n-accent)] group-hover:underline underline-offset-2 transition-colors">
                     {s.title[lang]}
                   </p>
                 </Link>
@@ -433,7 +433,7 @@ export function DesignDetail({ project }: { project: DesignProject }) {
                 whileHover={{ y: -5 }}
                 whileTap={{ scale: 0.98 }}
                 transition={{ type: "spring", stiffness: 300, damping: 22 }}
-                className="relative aspect-square rounded-lg overflow-hidden border border-[var(--n-border)]"
+                className="relative aspect-square rounded-lg overflow-hidden border border-[var(--n-border)] bg-[var(--n-accent-bg)] shadow-sm transition-all group-hover:shadow-md group-hover:ring-2 group-hover:ring-[var(--n-accent-border)]"
               >
                 {p.cover ? (
                   // eslint-disable-next-line @next/next/no-img-element
@@ -444,7 +444,7 @@ export function DesignDetail({ project }: { project: DesignProject }) {
                   </div>
                 )}
               </motion.div>
-              <p className="text-xs font-medium text-[var(--n-text)] mt-1.5 line-clamp-2 group-hover:underline underline-offset-2">
+              <p className="text-xs font-medium text-[var(--n-text)] mt-1.5 line-clamp-2 group-hover:text-[var(--n-accent)] group-hover:underline underline-offset-2 transition-colors">
                 {p.title[lang]}
               </p>
             </Link>

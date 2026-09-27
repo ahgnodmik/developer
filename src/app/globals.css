@@ -56,6 +56,12 @@
   --n-text-secondary: #787774;
   --n-text-tertiary: #acaba8;
 
+  /* Calm indigo accent — interactive & structural elements only */
+  --n-accent: #4f46e5;
+  --n-accent-hover: #4338ca;
+  --n-accent-bg: #eef2ff;
+  --n-accent-border: #c7d2fe;
+
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.129 0.042 264.695);
@@ -101,6 +107,11 @@
   --n-text: #e6e6e4;
   --n-text-secondary: #9b9b98;
   --n-text-tertiary: #6f6f6c;
+
+  --n-accent: #818cf8;
+  --n-accent-hover: #a5b4fc;
+  --n-accent-bg: rgba(129, 140, 248, 0.12);
+  --n-accent-border: rgba(129, 140, 248, 0.28);
 
   --background: oklch(0.129 0.042 264.695);
   --foreground: oklch(0.984 0.003 247.858);

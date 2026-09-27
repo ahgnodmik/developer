@@ -42,12 +42,12 @@ function FilterPill({
       onClick={onClick}
       className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
         active
-          ? "bg-[var(--n-text)] text-[var(--n-bg)] border-[var(--n-text)]"
+          ? "bg-[var(--n-accent)] text-white border-[var(--n-accent)]"
           : "bg-transparent text-[var(--n-text-secondary)] border-[var(--n-border)] hover:bg-[var(--n-bg-hover)] hover:text-[var(--n-text)]"
       }`}
     >
       {label}
-      <span className={`tabular-nums ${active ? "text-[var(--n-bg)]/70" : "text-[var(--n-text-tertiary)]"}`}>
+      <span className={`tabular-nums ${active ? "text-white/70" : "text-[var(--n-text-tertiary)]"}`}>
         {String(count).padStart(2, "0")}
       </span>
     </button>
@@ -76,7 +76,7 @@ function CaseCard({ p, i, lang, open }: { p: DesignProject; i: number; lang: Lan
           whileHover={{ y: -6 }}
           whileTap={{ scale: 0.98 }}
           transition={{ type: "spring", stiffness: 300, damping: 22 }}
-          className="relative aspect-square rounded-xl overflow-hidden border border-[var(--n-border)] group-hover:shadow-lg"
+          className="relative aspect-square rounded-xl overflow-hidden border border-[var(--n-border)] bg-[var(--n-accent-bg)] shadow-sm transition-all group-hover:shadow-lg group-hover:ring-2 group-hover:ring-[var(--n-accent-border)]"
         >
           {p.cover ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -103,13 +103,13 @@ function CaseCard({ p, i, lang, open }: { p: DesignProject; i: number; lang: Lan
             {p.year}
           </span>
           {/* OPEN ↗ on hover */}
-          <span className="absolute top-2 right-2 flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-white/90 text-[#191919] text-[10px] font-semibold opacity-0 -translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200">
+          <span className="absolute top-2 right-2 flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-white/95 text-[var(--n-accent)] text-[10px] font-semibold opacity-0 -translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200">
             {open}
             <ArrowUpRight className="w-3 h-3" />
           </span>
         </motion.div>
         <div className="mt-2 px-0.5">
-          <p className="text-sm font-medium text-[var(--n-text)] leading-snug line-clamp-1 group-hover:underline underline-offset-2">
+          <p className="text-sm font-medium text-[var(--n-text)] leading-snug line-clamp-1 group-hover:text-[var(--n-accent)] group-hover:underline underline-offset-2 transition-colors">
             {p.title[lang]}
           </p>
           <p className="text-xs text-[var(--n-text-secondary)] mt-0.5 line-clamp-1 leading-snug">
