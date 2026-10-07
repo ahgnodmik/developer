@@ -44,23 +44,25 @@
 }
 
 :root {
-  /* Notion palette — page.tsx references these via arbitrary values */
-  --n-bg: #ffffff;
-  --n-bg-sidebar: #fbfbfa;
-  --n-bg-callout: #f7f7f5;
-  --n-bg-hover: #f1f1ef;
-  --n-bg-active: #e9e9e7;
-  --n-border: #e9e9e7;
-  --n-divide: #f1f1ef;
-  --n-text: #37352f;
-  --n-text-secondary: #787774;
-  --n-text-tertiary: #acaba8;
+  /* Paper palette: page.tsx and shared components reference these via arbitrary values */
+  --n-bg: #f3f1ec;
+  --n-bg-sidebar: #eeebe5;
+  --n-bg-callout: #ebe8e1;
+  --n-bg-hover: #e4e0d8;
+  --n-bg-active: #dad5cb;
+  --n-border: #dcd7cd;
+  --n-divide: #e6e2da;
+  --n-text: #161616;
+  --n-text-secondary: #57544e;
+  --n-text-tertiary: #6f6b64;
 
-  /* Calm indigo accent — interactive & structural elements only */
-  --n-accent: #4f46e5;
-  --n-accent-hover: #4338ca;
-  --n-accent-bg: #eef2ff;
-  --n-accent-border: #c7d2fe;
+  /* Ultramarine: the single brand accent */
+  --n-accent: #2b3bd9;
+  --n-accent-hover: #1f2cb8;
+  --n-accent-bg: #e2e4f7;
+  --n-accent-border: #b9bff0;
+  /* Solid brand fields (white text on top): same in both themes for contrast */
+  --n-brand: #2b3bd9;
 
   --radius: 0.625rem;
   --background: oklch(1 0 0);
@@ -97,21 +99,21 @@
 }
 
 .dark {
-  --n-bg: #191919;
-  --n-bg-sidebar: #202020;
-  --n-bg-callout: #252525;
-  --n-bg-hover: #2c2c2c;
-  --n-bg-active: #373737;
-  --n-border: #313131;
-  --n-divide: #2a2a2a;
-  --n-text: #e6e6e4;
-  --n-text-secondary: #9b9b98;
-  --n-text-tertiary: #6f6f6c;
+  --n-bg: #131312;
+  --n-bg-sidebar: #191918;
+  --n-bg-callout: #1d1d1b;
+  --n-bg-hover: #262624;
+  --n-bg-active: #30302d;
+  --n-border: #2c2c2a;
+  --n-divide: #222220;
+  --n-text: #edebe6;
+  --n-text-secondary: #a8a59f;
+  --n-text-tertiary: #85827c;
 
-  --n-accent: #818cf8;
-  --n-accent-hover: #a5b4fc;
-  --n-accent-bg: rgba(129, 140, 248, 0.12);
-  --n-accent-border: rgba(129, 140, 248, 0.28);
+  --n-accent: #7f8cff;
+  --n-accent-hover: #a3acff;
+  --n-accent-bg: rgba(127, 140, 255, 0.12);
+  --n-accent-border: rgba(127, 140, 255, 0.3);
 
   --background: oklch(0.129 0.042 264.695);
   --foreground: oklch(0.984 0.003 247.858);
@@ -161,12 +163,12 @@
     scroll-behavior: smooth;
   }
   ::selection {
-    background-color: #d3e5ef;
-    color: #37352f;
+    background-color: #2b3bd9;
+    color: #ffffff;
   }
   .dark ::selection {
-    background-color: #2f4a5c;
-    color: #e6e6e4;
+    background-color: #7f8cff;
+    color: #131312;
   }
 }
 
@@ -179,4 +181,18 @@
     font-size: 16px !important;
     line-height: 1.5 !important;
   }
+}
+
+/* Paper grain: fixed noise layer over the whole page, never intercepts input. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.dark body::before {
+  opacity: 0.035;
 }

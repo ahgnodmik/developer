@@ -1,314 +1,153 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Github, Mail, ExternalLink, Languages } from "lucide-react";
-import { ThemeToggle } from "@/components/theme-toggle";
-import { SideNav, MobileNav } from "@/components/side-nav";
+import Link from "next/link";
+import { MotionConfig, motion } from "motion/react";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { SiteHeader, SITE_VERSION } from "@/components/site-header";
+import type { Lang } from "@/lib/design";
 
-const tagColors = {
-  blue: "bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300",
-  green: "bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300",
-  purple: "bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300",
-  orange: "bg-orange-100 text-orange-800 dark:bg-orange-950 dark:text-orange-300",
-  gray: "bg-gray-100 text-gray-700 dark:bg-neutral-800 dark:text-neutral-300",
-  yellow: "bg-yellow-100 text-yellow-800 dark:bg-yellow-950 dark:text-yellow-300",
-  pink: "bg-pink-100 text-pink-800 dark:bg-pink-950 dark:text-pink-300",
-  red: "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300",
-} as const;
-
-type TagColor = keyof typeof tagColors;
-type Lang = "ko" | "en";
 type ProjectStatus = "live" | "dev" | "case";
 
-function Tag({ label, color = "gray" }: { label: string; color?: TagColor }) {
+const FONT_STACK = "var(--font-geist-sans), 'Pretendard Variable', Pretendard, system-ui, sans-serif";
+const CONTAINER = "max-w-[1400px] mx-auto px-5 md:px-10";
+
+// Career ruler spans 2019 to "now" (Oct 2026); bars and ticks are positioned as % of this range.
+const RULER_START = 2019;
+const RULER_END = 2026.8;
+const rulerPos = (year: number) => ((year - RULER_START) / (RULER_END - RULER_START)) * 100;
+
+function Reveal({ children, className = "", delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${tagColors[color]}`}>
+    <motion.div
+      initial={{ opacity: 0, y: 18 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-80px" }}
+      transition={{ duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+// Figma-style selection frame around a label: the "designer" half of the identity diptych.
+function SelectionFrame({ children }: { children: React.ReactNode }) {
+  const handle = "absolute w-1.5 h-1.5 bg-[var(--n-bg)] border border-[var(--n-accent)]";
+  return (
+    <span className="relative inline-block px-2.5 py-1 border border-[var(--n-accent)] text-sm font-medium text-[var(--n-text)]">
+      {children}
+      <span className={`${handle} -left-[4px] -top-[4px]`} />
+      <span className={`${handle} -right-[4px] -top-[4px]`} />
+      <span className={`${handle} -left-[4px] -bottom-[4px]`} />
+      <span className={`${handle} -right-[4px] -bottom-[4px]`} />
+    </span>
+  );
+}
+
+function LiveSticker({ label }: { label: string }) {
+  return (
+    <span className="inline-flex items-center gap-1.5 -rotate-3 px-2 py-0.5 rounded-[3px] bg-[var(--n-brand)] text-white text-[11px] font-semibold tracking-wide whitespace-nowrap">
+      <span className="w-1.5 h-1.5 rounded-full bg-white motion-safe:animate-pulse" />
       {label}
     </span>
   );
 }
 
-function Callout({ emoji, children }: { emoji: string; children: React.ReactNode }) {
-  return (
-    <div className="flex gap-3 bg-[var(--n-bg-callout)] border border-[var(--n-border)] rounded-md p-4 my-4">
-      <span className="text-lg flex-shrink-0 leading-6">{emoji}</span>
-      <p className="text-sm text-[var(--n-text)] leading-relaxed">{children}</p>
-    </div>
-  );
-}
-
-function SectionHeading({ emoji, title }: { emoji: string; title: string }) {
-  return (
-    <div className="flex items-center gap-2 mt-10 mb-4">
-      <span className="text-xl">{emoji}</span>
-      <h2 className="text-lg font-semibold text-[var(--n-text)]">{title}</h2>
-    </div>
-  );
-}
-
-function Divider() {
-  return <hr className="border-t border-[var(--n-border)] my-6" />;
-}
-
-function LangToggle({ lang, onToggle }: { lang: Lang; onToggle: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onToggle}
-      aria-label={lang === "ko" ? "Switch to English" : "한국어로 전환"}
-      className="flex items-center gap-1 px-2 h-8 rounded text-xs font-semibold text-[var(--n-text-secondary)] hover:bg-[var(--n-bg-hover)] hover:text-[var(--n-text)] transition-colors"
-    >
-      <Languages className="w-4 h-4" />
-      {lang === "ko" ? "EN" : "한"}
-    </button>
-  );
-}
-
 const skillGroups = [
-  {
-    heading: "AI Build",
-    items: [
-      {
-        category: "Frontend & Web",
-        tags: [
-          { label: "React", color: "blue" },
-          { label: "TypeScript", color: "blue" },
-          { label: "Tailwind CSS", color: "purple" },
-          { label: "JavaScript", color: "yellow" },
-        ],
-      },
-      {
-        category: "Serverless & Backend",
-        tags: [
-          { label: "Netlify", color: "green" },
-          { label: "AWS", color: "orange" },
-          { label: "Firebase", color: "yellow" },
-        ],
-      },
-      {
-        category: "Mobile",
-        tags: [
-          { label: "Flutter", color: "blue" },
-          { label: "Dart", color: "blue" },
-        ],
-      },
-      {
-        category: "AI",
-        tags: [
-          { label: "Claude API", color: "pink" },
-          { label: "OpenAI API", color: "green" },
-          { label: "Cursor", color: "blue" },
-          { label: "AI Integration", color: "pink" },
-        ],
-      },
-    ],
-  },
-  {
-    heading: "Skills",
-    items: [
-      {
-        category: "UX/UI Design",
-        tags: [
-          { label: "Figma", color: "purple" },
-          { label: "Adobe", color: "red" },
-          { label: "Prototyping", color: "orange" },
-          { label: "User Research", color: "blue" },
-          { label: "Design System", color: "gray" },
-        ],
-      },
-      {
-        category: "CMS Publishing",
-        tags: [
-          { label: "WordPress", color: "blue" },
-          { label: "Divi Theme", color: "purple" },
-          { label: "아임웹", color: "gray" },
-          { label: "카페24", color: "orange" },
-        ],
-      },
-      {
-        category: "Work Tools",
-        tags: [
-          { label: "Google Workspace", color: "green" },
-          { label: "Docswave", color: "blue" },
-          { label: "Monday.com", color: "red" },
-        ],
-      },
-      {
-        category: "Documentation",
-        tags: [
-          { label: "Notion", color: "gray" },
-          { label: "Jira", color: "blue" },
-          { label: "Confluence", color: "blue" },
-        ],
-      },
-    ],
-  },
-] satisfies {
-  heading: string | null;
-  items: { category: string; tags: { label: string; color: TagColor }[] }[];
-}[];
-
-const careerTags = [
-  [
-    { label: "Claude API", color: "pink" },
-    { label: "OpenAI API", color: "green" },
-    { label: "AI Integration", color: "pink" },
-    { label: "Next.js", color: "gray" },
-  ],
-  [
-    { label: "Figma", color: "purple" },
-    { label: "Prototyping", color: "orange" },
-    { label: "User Research", color: "blue" },
-    { label: "Design System", color: "gray" },
-  ],
-  [
-    { label: "Marketing Design", color: "red" },
-    { label: "UX/UI", color: "purple" },
-    { label: "Adobe", color: "red" },
-    { label: "Branding", color: "orange" },
-  ],
-] satisfies { label: string; color: TagColor }[][];
-
-const projectTags = [
-  [
-    { label: "Flutter", color: "blue" },
-    { label: "OCR", color: "orange" },
-    { label: "AdMob", color: "yellow" },
-  ],
-  [
-    { label: "Flutter", color: "blue" },
-    { label: "REST API", color: "green" },
-    { label: "AdMob", color: "yellow" },
-  ],
-  [
-    { label: "Flutter", color: "blue" },
-    { label: "Firebase", color: "yellow" },
-    { label: "Google Maps", color: "green" },
-  ],
-  [
-    { label: "Python", color: "blue" },
-    { label: "LLM", color: "pink" },
-    { label: "Automation", color: "purple" },
-  ],
-  [
-    { label: "Node.js", color: "green" },
-    { label: "Supabase", color: "green" },
-    { label: "Automation", color: "purple" },
-  ],
-  [
-    { label: "Node.js", color: "green" },
-    { label: "Apify", color: "gray" },
-    { label: "Telegram Bot", color: "blue" },
-  ],
-  [
-    { label: "Flutter", color: "blue" },
-    { label: "Firestore", color: "yellow" },
-    { label: "Riverpod", color: "purple" },
-  ],
-  [
-    { label: "Next.js", color: "gray" },
-    { label: "Supabase", color: "green" },
-    { label: "LLM", color: "pink" },
-  ],
-] satisfies { label: string; color: TagColor }[][];
-
-const projectStatuses: ProjectStatus[] = [
-  "live",
-  "live",
-  "live",
-  "case",
-  "dev",
-  "dev",
-  "case",
-  "case",
+  { heading: "AI Build", tags: ["React", "TypeScript", "Next.js", "Tailwind CSS", "Flutter", "Dart", "Firebase", "AWS", "Netlify", "Claude API", "OpenAI API", "Cursor"] },
+  { heading: "Design & Work", tags: ["Figma", "Adobe", "Prototyping", "User Research", "Design System", "WordPress", "아임웹", "카페24", "Notion", "Jira", "Confluence", "Monday.com"] },
 ];
+
+// Index-aligned with content.{ko,en}.career
+const careerMeta = [
+  { from: 2025, to: RULER_END },
+  { from: 2020, to: 2025 },
+  { from: 2019, to: 2020 },
+];
+
+// Index-aligned with content.{ko,en}.projects
+const projectTags = [
+  ["Flutter", "OCR", "AdMob"],
+  ["Flutter", "REST API", "AdMob"],
+  ["Flutter", "Firebase", "Google Maps"],
+  ["Python", "LLM", "Automation"],
+  ["Node.js", "Supabase", "Automation"],
+  ["Node.js", "Apify", "Telegram Bot"],
+  ["Flutter", "Firestore", "Riverpod"],
+  ["Next.js", "Supabase", "LLM"],
+];
+
+const projectStatuses: ProjectStatus[] = ["live", "live", "live", "case", "dev", "dev", "case", "case"];
+
+// Generated duotone covers for the LIVE apps (abstract, no real UI), index-aligned with live projects.
+const liveCovers = ["/work/ocr.webp", "/work/currency.webp", "/work/place.webp"];
 
 const content = {
   ko: {
     name: "김동하",
-    subtitle: "AI Builder · UX/UI Designer",
-    nav: ["홈", "소개", "사용하는 도구", "경력", "프로젝트", "연락처"],
-    props: { email: "이메일", github: "GitHub", experience: "경력", experienceValue: "디자인 10+ 년", experienceSub: "UX/UI 5+ · AI Builder 1+", status: "상태", statusValue: "구직 중" },
-    sections: { about: "소개", skills: "사용하는 도구", career: "경력", projects: "프로젝트", contact: "연락처" },
-    aboutCallout:
-      "프로덕트 기획부터 프로토타입 개발, 서비스 환경 구축까지 전 과정을 제공합니다.",
+    role: "AI Builder, UX/UI Designer",
+    headline: "디자인하고, AI로 직접 만들고, 운영합니다",
+    experience: "디자인 10+ 년",
+    status: "구직 중",
+    seeWork: "대표 작업 보기",
+    identity: {
+      design: { role: "UX/UI Designer", years: "5+", unit: "년", desc: "리서치, UI 디자인, 프로토타입, 디자인 시스템 구축" },
+      build: { role: "AIBuilder", years: "1+", unit: "년", desc: "Claude와 OpenAI API, Flutter, Next.js로 기획부터 출시까지" },
+    },
+    aboutLead: "프로덕트 기획부터 프로토타입 개발, 서비스 환경 구축까지 전 과정을 제공합니다.",
     aboutBody:
       "AI 기술과 Flutter를 활용한 크로스 플랫폼 앱 개발에 집중하며, 웹 서비스와 모바일 앱을 통합한 디지털 솔루션을 제공합니다. 디자인 중심의 개발 철학으로 사용자 친화적인 인터페이스를 구현하고, 지속적인 기술 연구와 혁신을 통해 더 나은 디지털 경험을 만들어갑니다.",
-    stats: [
-      { value: "5+", label: "UX/UI 경력" },
-      { value: "1+", label: "AI Builder" },
-      { value: "10+", label: "사용하는 도구" },
-      { value: "100%", label: "성실함" },
-    ],
-    career: [
-      {
-        period: "2025 — 현재",
-        title: "AI Builder",
-        desc: "Claude, OpenAI API 등 AI를 활용한 웹 서비스 및 앱 기획·개발. Cursor 등 AI 도구 기반 고속 프로토타이핑.",
-      },
-      {
-        period: "2020 — 2025",
-        title: "UX/UI 디자이너",
-        desc: "모바일·웹 서비스 UX 리서치, UI 디자인, 프로토타이핑. 디자인 시스템 구축 및 개발팀 협업.",
-      },
-      {
-        period: "2019 — 2020",
-        title: "마케팅 디자인 · UX/UI 디자인 매니저",
-        desc: "헬스케어 회사에서 마케팅 디자인과 UX/UI 디자인 매니저로 브랜드·프로덕트 디자인 전반을 담당.",
-      },
-    ],
-    statusLabels: { live: "LIVE", dev: "In dev", case: "Study" },
-    projectSummary: (total: number, live: number, dev: number, cs: number) =>
-      `총 ${total}개 · LIVE ${live} · 개발 중 ${dev} · 케이스 스터디 ${cs}`,
+    work: { title: "대표 작업", note: "스토어에 출시해 운영 중인 앱 3개. 서비스명과 코드는 비공개입니다." },
+    more: { title: "더 많은 프로젝트", note: "상세 케이스 스터디와 시연은 문의 시 공유합니다." },
+    designCta: { title: "서비스 디자인 케이스 스터디", body: "B2B 관제 시스템, 챗봇, 퍼블리싱 등 디자인 작업 모음", link: "디자인 작업 보기", archive: "More Works" },
+    career: {
+      title: "경력과 도구",
+      items: [
+        { period: "2025 - 현재", short: "AI Builder", title: "AI Builder", desc: "Claude, OpenAI API 등 AI를 활용한 웹 서비스 및 앱 기획·개발. Cursor 등 AI 도구 기반 고속 프로토타이핑." },
+        { period: "2020 - 2025", short: "UX/UI", title: "UX/UI 디자이너", desc: "모바일·웹 서비스 UX 리서치, UI 디자인, 프로토타이핑. 디자인 시스템 구축 및 개발팀 협업." },
+        { period: "2019 - 2020", short: "Marketing", title: "마케팅 디자인, UX/UI 디자인 매니저", desc: "헬스케어 회사에서 마케팅 디자인과 UX/UI 디자인 매니저로 브랜드·프로덕트 디자인 전반을 담당." },
+      ],
+    },
+    statusLabels: { live: "LIVE", dev: "개발 중", case: "케이스 스터디" },
     projects: [
       { title: "OCR 기반 노트 생성 앱", desc: "촬영·스캔 문서를 구조화된 노트로 변환하는 모바일 앱. 스토어 출시 및 운영 중." },
       { title: "실시간 환율 변환 앱", desc: "20개 통화 실시간 환율 조회·변환. 스토어 출시 및 운영 중." },
       { title: "장소 기록 모바일 앱", desc: "장소를 카드로 기록·탐색. 필드 암호화, 다국어, 지도 연동 포함 프로덕션 운영." },
       { title: "블로그 콘텐츠 자동 발행 파이프라인", desc: "키워드 수집부터 원고 생성·발행까지 무인 운영한 일일 자동 발행 시스템." },
-      { title: "SNS 카드뉴스 자동화 파이프라인", desc: "소재 수집 → 카드 렌더링 → 게시까지 이어지는 멀티 계정 콘텐츠 자동화." },
+      { title: "SNS 카드뉴스 자동화 파이프라인", desc: "소재 수집, 카드 렌더링, 게시까지 이어지는 멀티 계정 콘텐츠 자동화." },
       { title: "해외 신상품 모니터링 시스템", desc: "해외 커머스 신상품을 수집·필터링해 메신저로 발송하는 소싱 레이더." },
       { title: "단체 주문 자동화 앱", desc: "링크 공유로 참여자 주문을 자동 집계. 비회원 참여, 실시간 동기화 설계." },
-      { title: "주간 식단·장보기 리스트 생성기", desc: "가구 제약(알레르기·예산·조리 실력)을 반영한 7일 식단과 합산 장보기 리스트 MVP." },
+      { title: "주간 식단·장보기 리스트 생성기", desc: "가구 제약(알레르기, 예산, 조리 실력)을 반영한 7일 식단과 합산 장보기 리스트 MVP." },
     ],
-    projectsNote: "모든 프로젝트는 비공개로 운영됩니다. 상세 케이스 스터디와 시연은 문의 시 공유 가능합니다.",
-    contactEmail: "이메일",
+    contact: { label: "연락처", lead: "프로젝트나 채용 관련 문의는 메일로 받습니다." },
   },
   en: {
     name: "Kim Dongha",
-    subtitle: "AI Builder · UX/UI Designer",
-    nav: ["Home", "About", "Skills", "Career", "Projects", "Contact"],
-    props: { email: "Email", github: "GitHub", experience: "Experience", experienceValue: "10+ years in design", experienceSub: "UX/UI 5+ · AI Builder 1+", status: "Status", statusValue: "Open to work" },
-    sections: { about: "About", skills: "Skills", career: "Career", projects: "Projects", contact: "Contact" },
-    aboutCallout:
-      "I cover the full journey from product planning to prototype development and service infrastructure setup.",
+    role: "AI Builder, UX/UI Designer",
+    headline: "I design it, build it with AI, and keep it running",
+    experience: "10+ years in design",
+    status: "Open to work",
+    seeWork: "See selected work",
+    identity: {
+      design: { role: "UX/UI Designer", years: "5+", unit: "yrs", desc: "Research, UI design, prototyping, and design systems" },
+      build: { role: "AIBuilder", years: "1+", unit: "yr", desc: "From planning to launch with Claude, OpenAI APIs, Flutter, and Next.js" },
+    },
+    aboutLead: "I cover the full journey from product planning to prototype development and service infrastructure setup.",
     aboutBody:
       "I focus on cross-platform app development combining AI and Flutter, delivering digital solutions that unify web services and mobile apps. With a design-driven development philosophy, I craft user-friendly interfaces and keep improving digital experiences through continuous research and innovation.",
-    stats: [
-      { value: "5+", label: "Years in UX/UI" },
-      { value: "1+", label: "AI Builder" },
-      { value: "10+", label: "Tech stacks" },
-      { value: "100%", label: "Commitment" },
-    ],
-    career: [
-      {
-        period: "2025 — Present",
-        title: "AI Builder",
-        desc: "Planning and building AI-powered web services and apps with Claude and OpenAI APIs. Rapid prototyping with AI tools such as Cursor.",
-      },
-      {
-        period: "2020 — 2025",
-        title: "UX/UI Designer",
-        desc: "UX research, UI design, and prototyping for mobile and web services. Built design systems and collaborated with engineering teams.",
-      },
-      {
-        period: "2019 — 2020",
-        title: "Marketing Design · UX/UI Design Manager",
-        desc: "Led marketing design and UX/UI as design manager at a healthcare company, covering brand and product design.",
-      },
-    ],
-    statusLabels: { live: "LIVE", dev: "In dev", case: "Study" },
-    projectSummary: (total: number, live: number, dev: number, cs: number) =>
-      `${total} total · ${live} live · ${dev} in development · ${cs} case studies`,
+    work: { title: "Selected work", note: "Three apps live in production. Names and code stay private." },
+    more: { title: "More projects", note: "Detailed case studies and demos are available on request." },
+    designCta: { title: "Service design case studies", body: "B2B monitoring systems, chatbots, publishing, and more", link: "View design work", archive: "More works" },
+    career: {
+      title: "Career and tools",
+      items: [
+        { period: "2025 - Present", short: "AI Builder", title: "AI Builder", desc: "Planning and building AI-powered web services and apps with Claude and OpenAI APIs. Rapid prototyping with AI tools such as Cursor." },
+        { period: "2020 - 2025", short: "UX/UI", title: "UX/UI Designer", desc: "UX research, UI design, and prototyping for mobile and web services. Built design systems and collaborated with engineering teams." },
+        { period: "2019 - 2020", short: "Marketing", title: "Marketing Design, UX/UI Design Manager", desc: "Led marketing design and UX/UI as design manager at a healthcare company, covering brand and product design." },
+      ],
+    },
+    statusLabels: { live: "LIVE", dev: "In development", case: "Case study" },
     projects: [
       { title: "OCR Note-Taking App", desc: "Mobile app that turns captured or scanned documents into structured notes. Published and live on the store." },
       { title: "Real-Time Currency Converter", desc: "Real-time exchange rates and conversion across 20 currencies. Published and live on the store." },
@@ -319,36 +158,9 @@ const content = {
       { title: "Group Ordering Automation App", desc: "Auto-aggregates participant orders via shared link. Designed for guest participation and real-time sync." },
       { title: "Weekly Meal Plan & Grocery List Generator", desc: "MVP generating 7-day meal plans and consolidated grocery lists that respect allergies, budget, and cooking skill." },
     ],
-    projectsNote: "All projects are privately operated. Detailed case studies and demos are available on request.",
-    contactEmail: "Email",
+    contact: { label: "Contact", lead: "For projects or hiring, email works best." },
   },
 } satisfies Record<Lang, unknown>;
-
-const statusMeta: Record<ProjectStatus, { dot: string; text: string }> = {
-  live: {
-    dot: "bg-green-500 animate-pulse",
-    text: "text-green-700 dark:text-green-400 bg-green-100 dark:bg-green-950",
-  },
-  dev: {
-    dot: "bg-yellow-500",
-    text: "text-yellow-700 dark:text-yellow-400 bg-yellow-100 dark:bg-yellow-950",
-  },
-  case: {
-    dot: "bg-gray-400",
-    text: "text-gray-600 dark:text-neutral-400 bg-gray-100 dark:bg-neutral-800",
-  },
-};
-
-function StatusBadge({ status, label }: { status: ProjectStatus; label: string }) {
-  const meta = statusMeta[status];
-  return (
-    <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium whitespace-nowrap ${meta.text}`}>
-      <span className={`w-1.5 h-1.5 rounded-full ${meta.dot}`} />
-      {label}
-    </span>
-  );
-}
-
 
 export default function Home() {
   const [lang, setLang] = useState<Lang>("ko");
@@ -369,221 +181,278 @@ export default function Home() {
   }
 
   const t = content[lang];
-  const liveCount = projectStatuses.filter((s) => s === "live").length;
-  const devCount = projectStatuses.filter((s) => s === "dev").length;
-  const caseCount = projectStatuses.filter((s) => s === "case").length;
+  const projects = t.projects.map((p, i) => ({ ...p, status: projectStatuses[i], tags: projectTags[i] }));
+  const liveProjects = projects.filter((p) => p.status === "live");
+  const otherProjects = projects
+    .filter((p) => p.status !== "live")
+    .sort((a, b) => (a.status === b.status ? 0 : a.status === "dev" ? -1 : 1));
+  const devCount = otherProjects.filter((p) => p.status === "dev").length;
+  const rulerYears = Array.from({ length: Math.floor(RULER_END) - RULER_START + 1 }, (_, i) => RULER_START + i);
 
   return (
-    <div className="flex min-h-screen bg-[var(--n-bg)]" style={{ fontFamily: "'Inter', 'Segoe UI', system-ui, sans-serif" }}>
-      {/* ── Sidebar ── */}
-      <SideNav lang={lang} onToggleLang={toggleLang} active="home" />
+    <MotionConfig reducedMotion="user">
+      <div className="min-h-screen bg-[var(--n-bg)] text-[var(--n-text)] break-keep" style={{ fontFamily: FONT_STACK }}>
+        <SiteHeader lang={lang} onToggleLang={toggleLang} active="home" />
 
-      {/* ── Main ── */}
-      <main className="flex-1 overflow-y-auto">
-        {/* Mobile top bar */}
-        <header className="md:hidden sticky top-0 z-20 flex items-center gap-2 px-4 h-14 bg-[var(--n-bg-sidebar)]/90 backdrop-blur border-b border-[var(--n-border)]">
-          <MobileNav lang={lang} onToggleLang={toggleLang} active="home" />
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.jpeg" alt="Kim Dongha" className="w-6 h-6 rounded object-cover shrink-0" />
-          <span className="text-sm font-semibold text-[var(--n-text)]">Kim Dongha</span>
-          <div className="ml-auto flex items-center">
-            <LangToggle lang={lang} onToggle={toggleLang} />
-            <ThemeToggle />
-          </div>
-        </header>
+        <main>
+          {/* ── Hero ── */}
+          <section className={`${CONTAINER} flex flex-col justify-between md:min-h-[calc(100dvh-3.5rem)] pt-16 md:pt-24 pb-10`}>
+            <motion.h1
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+              className="max-w-[11ch] text-[clamp(3rem,10.5vw,10.5rem)] leading-[0.96] font-medium tracking-[-0.045em] text-balance"
+            >
+              <span className="sr-only">{t.name}, </span>
+              {t.headline}
+              <span aria-hidden className="inline-block ml-[0.08em] w-[0.22em] h-[0.22em] rounded-full bg-[var(--n-accent)] align-baseline" />
+            </motion.h1>
 
-        {/* Page content */}
-        <div className="max-w-3xl mx-auto px-6 sm:px-10 pb-32 animate-in fade-in slide-in-from-bottom-2 duration-500">
-          {/* Page icon */}
-          <div className="mt-12 mb-3 text-6xl select-none">🧑‍💻</div>
-
-          {/* Title */}
-          <h1 className="text-4xl font-bold text-[var(--n-text)] mb-1 tracking-tight">{t.name}</h1>
-          <p className="text-[var(--n-text-secondary)] text-base mb-6">{t.subtitle}</p>
-
-          {/* Properties */}
-          <div className="text-sm space-y-2 mb-6">
-            {[
-              { key: t.props.email, value: "samdongpm@gmail.com", href: "mailto:samdongpm@gmail.com" },
-              { key: t.props.github, value: "github.com/ahgnodmik", href: "https://github.com/ahgnodmik" },
-              { key: t.props.experience, value: t.props.experienceValue },
-            ].map((prop) => (
-              <div key={prop.key} className="flex items-center gap-0">
-                <span className="w-28 shrink-0 text-[var(--n-text-tertiary)]">{prop.key}</span>
-                {prop.href ? (
-                  <a href={prop.href} className="text-[var(--n-text)] hover:text-[var(--n-accent)] hover:underline underline-offset-2 transition-colors">
-                    {prop.value}
-                  </a>
-                ) : (
-                  <span className="text-[var(--n-text)]">
-                    {prop.value}
-                    {prop.key === t.props.experience && (
-                      <span className="ml-2 text-xs text-[var(--n-text-tertiary)]">{t.props.experienceSub}</span>
-                    )}
-                  </span>
-                )}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.35 }}
+              className="mt-16 grid gap-6 md:grid-cols-12 md:items-end pt-6 border-t border-[var(--n-border)]"
+            >
+              <div className="md:col-span-4 flex items-center gap-3">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/logo.jpeg" alt="" className="w-12 h-12 rounded-lg object-cover ring-1 ring-[var(--n-border)]" />
+                <div className="text-sm leading-5">
+                  <p className="font-medium">{t.name}</p>
+                  <p className="text-[var(--n-text-secondary)]">{t.role}</p>
+                </div>
               </div>
-            ))}
-            <div className="flex items-center gap-0">
-              <span className="w-28 shrink-0 text-[var(--n-text-tertiary)]">{t.props.status}</span>
-              <Tag label={t.props.statusValue} color="green" />
-            </div>
-          </div>
+              <dl className="md:col-span-4 grid grid-cols-[4.5rem_1fr] gap-y-1 text-sm">
+                <dt className="font-mono text-xs leading-5 text-[var(--n-text-tertiary)]">Email</dt>
+                <dd><a href="mailto:samdongpm@gmail.com" className="hover:text-[var(--n-accent)] transition-colors">samdongpm@gmail.com</a></dd>
+                <dt className="font-mono text-xs leading-5 text-[var(--n-text-tertiary)]">GitHub</dt>
+                <dd><a href="https://github.com/ahgnodmik" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--n-accent)] transition-colors">ahgnodmik</a></dd>
+                <dt className="font-mono text-xs leading-5 text-[var(--n-text-tertiary)]">Exp.</dt>
+                <dd>{t.experience}</dd>
+              </dl>
+              <div className="md:col-span-4 flex items-center gap-5 md:justify-end">
+                <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-[var(--n-accent-bg)] text-[var(--n-accent)]">{t.status}</span>
+                <a href="#projects" className="group inline-flex items-center gap-1.5 text-sm font-medium underline underline-offset-4 decoration-[var(--n-border)] hover:decoration-[var(--n-accent)] transition-colors">
+                  {t.seeWork}
+                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+                </a>
+              </div>
+            </motion.div>
+          </section>
 
-          <Divider />
+          {/* ── Identity diptych + about ── */}
+          <section id="about" className={`${CONTAINER} scroll-mt-14 py-20 md:py-28`}>
+            <Reveal className="grid md:grid-cols-2 border border-[var(--n-border)]">
+              <div className="p-7 md:p-12">
+                <SelectionFrame>{t.identity.design.role}</SelectionFrame>
+                <p className="mt-12 text-[clamp(4.5rem,10vw,9rem)] leading-none font-light tracking-[-0.05em] tabular-nums">
+                  {t.identity.design.years}
+                  <span className="ml-2 text-base font-medium tracking-normal text-[var(--n-text-secondary)]">{t.identity.design.unit}</span>
+                </p>
+                <p className="mt-4 text-sm text-[var(--n-text-secondary)]">{t.identity.design.desc}</p>
+              </div>
+              <div className="p-7 md:p-12 bg-[var(--n-brand)] text-white">
+                <p className="inline-block py-1 font-mono text-sm">
+                  &lt;{t.identity.build.role} /&gt;
+                  <span aria-hidden className="inline-block w-[0.55em] h-[1.1em] ml-1.5 -mb-[0.2em] bg-white motion-safe:animate-pulse" />
+                </p>
+                <p className="mt-12 font-mono text-[clamp(4.5rem,10vw,9rem)] leading-none font-light tracking-[-0.06em] tabular-nums">
+                  {t.identity.build.years}
+                  <span className="ml-2 font-sans text-base font-medium tracking-normal text-white/75">{t.identity.build.unit}</span>
+                </p>
+                <p className="mt-4 text-sm text-white/80">{t.identity.build.desc}</p>
+              </div>
+            </Reveal>
 
-          {/* ── About ── */}
-          <section id="about">
-            <SectionHeading emoji="👋" title={t.sections.about} />
+            <Reveal className="mt-16 md:mt-24 grid gap-8 md:grid-cols-12">
+              <p className="md:col-span-7 text-[clamp(1.6rem,3vw,2.6rem)] leading-[1.2] font-medium tracking-[-0.025em] text-balance">{t.aboutLead}</p>
+              <p className="md:col-span-4 md:col-start-9 text-sm leading-7 text-[var(--n-text-secondary)] text-pretty md:pt-2">{t.aboutBody}</p>
+            </Reveal>
+          </section>
 
-            <Callout emoji="💡">{t.aboutCallout}</Callout>
+          {/* ── Selected work ── */}
+          <section id="projects" className={`${CONTAINER} scroll-mt-14 py-20 md:py-28 border-t border-[var(--n-border)]`}>
+            <Reveal className="grid gap-4 md:grid-cols-12 md:items-end mb-10 md:mb-14">
+              <h2 className="md:col-span-8 text-[clamp(2.4rem,5.5vw,5rem)] leading-none font-medium tracking-[-0.04em]">{t.work.title}</h2>
+              <p className="md:col-span-4 text-sm leading-6 text-[var(--n-text-secondary)] md:text-right">{t.work.note}</p>
+            </Reveal>
 
-            <p className="text-sm text-[var(--n-text)] leading-7">{t.aboutBody}</p>
-
-            {/* Stats */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6">
-              {t.stats.map((stat) => (
-                <div
-                  key={stat.label}
-                  className="bg-[var(--n-bg-callout)] border border-[var(--n-border)] rounded-md p-4 text-center"
+            <Reveal className="grid md:grid-cols-12 md:grid-rows-2 gap-px bg-[var(--n-border)] border border-[var(--n-border)]">
+              {liveProjects.map((project, i) => (
+                <article
+                  key={project.title}
+                  className={`group flex flex-col bg-[var(--n-bg)] ${i === 0 ? "md:col-span-7 md:row-span-2" : "md:col-span-5"}`}
                 >
-                  <p className="text-2xl font-bold text-[var(--n-accent)]">{stat.value}</p>
-                  <p className="text-xs text-[var(--n-text-secondary)] mt-1">{stat.label}</p>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <Divider />
-
-          {/* ── Skills ── */}
-          <section id="skills">
-            <SectionHeading emoji="⚙️" title={t.sections.skills} />
-
-            <div className="space-y-4">
-              {skillGroups.map((group, gi) => (
-                <div key={gi}>
-                  {group.heading && (
-                    <p className="text-sm font-medium text-[var(--n-text)] mb-1">{group.heading}</p>
-                  )}
-                  <div className="divide-y divide-[var(--n-divide)]">
-                    {group.items.map((item) => (
-                      <div key={item.category} className="flex items-start gap-4 py-3">
-                        <span className="w-44 shrink-0 text-xs text-[var(--n-text-tertiary)] pt-0.5">{item.category}</span>
-                        <div className="flex flex-wrap gap-1.5">
-                          {item.tags.map((tag) => (
-                            <Tag key={tag.label} label={tag.label} color={tag.color} />
-                          ))}
-                        </div>
-                      </div>
-                    ))}
+                  <div className={`relative overflow-hidden ${i === 0 ? "aspect-[4/3] md:aspect-auto md:flex-1 md:min-h-[360px]" : "aspect-[16/9]"}`}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={liveCovers[i]}
+                      alt=""
+                      loading="lazy"
+                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+                    />
                   </div>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <Divider />
-
-          {/* ── Career ── */}
-          <section id="career">
-            <SectionHeading emoji="💼" title={t.sections.career} />
-
-            <div className="relative pl-6 space-y-8 before:absolute before:left-[5px] before:top-1 before:bottom-1 before:w-px before:bg-[var(--n-border)]">
-              {t.career.map((item, i) => (
-                <div key={item.period} className="relative">
-                  <span className="absolute -left-6 top-1.5 w-[11px] h-[11px] rounded-full bg-[var(--n-bg)] border-2 border-[var(--n-accent)]" />
-                  <p className="text-xs text-[var(--n-text-tertiary)] mb-0.5">{item.period}</p>
-                  <p className="text-sm font-medium text-[var(--n-text)]">{item.title}</p>
-                  <p className="text-xs text-[var(--n-text-secondary)] mt-1 leading-5">{item.desc}</p>
-                  <div className="flex flex-wrap gap-1 mt-2">
-                    {careerTags[i].map((tag) => (
-                      <Tag key={tag.label} label={tag.label} color={tag.color} />
-                    ))}
+                  <div className="p-5 md:p-6">
+                    <LiveSticker label={t.statusLabels.live} />
+                    <h3 className={`mt-3 font-medium tracking-tight ${i === 0 ? "text-2xl md:text-3xl" : "text-lg"}`}>{project.title}</h3>
+                    <p className="mt-1.5 text-sm leading-6 text-[var(--n-text-secondary)]">{project.desc}</p>
+                    <p className="mt-3 font-mono text-xs text-[var(--n-text-tertiary)]">{project.tags.join(" / ")}</p>
                   </div>
-                </div>
+                </article>
               ))}
+            </Reveal>
+
+            {/* ── More projects: dossier index ── */}
+            <div className="mt-24 md:mt-32 grid gap-10 md:grid-cols-12">
+              <Reveal className="md:col-span-4">
+                <h2 className="text-[clamp(2rem,4vw,3.5rem)] leading-none font-medium tracking-[-0.035em]">{t.more.title}</h2>
+                <p className="mt-5 font-mono text-xs leading-6 text-[var(--n-text-tertiary)]">
+                  {t.statusLabels.dev} ({devCount})<br />
+                  {t.statusLabels.case} ({otherProjects.length - devCount})
+                </p>
+              </Reveal>
+              <Reveal className="md:col-span-8 border-t border-[var(--n-text)]">
+                {otherProjects.map((project) => (
+                  <div
+                    key={project.title}
+                    className="grid gap-1 md:grid-cols-[1fr_15rem] md:gap-8 py-6 px-1 md:px-3 -mx-1 md:-mx-3 hover:bg-[var(--n-bg-hover)] transition-colors"
+                  >
+                    <div>
+                      <h3 className="text-lg font-medium tracking-tight">{project.title}</h3>
+                      <p className="mt-1 text-sm leading-6 text-[var(--n-text-secondary)]">{project.desc}</p>
+                    </div>
+                    <div className="md:text-right">
+                      <p className="text-xs text-[var(--n-text-secondary)]">{t.statusLabels[project.status]}</p>
+                      <p className="mt-1 font-mono text-xs text-[var(--n-text-tertiary)]">{project.tags.join(" / ")}</p>
+                    </div>
+                  </div>
+                ))}
+                <p className="mt-4 text-xs text-[var(--n-text-tertiary)]">{t.more.note}</p>
+              </Reveal>
             </div>
+
+            {/* Link out to the design case studies */}
+            <Reveal className="mt-20 md:mt-28">
+              <Link
+                href="/design"
+                className="group flex flex-col md:flex-row md:items-end justify-between gap-6 p-7 md:p-12 border border-[var(--n-border)] hover:border-[var(--n-accent)] transition-colors"
+              >
+                <div>
+                  <h2 className="text-[clamp(1.75rem,3.2vw,2.75rem)] leading-tight font-medium tracking-[-0.03em]">{t.designCta.title}</h2>
+                  <p className="mt-2 text-sm text-[var(--n-text-secondary)]">{t.designCta.body}</p>
+                </div>
+                <span className="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--n-accent)] underline underline-offset-4 shrink-0">
+                  {t.designCta.link}
+                  <ArrowUpRight className="w-4 h-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                </span>
+              </Link>
+              <Link href="/archive" className="inline-flex mt-4 text-sm text-[var(--n-text-secondary)] hover:text-[var(--n-accent)] transition-colors">
+                {t.designCta.archive} <ArrowRight className="w-4 h-4 ml-1 self-center" />
+              </Link>
+            </Reveal>
           </section>
 
-          <Divider />
+          {/* ── Career & tools ── */}
+          <section id="career" className={`${CONTAINER} scroll-mt-14 py-20 md:py-28 border-t border-[var(--n-border)]`}>
+            <Reveal>
+              <h2 className="text-[clamp(2.4rem,5.5vw,5rem)] leading-none font-medium tracking-[-0.04em]">{t.career.title}</h2>
+            </Reveal>
 
-          {/* ── Projects ── */}
-          <section id="projects">
-            <SectionHeading emoji="📋" title={t.sections.projects} />
-
-            <div className="flex items-center gap-4 mt-2 mb-3 pl-3 text-[11px] text-[var(--n-text-tertiary)]">
-              <span>{t.projectSummary(t.projects.length, liveCount, devCount, caseCount)}</span>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-1">
-              {(["live", "dev", "case"] as ProjectStatus[]).flatMap((group) =>
-                t.projects
-                  .map((project, i) => ({ ...project, status: projectStatuses[i], tags: projectTags[i] }))
-                  .filter((p) => p.status === group)
-                  .map((project) => (
-                    <div
-                      key={project.title}
-                      className="flex flex-col gap-2 p-4 rounded-lg border border-[var(--n-border)] hover:bg-[var(--n-bg-callout)] transition-colors"
-                    >
-                      <div className="flex items-start justify-between gap-2">
-                        <span className="text-sm font-medium text-[var(--n-text)] leading-5">{project.title}</span>
-                        <StatusBadge status={project.status} label={t.statusLabels[project.status]} />
-                      </div>
-                      <p className="text-xs text-[var(--n-text-secondary)] leading-5 line-clamp-2">{project.desc}</p>
-                      <div className="flex flex-wrap gap-1 mt-auto pt-1">
-                        {project.tags.slice(0, 3).map((tag) => (
-                          <Tag key={tag.label} label={tag.label} color={tag.color} />
-                        ))}
+            {/* Ruler timeline */}
+            <Reveal className="mt-14" >
+              <div aria-hidden className="space-y-2">
+                {[...t.career.items].reverse().map((item, ri) => {
+                  const i = t.career.items.length - 1 - ri;
+                  const meta = careerMeta[i];
+                  return (
+                    <div key={item.period} className="relative h-8">
+                      <div
+                        className={`absolute inset-y-0 flex items-center px-3 text-xs font-medium whitespace-nowrap overflow-hidden ${
+                          i === 0 ? "bg-[var(--n-brand)] text-white" : "border border-[var(--n-accent)] text-[var(--n-accent)]"
+                        }`}
+                        style={{ left: `${rulerPos(meta.from)}%`, width: `${rulerPos(meta.to) - rulerPos(meta.from)}%` }}
+                      >
+                        {/* labels don't fit the short bars at phone width (16px text floor) */}
+                        <span className="hidden sm:inline">{item.short}</span>
                       </div>
                     </div>
-                  ))
-              )}
+                  );
+                })}
+              </div>
+              <div aria-hidden className="relative mt-4 h-8 border-t border-[var(--n-text)]">
+                {Array.from({ length: Math.floor((RULER_END - RULER_START) * 4) + 1 }, (_, q) => RULER_START + q / 4).map((tick) => {
+                  const major = Number.isInteger(tick);
+                  return (
+                    <div key={tick} className="absolute top-0" style={{ left: `${rulerPos(tick)}%` }}>
+                      <span className={`block w-px bg-[var(--n-text)] ${major ? "h-2.5" : "h-1 opacity-50"}`} />
+                    </div>
+                  );
+                })}
+                {rulerYears.map((year) => (
+                  <span
+                    key={year}
+                    className={`absolute top-3.5 -translate-x-1/2 font-mono text-[11px] text-[var(--n-text-tertiary)] tabular-nums ${year % 2 ? "hidden sm:block" : ""}`}
+                    style={{ left: `${rulerPos(year)}%` }}
+                  >
+                    {year}
+                  </span>
+                ))}
+              </div>
+            </Reveal>
+
+            <div className="mt-14 grid gap-10 md:grid-cols-3">
+              {t.career.items.map((item, i) => (
+                <Reveal key={item.period} delay={i * 0.08}>
+                  <p className="font-mono text-xs text-[var(--n-text-tertiary)] tabular-nums">{item.period}</p>
+                  <h3 className="mt-2 text-xl font-medium tracking-tight">{item.title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-[var(--n-text-secondary)]">{item.desc}</p>
+                </Reveal>
+              ))}
             </div>
 
-            <p className="text-xs text-[var(--n-text-tertiary)] mt-4 pl-3 italic">{t.projectsNote}</p>
+            {/* Tools as a type specimen */}
+            <div id="skills" className="scroll-mt-14 mt-24 md:mt-32 grid gap-12 md:grid-cols-2 md:gap-16">
+              {skillGroups.map((group) => (
+                <Reveal key={group.heading}>
+                  <p className="pb-3 mb-5 font-mono text-xs text-[var(--n-accent)] border-b border-[var(--n-border)]">{group.heading}</p>
+                  <p className="flex flex-wrap gap-x-5 gap-y-1 text-[clamp(1.35rem,2.2vw,2rem)] font-medium tracking-[-0.02em] leading-snug">
+                    {group.tags.map((tag) => (
+                      <span key={tag}>{tag}</span>
+                    ))}
+                  </p>
+                </Reveal>
+              ))}
+            </div>
           </section>
 
-          <Divider />
-
-          {/* ── Contact ── */}
-          <section id="contact">
-            <SectionHeading emoji="📬" title={t.sections.contact} />
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-1">
+          {/* ── Contact (brand field) ── */}
+          <section id="contact" className="scroll-mt-14 relative overflow-hidden bg-[var(--n-brand)] text-white">
+            <span aria-hidden className="hidden md:block pointer-events-none absolute -right-[14vw] top-[42%] -translate-y-1/2 w-[44vw] h-[44vw] rounded-full border border-white/25" />
+            <div className={`${CONTAINER} relative pt-24 md:pt-32`}>
+              <p className="text-sm text-white/80">{t.contact.label}</p>
               <a
                 href="mailto:samdongpm@gmail.com"
-                className="flex items-center gap-3 px-3 py-3 rounded-md hover:bg-[var(--n-bg-callout)] transition-colors group"
+                className="group mt-6 inline-flex flex-wrap items-center gap-x-4 text-[clamp(1.6rem,7vw,6.5rem)] leading-none font-medium tracking-[-0.045em] hover:opacity-85 transition-opacity"
               >
-                <div className="w-8 h-8 rounded bg-[var(--n-bg-hover)] group-hover:bg-[var(--n-accent-bg)] flex items-center justify-center shrink-0 transition-colors">
-                  <Mail className="w-4 h-4 text-[var(--n-text-secondary)] group-hover:text-[var(--n-accent)] transition-colors" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-[var(--n-text)]">{t.contactEmail}</p>
-                  <p className="text-xs text-[var(--n-text-secondary)]">samdongpm@gmail.com</p>
-                </div>
-                <ExternalLink className="w-3.5 h-3.5 text-[var(--n-text-tertiary)] ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
+                samdongpm@gmail.com
+                <ArrowRight className="w-[0.7em] h-[0.7em] transition-transform group-hover:translate-x-2" strokeWidth={1.5} />
+              </a>
+              <p className="mt-8 text-sm text-white/80">{t.contact.lead}</p>
+              <a href="https://github.com/ahgnodmik" target="_blank" rel="noopener noreferrer" className="mt-2 inline-block text-sm underline underline-offset-4 decoration-white/40 hover:decoration-white">
+                github.com/ahgnodmik
               </a>
 
-              <a
-                href="https://github.com/ahgnodmik"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-3 px-3 py-3 rounded-md hover:bg-[var(--n-bg-callout)] transition-colors group"
-              >
-                <div className="w-8 h-8 rounded bg-[var(--n-bg-hover)] group-hover:bg-[var(--n-accent-bg)] flex items-center justify-center shrink-0 transition-colors">
-                  <Github className="w-4 h-4 text-[var(--n-text-secondary)] group-hover:text-[var(--n-accent)] transition-colors" />
+              <footer className="mt-24 md:mt-32 flex flex-wrap items-center gap-x-6 gap-y-2 py-6 border-t border-white/25 text-xs text-white/70">
+                <span>© 2026 Kim Dongha, {SITE_VERSION}</span>
+                <div className="flex gap-5 sm:ml-auto">
+                  <Link href="/design" className="hover:text-white transition-colors">{t.designCta.link}</Link>
+                  <Link href="/archive" className="hover:text-white transition-colors">More Works</Link>
                 </div>
-                <div>
-                  <p className="text-sm font-medium text-[var(--n-text)]">GitHub</p>
-                  <p className="text-xs text-[var(--n-text-secondary)]">github.com/ahgnodmik</p>
-                </div>
-                <ExternalLink className="w-3.5 h-3.5 text-[var(--n-text-tertiary)] ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
-              </a>
+              </footer>
             </div>
           </section>
-        </div>
-      </main>
-    </div>
+        </main>
+      </div>
+    </MotionConfig>
   );
 }

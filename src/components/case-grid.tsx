@@ -6,9 +6,8 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { MotionConfig, motion } from "motion/react";
-import { ArrowLeft, ArrowUpRight, Languages } from "lucide-react";
-import { ThemeToggle } from "@/components/theme-toggle";
-import { SideNav, MobileNav, type SideNavActive } from "@/components/side-nav";
+import { ArrowLeft, ArrowUpRight } from "lucide-react";
+import { SiteHeader, SiteFooter, type NavActive } from "@/components/site-header";
 import type { DesignProject, Lang } from "@/lib/design";
 
 export type CaseGridCopy = Record<
@@ -50,20 +49,6 @@ function FilterPill({
       <span className={`tabular-nums ${active ? "text-white/70" : "text-[var(--n-text-tertiary)]"}`}>
         {String(count).padStart(2, "0")}
       </span>
-    </button>
-  );
-}
-
-function LangToggle({ lang, onToggle }: { lang: Lang; onToggle: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onToggle}
-      aria-label={lang === "ko" ? "Switch to English" : "한국어로 전환"}
-      className="flex items-center gap-1 px-2 h-8 rounded text-xs font-semibold text-[var(--n-text-secondary)] hover:bg-[var(--n-bg-hover)] hover:text-[var(--n-text)] transition-colors"
-    >
-      <Languages className="w-4 h-4" />
-      {lang === "ko" ? "EN" : "한"}
     </button>
   );
 }
@@ -129,7 +114,7 @@ export function CaseGrid({
 }: {
   projects: DesignProject[];
   copy: CaseGridCopy;
-  active: SideNavActive;
+  active: NavActive;
   /** Optional extra group rendered below the main grid under its own heading. */
   subSection?: { title: Record<Lang, string>; projects: DesignProject[] };
 }) {
@@ -175,9 +160,11 @@ export function CaseGrid({
   );
 
   return (
-    <div className="flex min-h-screen bg-[var(--n-bg)]" style={{ fontFamily: "'Inter', 'Segoe UI', system-ui, sans-serif" }}>
-      {/* ── Sidebar (desktop) ── */}
-      <SideNav lang={lang} onToggleLang={toggleLang} active={active} />
+    <div className="min-h-screen bg-[var(--n-bg)] break-keep" style={{ fontFamily: "var(--font-geist-sans), 'Pretendard Variable', Pretendard, system-ui, sans-serif" }}>
+      <SiteHeader lang={lang} onToggleLang={toggleLang} active={active}>
+        <span className="text-[var(--n-text-tertiary)]">/</span>
+        <span className="text-[var(--n-text)] font-medium truncate">{t.crumb}</span>
+      </SiteHeader>
 
       <MotionConfig reducedMotion="user">
       <motion.div
@@ -186,24 +173,6 @@ export function CaseGrid({
         transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
         className="flex-1 min-w-0"
       >
-      {/* ── Top bar (mobile) ── */}
-      <header className="md:hidden sticky top-0 z-20 flex items-center gap-2 px-4 sm:px-6 h-14 bg-[var(--n-bg-sidebar)]/90 backdrop-blur border-b border-[var(--n-border)]">
-        <MobileNav lang={lang} onToggleLang={toggleLang} active={active} />
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/logo.jpeg" alt="Kim Dongha" className="w-6 h-6 rounded object-cover shrink-0" />
-        <nav className="flex items-center gap-1.5 text-sm min-w-0">
-          <Link href="/" className="text-[var(--n-text-secondary)] hover:text-[var(--n-text)] transition-colors truncate">
-            {t.home}
-          </Link>
-          <span className="text-[var(--n-text-tertiary)]">/</span>
-          <span className="text-[var(--n-text)] font-medium truncate">{t.crumb}</span>
-        </nav>
-        <div className="ml-auto flex items-center">
-          <LangToggle lang={lang} onToggle={toggleLang} />
-          <ThemeToggle />
-        </div>
-      </header>
-
       {/* ── Content ── */}
       <main className="max-w-5xl mx-auto px-4 sm:px-8 pb-32">
         {/* Header */}
@@ -266,6 +235,7 @@ export function CaseGrid({
       </main>
       </motion.div>
       </MotionConfig>
+      <SiteFooter lang={lang} />
     </div>
   );
 }

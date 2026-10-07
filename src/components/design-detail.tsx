@@ -3,9 +3,8 @@
 import { useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { motion } from "motion/react";
-import { ArrowLeft, ExternalLink, Languages } from "lucide-react";
-import { ThemeToggle } from "@/components/theme-toggle";
-import { MobileNav } from "@/components/side-nav";
+import { ArrowLeft, ExternalLink } from "lucide-react";
+import { SiteHeader, SiteFooter } from "@/components/site-header";
 import { visibleDesignProjects, type DesignBlock, type DesignProject, type Lang } from "@/lib/design";
 
 type ImageBlock = Extract<DesignBlock, { type: "image" }>;
@@ -230,20 +229,6 @@ const copy = {
   },
 } satisfies Record<Lang, unknown>;
 
-function LangToggle({ lang, onToggle }: { lang: Lang; onToggle: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onToggle}
-      aria-label={lang === "ko" ? "Switch to English" : "한국어로 전환"}
-      className="flex items-center gap-1 px-2 h-8 rounded text-xs font-semibold text-[var(--n-text-secondary)] hover:bg-[var(--n-bg-hover)] hover:text-[var(--n-text)] transition-colors"
-    >
-      <Languages className="w-4 h-4" />
-      {lang === "ko" ? "EN" : "한"}
-    </button>
-  );
-}
-
 export function DesignDetail({ project }: { project: DesignProject }) {
   const [lang, setLang] = useState<Lang>("ko");
 
@@ -270,18 +255,10 @@ export function DesignDetail({ project }: { project: DesignProject }) {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-      className="min-h-screen bg-[var(--n-bg)]"
-      style={{ fontFamily: "'Inter', 'Segoe UI', system-ui, sans-serif" }}
+      className="min-h-screen bg-[var(--n-bg)] break-keep"
+      style={{ fontFamily: "var(--font-geist-sans), 'Pretendard Variable', Pretendard, system-ui, sans-serif" }}
     >
-      {/* ── Top bar ── */}
-      <header className="sticky top-0 z-20 flex items-center gap-2 px-4 sm:px-6 h-14 bg-[var(--n-bg-sidebar)]/90 backdrop-blur border-b border-[var(--n-border)]">
-        <MobileNav lang={lang} onToggleLang={toggleLang} active="design" />
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/logo.jpeg" alt="Kim Dongha" className="w-6 h-6 rounded object-cover shrink-0" />
-        <nav className="flex items-center gap-1.5 text-sm min-w-0">
-          <Link href="/" className="text-[var(--n-text-secondary)] hover:text-[var(--n-text)] transition-colors shrink-0">
-            {t.home}
-          </Link>
+      <SiteHeader lang={lang} onToggleLang={toggleLang} active="design">
           <span className="text-[var(--n-text-tertiary)]">/</span>
           <Link href="/design" className="text-[var(--n-text-secondary)] hover:text-[var(--n-text)] transition-colors shrink-0">
             {t.crumb}
@@ -299,12 +276,7 @@ export function DesignDetail({ project }: { project: DesignProject }) {
           )}
           <span className="text-[var(--n-text-tertiary)]">/</span>
           <span className="text-[var(--n-text)] font-medium truncate">{project.title[lang]}</span>
-        </nav>
-        <div className="ml-auto flex items-center">
-          <LangToggle lang={lang} onToggle={toggleLang} />
-          <ThemeToggle />
-        </div>
-      </header>
+      </SiteHeader>
 
       {/* ── Content ── */}
       <main className="max-w-3xl mx-auto px-6 sm:px-10 pb-32">
@@ -459,6 +431,7 @@ export function DesignDetail({ project }: { project: DesignProject }) {
           {t.back}
         </Link>
       </main>
+      <SiteFooter lang={lang} />
     </motion.div>
   );
 }

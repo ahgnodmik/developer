@@ -17,7 +17,7 @@ const siteUrl = "https://samdong.xyz";
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "김동하 | Web & Mobile Developer",
+    default: "김동하 | AI Builder · UX/UI Designer",
     template: "%s | 김동하",
   },
   description:
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     type: "website",
     url: siteUrl,
     siteName: "김동하 포트폴리오",
-    title: "김동하 | Web & Mobile Developer",
+    title: "김동하 | AI Builder · UX/UI Designer",
     description:
       "React, Next.js, TypeScript 기반 웹 개발과 Flutter 크로스 플랫폼 앱 개발 포트폴리오",
     locale: "ko_KR",
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     images: ["/og.png"],
-    title: "김동하 | Web & Mobile Developer",
+    title: "김동하 | AI Builder · UX/UI Designer",
     description:
       "React, Next.js, TypeScript 기반 웹 개발과 Flutter 크로스 플랫폼 앱 개발 포트폴리오",
   },
@@ -66,7 +66,7 @@ const jsonLd = {
   alternateName: "Kim Dongha",
   url: siteUrl,
   email: "mailto:samdongpm@gmail.com",
-  jobTitle: "Web & Mobile Developer",
+  jobTitle: "AI Builder, UX/UI Designer",
   sameAs: [
     "https://github.com/ahgnodmik",
     "https://www.instagram.com/abroad.now/",
@@ -83,6 +83,11 @@ export default function RootLayout({
   return (
     <html lang="ko" suppressHydrationWarning>
       <head>
+        <link
+          rel="stylesheet"
+          crossOrigin="anonymous"
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+        />
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         <script
           type="application/ld+json"
