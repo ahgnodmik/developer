@@ -12,12 +12,13 @@ import type { Lang } from "@/lib/design";
 
 export const SITE_VERSION = "v1.2.0";
 
-export type NavActive = "home" | "design" | "archive";
+export type NavActive = "home" | "design" | "graphics" | "archive";
 
 const navItems: { href: string; label: Record<Lang, string>; key?: NavActive }[] = [
   { href: "/#projects", label: { ko: "작업", en: "Work" } },
   { href: "/#career", label: { ko: "경력", en: "Career" } },
   { href: "/design", label: { ko: "서비스 디자인", en: "Service design" }, key: "design" },
+  { href: "/graphics", label: { ko: "그래픽", en: "Graphics" }, key: "graphics" },
   { href: "/archive", label: { ko: "More Works", en: "More works" }, key: "archive" },
   { href: "/#contact", label: { ko: "연락처", en: "Contact" } },
 ];
@@ -141,6 +142,7 @@ export function SiteFooter({ lang }: { lang: Lang }) {
         <div className="flex gap-5 ml-auto">
           <Link href="/" className="hover:text-[var(--n-text)] transition-colors">{lang === "ko" ? "홈" : "Home"}</Link>
           <Link href="/design" className="hover:text-[var(--n-text)] transition-colors">{lang === "ko" ? "서비스 디자인" : "Service design"}</Link>
+          <Link href="/graphics" className="hover:text-[var(--n-text)] transition-colors">{lang === "ko" ? "그래픽" : "Graphics"}</Link>
           <Link href="/archive" className="hover:text-[var(--n-text)] transition-colors">More Works</Link>
         </div>
       </div>

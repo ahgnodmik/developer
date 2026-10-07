@@ -228,3 +228,51 @@ export const extraActivityProjects: DesignProject[] = designProjects.filter(
 export function getDesignProject(slug: string): DesignProject | undefined {
   return designProjects.find((p) => p.slug === slug);
 }
+
+// ── /graphics: image wall aggregated from graphic/GUI cases ──
+
+export type GraphicImage = { src: string; caption?: string };
+export type GraphicGroup = { slug: string; title: Record<Lang, string>; images: GraphicImage[] };
+export type GraphicSection = {
+  slug: string;
+  title: Record<Lang, string>;
+  year: string;
+  role: Record<Lang, string>;
+  tags: string[];
+  /** First group holds the case's own images (title = case title); the rest are its sub-cases. */
+  groups: GraphicGroup[];
+};
+
+// Notion "Tags" values that mark a case as graphic / GUI work.
+const GRAPHIC_TAG = /graphic|gui|brand|logo|marketing|illustration|print|editorial|package/i;
+
+function bodyImages(p: DesignProject): GraphicImage[] {
+  const out: GraphicImage[] = [];
+  for (const b of p.body ?? []) {
+    if (b.type === "image") out.push({ src: b.src, caption: b.caption });
+    if (b.type === "gallery") out.push(...b.images);
+  }
+  for (const src of p.gallery ?? []) out.push({ src });
+  if (out.length === 0 && p.cover) out.push({ src: p.cover });
+  const seen = new Set<string>();
+  return out.filter((img) => (seen.has(img.src) ? false : (seen.add(img.src), true)));
+}
+
+/** Graphic/GUI cases (tagged, or archived brand/marketing work) with their images grouped by sub-case. */
+export const graphicSections: GraphicSection[] = designProjects
+  .filter((p) => !p.hidden && !isExtraActivity(p) && (isArchived(p) || p.tags.some((t) => GRAPHIC_TAG.test(t))))
+  .map((p) => {
+    const subs = (p.subpages ?? [])
+      .map((ref) => getDesignProject(ref.slug))
+      .filter((s): s is DesignProject => Boolean(s))
+      .map((s) => ({ slug: s.slug, title: s.title, images: bodyImages(s) }));
+    return {
+      slug: p.slug,
+      title: p.title,
+      year: p.year,
+      role: p.role,
+      tags: p.tags,
+      groups: [{ slug: p.slug, title: p.title, images: bodyImages(p) }, ...subs].filter((g) => g.images.length > 0),
+    };
+  })
+  .filter((s) => s.groups.length > 0);

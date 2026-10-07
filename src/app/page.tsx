@@ -446,6 +446,7 @@ export default function Home() {
                 <span>© 2026 Kim Dongha, {SITE_VERSION}</span>
                 <div className="flex gap-5 sm:ml-auto">
                   <Link href="/design" className="hover:text-white transition-colors">{t.designCta.link}</Link>
+                  <Link href="/graphics" className="hover:text-white transition-colors">{lang === "ko" ? "그래픽" : "Graphics"}</Link>
                   <Link href="/archive" className="hover:text-white transition-colors">More Works</Link>
                 </div>
               </footer>

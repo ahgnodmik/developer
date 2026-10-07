@@ -572,6 +572,7 @@ async function writeSitemap(all) {
   const urls = [
     { loc: "https://samdong.xyz/", priority: "1.0" },
     { loc: "https://samdong.xyz/design", priority: "0.8" },
+    { loc: "https://samdong.xyz/graphics", priority: "0.7" },
     { loc: "https://samdong.xyz/archive", priority: "0.6" },
     ...all.map((p) => ({
       loc: `https://samdong.xyz/design/${p.slug}`,
