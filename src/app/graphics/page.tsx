@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import { MotionConfig, motion } from "motion/react";
-import { ArrowLeft, ArrowRight, ArrowUpRight, X } from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUpRight, X } from "lucide-react";
 import { SiteHeader, SiteFooter } from "@/components/site-header";
 import { graphicSections, type GraphicImage, type Lang } from "@/lib/design";
 
@@ -21,6 +21,7 @@ const copy = {
     close: "닫기",
     prev: "이전",
     next: "다음",
+    more: "자세히 보기",
   },
   en: {
     crumb: "Graphics",
@@ -31,6 +32,7 @@ const copy = {
     close: "Close",
     prev: "Previous",
     next: "Next",
+    more: "View full page",
   },
 };
 
@@ -42,17 +44,26 @@ function splitTitle(title: string) {
 
 type FlatImage = GraphicImage & { label: string };
 
+// Height/width above this = long detail page (sales page, scroll capture). Phone screens (~2.1) stay below.
+const TALL_RATIO = 2.5;
+const isTallImg = (el: HTMLImageElement) => el.naturalWidth > 0 && el.naturalHeight / el.naturalWidth > TALL_RATIO;
+
 function Lightbox({
   images,
   index,
   onClose,
   onMove,
+  tall,
+  onMeasure,
   t,
 }: {
   images: FlatImage[];
   index: number;
   onClose: () => void;
   onMove: (delta: number) => void;
+  /** Long detail page: render at reading width and scroll vertically instead of fitting to screen. */
+  tall: boolean;
+  onMeasure: (src: string, tall: boolean) => void;
   t: (typeof copy)["ko"];
 }) {
   useEffect(() => {
@@ -83,18 +94,26 @@ function Lightbox({
           <X className="w-5 h-5" />
         </button>
       </div>
-      <div className="relative flex-1 min-h-0 flex items-center justify-center px-4 md:px-20 pb-6" onClick={onClose}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={img.src}
-          alt={img.caption ?? img.label}
-          className="max-w-full max-h-full object-contain"
-          onClick={(e) => e.stopPropagation()}
-        />
-        <button type="button" aria-label={t.prev} onClick={(e) => { e.stopPropagation(); onMove(-1); }} className={`${btn} absolute left-4 top-1/2 -translate-y-1/2 hidden md:flex`}>
+      <div className="relative flex-1 min-h-0">
+        {/* key resets scroll position when moving to another image */}
+        <div
+          key={index}
+          className={`absolute inset-0 overflow-y-auto overscroll-contain px-4 md:px-20 pb-6 ${tall ? "" : "flex items-center justify-center"}`}
+          onClick={onClose}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={img.src}
+            alt={img.caption ?? img.label}
+            onLoad={(e) => onMeasure(img.src, isTallImg(e.currentTarget))}
+            className={tall ? "block w-full max-w-[900px] h-auto mx-auto" : "max-w-full max-h-full object-contain"}
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+        <button type="button" aria-label={t.prev} onClick={() => onMove(-1)} className={`${btn} absolute left-4 top-1/2 -translate-y-1/2 hidden md:flex`}>
           <ArrowLeft className="w-5 h-5" />
         </button>
-        <button type="button" aria-label={t.next} onClick={(e) => { e.stopPropagation(); onMove(1); }} className={`${btn} absolute right-4 top-1/2 -translate-y-1/2 hidden md:flex`}>
+        <button type="button" aria-label={t.next} onClick={() => onMove(1)} className={`${btn} absolute right-4 top-1/2 -translate-y-1/2 hidden md:flex`}>
           <ArrowRight className="w-5 h-5" />
         </button>
       </div>
@@ -107,6 +126,11 @@ function Lightbox({
 export default function GraphicsPage() {
   const [lang, setLang] = useState<Lang>("ko");
   const [open, setOpen] = useState<number | null>(null);
+  const [tallSrcs, setTallSrcs] = useState<Record<string, boolean>>({});
+  const measure = useCallback(
+    (src: string, tall: boolean) => setTallSrcs((m) => (m[src] === tall ? m : { ...m, [src]: tall })),
+    []
+  );
 
   useEffect(() => {
     const saved = localStorage.getItem("lang");
@@ -132,7 +156,10 @@ export default function GraphicsPage() {
     for (const section of graphicSections) {
       for (const group of section.groups) {
         offsets.set(group.slug, flat.length);
-        for (const img of group.images) flat.push({ ...img, label: group.title[lang] });
+        for (const part of group.parts) {
+          const label = part.heading ? `${group.title[lang]} / ${part.heading}` : group.title[lang];
+          for (const img of part.images) flat.push({ ...img, label });
+        }
       }
     }
     return { flat, offsets };
@@ -220,25 +247,55 @@ export default function GraphicsPage() {
                           <span className="font-mono text-xs text-[var(--n-text-tertiary)] tabular-nums">{group.images.length}</span>
                         </h3>
                       )}
-                      <div className="columns-2 md:columns-3 xl:columns-4 gap-3 [column-fill:_balance]">
-                        {group.images.map((img, ii) => (
-                          <button
-                            key={img.src}
-                            type="button"
-                            onClick={() => setOpen(start + ii)}
-                            className="group relative block w-full mb-3 break-inside-avoid overflow-hidden bg-[var(--n-bg-callout)] focus-visible:outline-2 focus-visible:outline-[var(--n-accent)]"
-                            aria-label={img.caption ?? `${group.title[lang]} ${ii + 1}`}
-                          >
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img
-                              src={img.src}
-                              alt={img.caption ?? ""}
-                              loading="lazy"
-                              className="w-full h-auto transition-transform duration-500 ease-out group-hover:scale-[1.02]"
-                            />
-                          </button>
-                        ))}
-                      </div>
+                      {group.parts.map((part, pi) => {
+                        // Lightbox index of this part's first image within the flat list.
+                        const partStart = start + group.parts.slice(0, pi).reduce((n, q) => n + q.images.length, 0);
+                        return (
+                          <div key={pi} className={pi > 0 || part.heading ? "mt-8" : ""}>
+                            {part.heading && (
+                              <h4 className="mb-4 text-sm font-medium text-[var(--n-text-secondary)]">
+                                {part.heading}
+                                <span className="ml-2 font-mono text-xs text-[var(--n-text-tertiary)] tabular-nums">{part.images.length}</span>
+                              </h4>
+                            )}
+                            <div className="columns-2 md:columns-3 xl:columns-4 gap-3 [column-fill:_balance]">
+                              {part.images.map((img, ii) => (
+                                <button
+                                  key={img.src}
+                                  type="button"
+                                  onClick={() => setOpen(partStart + ii)}
+                                  className="group relative flex justify-center w-full mb-3 break-inside-avoid overflow-hidden bg-[var(--n-bg-callout)] focus-visible:outline-2 focus-visible:outline-[var(--n-accent)]"
+                                  aria-label={img.caption ?? `${part.heading ?? group.title[lang]} ${ii + 1}`}
+                                >
+                                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                                  <img
+                                    src={img.src}
+                                    alt={img.caption ?? ""}
+                                    loading="lazy"
+                                    onLoad={(e) => measure(img.src, isTallImg(e.currentTarget))}
+                                    // images that finished loading before hydration never fire onLoad
+                                    ref={(el) => {
+                                      if (el?.complete) measure(img.src, isTallImg(el));
+                                    }}
+                                    // long pages show only their top; small assets (logos) keep native size instead of upscaling
+                                    className={`transition-transform duration-500 ease-out group-hover:scale-[1.02] ${
+                                      tallSrcs[img.src] ? "w-full aspect-[3/4] object-cover object-top" : "max-w-full h-auto"
+                                    }`}
+                                  />
+                                  {tallSrcs[img.src] && (
+                                    <span className="absolute inset-x-0 bottom-0 flex items-end justify-center h-28 pb-4 bg-gradient-to-t from-[var(--n-bg)] via-[var(--n-bg)]/80 to-transparent">
+                                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--n-brand)] text-white text-xs font-medium">
+                                        {t.more}
+                                        <ArrowDown className="w-3.5 h-3.5" />
+                                      </span>
+                                    </span>
+                                  )}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
                   );
                 })}
@@ -249,7 +306,7 @@ export default function GraphicsPage() {
 
         <SiteFooter lang={lang} />
 
-        {open !== null && flat[open] && <Lightbox images={flat} index={open} onClose={close} onMove={move} t={t} />}
+        {open !== null && flat[open] && <Lightbox images={flat} index={open} onClose={close} onMove={move} tall={Boolean(tallSrcs[flat[open].src])} onMeasure={measure} t={t} />}
       </div>
     </MotionConfig>
   );

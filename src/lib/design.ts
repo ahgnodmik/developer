@@ -232,7 +232,15 @@ export function getDesignProject(slug: string): DesignProject | undefined {
 // ── /graphics: image wall aggregated from graphic/GUI cases ──
 
 export type GraphicImage = { src: string; caption?: string };
-export type GraphicGroup = { slug: string; title: Record<Lang, string>; images: GraphicImage[] };
+/** Images under one Notion heading inside a page (heading omitted before the first heading). */
+export type GraphicPart = { heading?: string; images: GraphicImage[] };
+export type GraphicGroup = {
+  slug: string;
+  title: Record<Lang, string>;
+  parts: GraphicPart[];
+  /** All part images in order; drives counts and the lightbox. */
+  images: GraphicImage[];
+};
 export type GraphicSection = {
   slug: string;
   title: Record<Lang, string>;
@@ -246,16 +254,28 @@ export type GraphicSection = {
 // Notion "Tags" values that mark a case as graphic / GUI work.
 const GRAPHIC_TAG = /graphic|gui|brand|logo|marketing|illustration|print|editorial|package/i;
 
-function bodyImages(p: DesignProject): GraphicImage[] {
-  const out: GraphicImage[] = [];
-  for (const b of p.body ?? []) {
-    if (b.type === "image") out.push({ src: b.src, caption: b.caption });
-    if (b.type === "gallery") out.push(...b.images);
-  }
-  for (const src of p.gallery ?? []) out.push({ src });
-  if (out.length === 0 && p.cover) out.push({ src: p.cover });
+// Split a page's images by its Notion headings so e.g. marketing visuals and app screens don't mix.
+function bodyParts(p: DesignProject): GraphicPart[] {
   const seen = new Set<string>();
-  return out.filter((img) => (seen.has(img.src) ? false : (seen.add(img.src), true)));
+  const parts: GraphicPart[] = [{ images: [] }];
+  const add = (img: GraphicImage) => {
+    if (seen.has(img.src)) return;
+    seen.add(img.src);
+    parts[parts.length - 1].images.push(img);
+  };
+  for (const b of p.body ?? []) {
+    if (b.type === "heading") parts.push({ heading: b.text, images: [] });
+    if (b.type === "image") add({ src: b.src, caption: b.caption });
+    if (b.type === "gallery") b.images.forEach(add);
+  }
+  (p.gallery ?? []).forEach((src) => add({ src }));
+  if (seen.size === 0 && p.cover) add({ src: p.cover });
+  return parts.filter((part) => part.images.length > 0);
+}
+
+function toGroup(p: DesignProject): GraphicGroup {
+  const parts = bodyParts(p);
+  return { slug: p.slug, title: p.title, parts, images: parts.flatMap((part) => part.images) };
 }
 
 /** Graphic/GUI cases (tagged, or archived brand/marketing work) with their images grouped by sub-case. */
@@ -265,14 +285,14 @@ export const graphicSections: GraphicSection[] = designProjects
     const subs = (p.subpages ?? [])
       .map((ref) => getDesignProject(ref.slug))
       .filter((s): s is DesignProject => Boolean(s))
-      .map((s) => ({ slug: s.slug, title: s.title, images: bodyImages(s) }));
+      .map(toGroup);
     return {
       slug: p.slug,
       title: p.title,
       year: p.year,
       role: p.role,
       tags: p.tags,
-      groups: [{ slug: p.slug, title: p.title, images: bodyImages(p) }, ...subs].filter((g) => g.images.length > 0),
+      groups: [toGroup(p), ...subs].filter((g) => g.images.length > 0),
     };
   })
   .filter((s) => s.groups.length > 0);
