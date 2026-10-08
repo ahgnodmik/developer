@@ -261,7 +261,8 @@ export default function GraphicsPage() {
                             <div
                               className={
                                 part.row
-                                  ? "grid grid-flow-col auto-cols-[minmax(160px,1fr)] gap-3 overflow-x-auto pb-2 [&>button]:mb-0"
+                                  ? // step rows keep each image at its full natural height
+                                  "grid grid-flow-col auto-cols-[minmax(160px,1fr)] items-start gap-3 overflow-x-auto pb-2 [&>button]:mb-0"
                                   : `gap-3 [column-fill:_balance] ${
                                       part.compact ? "columns-4 md:columns-7 xl:columns-9" : "columns-2 md:columns-3 xl:columns-4"
                                     }`
@@ -287,10 +288,10 @@ export default function GraphicsPage() {
                                     }}
                                     // long pages show only their top; small assets (logos) keep native size instead of upscaling
                                     className={`transition-transform duration-500 ease-out group-hover:scale-[1.02] ${
-                                      tallSrcs[img.src] ? "w-full aspect-[3/4] object-cover object-top" : "max-w-full h-auto"
+                                      tallSrcs[img.src] && !part.row ? "w-full aspect-[3/4] object-cover object-top" : "max-w-full h-auto"
                                     }`}
                                   />
-                                  {tallSrcs[img.src] && (
+                                  {tallSrcs[img.src] && !part.row && (
                                     <span className="absolute inset-x-0 bottom-0 flex items-end justify-center h-28 pb-4 bg-gradient-to-t from-[var(--n-bg)] via-[var(--n-bg)]/80 to-transparent">
                                       <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--n-brand)] text-white text-xs font-medium">
                                         {t.more}
