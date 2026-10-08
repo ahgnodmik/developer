@@ -233,7 +233,12 @@ export function getDesignProject(slug: string): DesignProject | undefined {
 
 export type GraphicImage = { src: string; caption?: string };
 /** Images under one Notion heading inside a page (heading omitted before the first heading). */
-export type GraphicPart = { heading?: string; images: GraphicImage[] };
+export type GraphicPart = {
+  heading?: string;
+  images: GraphicImage[];
+  /** App/GUI screen sets render in a denser grid (smaller tiles). */
+  compact?: boolean;
+};
 export type GraphicGroup = {
   slug: string;
   title: Record<Lang, string>;
@@ -254,6 +259,11 @@ export type GraphicSection = {
 // Notion "Tags" values that mark a case as graphic / GUI work.
 const GRAPHIC_TAG = /graphic|gui|brand|logo|marketing|illustration|print|editorial|package/i;
 
+// Parts left off /graphics (still on the case detail page). Matched against the Notion heading.
+const EXCLUDED_PARTS = [/^마켓\s*파트$/];
+// Phone-screen sets (e.g. QSTAG app screens) shown smaller.
+const COMPACT_PARTS = /앱\s*화면|app\s*screen|gui/i;
+
 // Split a page's images by its Notion headings so e.g. marketing visuals and app screens don't mix.
 function bodyParts(p: DesignProject): GraphicPart[] {
   const seen = new Set<string>();
@@ -270,7 +280,9 @@ function bodyParts(p: DesignProject): GraphicPart[] {
   }
   (p.gallery ?? []).forEach((src) => add({ src }));
   if (seen.size === 0 && p.cover) add({ src: p.cover });
-  return parts.filter((part) => part.images.length > 0);
+  return parts
+    .filter((part) => part.images.length > 0 && !EXCLUDED_PARTS.some((re) => re.test(part.heading ?? "")))
+    .map((part) => (part.heading && COMPACT_PARTS.test(part.heading) ? { ...part, compact: true } : part));
 }
 
 function toGroup(p: DesignProject): GraphicGroup {

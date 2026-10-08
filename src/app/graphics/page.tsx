@@ -258,7 +258,11 @@ export default function GraphicsPage() {
                                 <span className="ml-2 font-mono text-xs text-[var(--n-text-tertiary)] tabular-nums">{part.images.length}</span>
                               </h4>
                             )}
-                            <div className="columns-2 md:columns-3 xl:columns-4 gap-3 [column-fill:_balance]">
+                            <div
+                              className={`gap-3 [column-fill:_balance] ${
+                                part.compact ? "columns-3 md:columns-5 xl:columns-6" : "columns-2 md:columns-3 xl:columns-4"
+                              }`}
+                            >
                               {part.images.map((img, ii) => (
                                 <button
                                   key={img.src}
