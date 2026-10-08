@@ -5,7 +5,7 @@
 // token), it writes an empty list so design.ts falls back to its static data —
 // the build never breaks.
 
-import { writeFile, mkdir, rm } from "node:fs/promises";
+import { writeFile, readFile, mkdir, rm } from "node:fs/promises";
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 
@@ -559,11 +559,70 @@ async function main() {
   projects.forEach((p) => delete p.order); // strip helper field
 
   const all = [...projects, ...subProjects];
+  await redactImages(all);
   await writeGenerated(all);
   await writeSitemap(all);
   console.log(
     `[fetch-notion] wrote ${projects.length} published case(s) + ${subProjects.length} sub-case(s).`
   );
+}
+
+// Confidential figures are blurred into the published file itself (CSS blur would leave the
+// original one URL away). Rules match on page title + the heading the image sits under, or its caption.
+// region: [left, top, width, height] as fractions of the image; omitted = whole image.
+const REDACTIONS = [
+  { page: /온라인\s*마케팅/, heading: /마케팅\s*믹스/ },
+  // media / CTR table: keep media names, blur the CTR column below the header row
+  { page: /^OJT/, caption: /CTR/, region: [0.5, 0.13, 0.5, 0.87] },
+];
+
+async function redactImages(all) {
+  if (!sharp) {
+    console.warn("[fetch-notion] sharp missing: confidential images NOT redacted.");
+    return;
+  }
+  let count = 0;
+  for (const p of all) {
+    let heading = "";
+    const images = [];
+    for (const b of p.body ?? []) {
+      if (b.type === "heading") heading = b.text;
+      if (b.type === "image") images.push({ ...b, heading });
+      if (b.type === "gallery") images.push(...b.images.map((img) => ({ ...img, heading })));
+    }
+    for (const img of images) {
+      const rule = REDACTIONS.find(
+        (r) =>
+          r.page.test(p.title.ko) &&
+          (!r.heading || r.heading.test(img.heading)) &&
+          (!r.caption || r.caption.test(img.caption ?? ""))
+      );
+      if (!rule) continue;
+      const file = path.join(ROOT, "public", img.src);
+      const buf = await readFile(file);
+      const { width, height } = await sharp(buf).metadata();
+      const sigma = Math.max(10, Math.round(width / 60));
+      let out;
+      if (rule.region) {
+        const [l, t, w, h] = rule.region;
+        const box = {
+          left: Math.round(l * width),
+          top: Math.round(t * height),
+          width: Math.round(w * width),
+          height: Math.round(h * height),
+        };
+        box.width = Math.min(box.width, width - box.left);
+        box.height = Math.min(box.height, height - box.top);
+        const patch = await sharp(buf).extract(box).blur(sigma).toBuffer();
+        out = await sharp(buf).composite([{ input: patch, left: box.left, top: box.top }]).webp({ quality: 80 }).toBuffer();
+      } else {
+        out = await sharp(buf).blur(sigma).webp({ quality: 80 }).toBuffer();
+      }
+      await writeFile(file, out);
+      count++;
+    }
+  }
+  console.log(`[fetch-notion] redacted ${count} confidential image(s)`);
 }
 
 // Regenerate public/sitemap.xml with every route (static pages + all cases).

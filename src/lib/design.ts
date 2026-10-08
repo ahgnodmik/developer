@@ -238,6 +238,8 @@ export type GraphicPart = {
   images: GraphicImage[];
   /** App/GUI screen sets render in a denser grid (smaller tiles). */
   compact?: boolean;
+  /** Step-by-step sets laid out as one horizontal row instead of masonry. */
+  row?: boolean;
 };
 export type GraphicGroup = {
   slug: string;
@@ -263,6 +265,12 @@ const GRAPHIC_TAG = /graphic|gui|brand|logo|marketing|illustration|print|editori
 const EXCLUDED_PARTS = [/^마켓\s*파트$/];
 // Phone-screen sets (e.g. QSTAG app screens) shown smaller.
 const COMPACT_PARTS = /앱\s*화면|app\s*screen|gui/i;
+// A heading that starts a step sequence: it and every later part of the page merge into one horizontal row.
+const ROW_PARTS = /유전자\s*검사\s*안내/;
+// /graphics-only display names for sub-cases (Notion name is kept for slugs and the detail page).
+const GROUP_TITLES: [RegExp, Record<Lang, string>][] = [
+  [/^OJT/, { ko: "콘텐츠 및 바이럴 광고", en: "Content & viral ads" }],
+];
 
 // Split a page's images by its Notion headings so e.g. marketing visuals and app screens don't mix.
 function bodyParts(p: DesignProject): GraphicPart[] {
@@ -274,12 +282,18 @@ function bodyParts(p: DesignProject): GraphicPart[] {
     parts[parts.length - 1].images.push(img);
   };
   for (const b of p.body ?? []) {
-    if (b.type === "heading") parts.push({ heading: b.text, images: [] });
+    // Notion headings sometimes carry markdown-ish markers ("*...", "#...")
+    if (b.type === "heading") parts.push({ heading: b.text.replace(/^[*#\s]+/, ""), images: [] });
     if (b.type === "image") add({ src: b.src, caption: b.caption });
     if (b.type === "gallery") b.images.forEach(add);
   }
   (p.gallery ?? []).forEach((src) => add({ src }));
   if (seen.size === 0 && p.cover) add({ src: p.cover });
+  const rowStart = parts.findIndex((part) => ROW_PARTS.test(part.heading ?? ""));
+  if (rowStart >= 0) {
+    const merged = parts.splice(rowStart);
+    parts.push({ heading: merged[0].heading, images: merged.flatMap((part) => part.images), row: true });
+  }
   return parts
     .filter((part) => part.images.length > 0 && !EXCLUDED_PARTS.some((re) => re.test(part.heading ?? "")))
     .map((part) => (part.heading && COMPACT_PARTS.test(part.heading) ? { ...part, compact: true } : part));
@@ -287,7 +301,8 @@ function bodyParts(p: DesignProject): GraphicPart[] {
 
 function toGroup(p: DesignProject): GraphicGroup {
   const parts = bodyParts(p);
-  return { slug: p.slug, title: p.title, parts, images: parts.flatMap((part) => part.images) };
+  const title = GROUP_TITLES.find(([re]) => re.test(p.title.ko))?.[1] ?? p.title;
+  return { slug: p.slug, title, parts, images: parts.flatMap((part) => part.images) };
 }
 
 /** Graphic/GUI cases (tagged, or archived brand/marketing work) with their images grouped by sub-case. */

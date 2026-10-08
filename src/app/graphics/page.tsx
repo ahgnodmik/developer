@@ -259,9 +259,13 @@ export default function GraphicsPage() {
                               </h4>
                             )}
                             <div
-                              className={`gap-3 [column-fill:_balance] ${
-                                part.compact ? "columns-3 md:columns-5 xl:columns-6" : "columns-2 md:columns-3 xl:columns-4"
-                              }`}
+                              className={
+                                part.row
+                                  ? "grid grid-flow-col auto-cols-[minmax(160px,1fr)] gap-3 overflow-x-auto pb-2 [&>button]:mb-0"
+                                  : `gap-3 [column-fill:_balance] ${
+                                      part.compact ? "columns-4 md:columns-7 xl:columns-9" : "columns-2 md:columns-3 xl:columns-4"
+                                    }`
+                              }
                             >
                               {part.images.map((img, ii) => (
                                 <button
