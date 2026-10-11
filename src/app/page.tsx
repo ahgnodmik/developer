@@ -80,8 +80,17 @@ const projectTags = [
 
 const projectStatuses: ProjectStatus[] = ["live", "live", "live", "case", "dev", "dev", "case", "case"];
 
-// Generated duotone covers for the LIVE apps (abstract, no real UI), index-aligned with live projects.
-const liveCovers = ["/work/ocr.webp", "/work/currency.webp", "/work/place.webp"];
+// Generated duotone covers (abstract, no real UI), index-aligned with content.{ko,en}.projects.
+const projectCovers = [
+  "/work/ocr.webp",
+  "/work/currency.webp",
+  "/work/place.webp",
+  "/work/blog.webp",
+  "/work/cards.webp",
+  "/work/sourcing.webp",
+  "/work/order.webp",
+  "/work/meal.webp",
+];
 
 const content = {
   ko: {
@@ -90,7 +99,7 @@ const content = {
     headline: "디자인하고, AI로 직접 만들고, 운영합니다",
     experience: "디자인 10+ 년",
     status: "구직 중",
-    seeWork: "대표 작업 보기",
+    seeWork: "작업 보기",
     identity: {
       design: { role: "UX/UI Designer", years: "5+", unit: "년", desc: "리서치, UI 디자인, 프로토타입, 디자인 시스템 구축" },
       build: { role: "AIBuilder", years: "1+", unit: "년", desc: "Claude와 OpenAI API, Flutter, Next.js로 기획부터 출시까지" },
@@ -98,8 +107,10 @@ const content = {
     aboutLead: "프로덕트 기획부터 프로토타입 개발, 서비스 환경 구축까지 전 과정을 제공합니다.",
     aboutBody:
       "AI 기술과 Flutter를 활용한 크로스 플랫폼 앱 개발에 집중하며, 웹 서비스와 모바일 앱을 통합한 디지털 솔루션을 제공합니다. 디자인 중심의 개발 철학으로 사용자 친화적인 인터페이스를 구현하고, 지속적인 기술 연구와 혁신을 통해 더 나은 디지털 경험을 만들어갑니다.",
-    work: { title: "대표 작업", note: "스토어에 출시해 운영 중인 앱 3개. 서비스명과 코드는 비공개입니다." },
-    more: { title: "더 많은 프로젝트", note: "상세 케이스 스터디와 시연은 문의 시 공유합니다." },
+    work: {
+      title: "작업",
+      note: "서비스명과 코드는 비공개입니다. 상세 케이스 스터디와 시연은 문의 시 공유합니다.",
+    },
     designCta: { title: "서비스 디자인 케이스 스터디", body: "B2B 관제 시스템, 챗봇, 퍼블리싱 등 디자인 작업 모음", link: "디자인 작업 보기", archive: "More Works" },
     career: {
       title: "경력과 도구",
@@ -128,7 +139,7 @@ const content = {
     headline: "I design it, build it with AI, and keep it running",
     experience: "10+ years in design",
     status: "Open to work",
-    seeWork: "See selected work",
+    seeWork: "See work",
     identity: {
       design: { role: "UX/UI Designer", years: "5+", unit: "yrs", desc: "Research, UI design, prototyping, and design systems" },
       build: { role: "AIBuilder", years: "1+", unit: "yr", desc: "From planning to launch with Claude, OpenAI APIs, Flutter, and Next.js" },
@@ -136,8 +147,10 @@ const content = {
     aboutLead: "I cover the full journey from product planning to prototype development and service infrastructure setup.",
     aboutBody:
       "I focus on cross-platform app development combining AI and Flutter, delivering digital solutions that unify web services and mobile apps. With a design-driven development philosophy, I craft user-friendly interfaces and keep improving digital experiences through continuous research and innovation.",
-    work: { title: "Selected work", note: "Three apps live in production. Names and code stay private." },
-    more: { title: "More projects", note: "Detailed case studies and demos are available on request." },
+    work: {
+      title: "Work",
+      note: "Names and code stay private. Detailed case studies and demos are available on request.",
+    },
     designCta: { title: "Service design case studies", body: "B2B monitoring systems, chatbots, publishing, and more", link: "View design work", archive: "More works" },
     career: {
       title: "Career and tools",
@@ -181,12 +194,10 @@ export default function Home() {
   }
 
   const t = content[lang];
-  const projects = t.projects.map((p, i) => ({ ...p, status: projectStatuses[i], tags: projectTags[i] }));
-  const liveProjects = projects.filter((p) => p.status === "live");
-  const otherProjects = projects
-    .filter((p) => p.status !== "live")
-    .sort((a, b) => (a.status === b.status ? 0 : a.status === "dev" ? -1 : 1));
-  const devCount = otherProjects.filter((p) => p.status === "dev").length;
+  const statusOrder: ProjectStatus[] = ["live", "dev", "case"];
+  const projects = t.projects
+    .map((p, i) => ({ ...p, status: projectStatuses[i], tags: projectTags[i], cover: projectCovers[i] }))
+    .sort((a, b) => statusOrder.indexOf(a.status) - statusOrder.indexOf(b.status));
   const rulerYears = Array.from({ length: Math.floor(RULER_END) - RULER_START + 1 }, (_, i) => RULER_START + i);
 
   return (
@@ -277,56 +288,38 @@ export default function Home() {
               <p className="md:col-span-4 text-sm leading-6 text-[var(--n-text-secondary)] md:text-right">{t.work.note}</p>
             </Reveal>
 
-            <Reveal className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {liveProjects.map((project, i) => (
-                <article key={project.title} className="group flex flex-col">
-                  <div className="relative aspect-[4/3] overflow-hidden bg-[var(--n-bg-callout)]">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={liveCovers[i]}
-                      alt=""
-                      loading="lazy"
-                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
-                    />
+            {/* All projects as one image grid; the cover is dimmed and the copy overlaid */}
+            <Reveal className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {projects.map((project) => (
+                <article key={project.title} className="group relative aspect-[4/3] sm:aspect-[4/5] overflow-hidden bg-[#161616] text-white">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={project.cover}
+                    alt=""
+                    loading="lazy"
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+                  />
+                  <div className="absolute inset-0 bg-[#0f0f0e]/45 transition-colors duration-500 group-hover:bg-[#0f0f0e]/30" />
+                  <div className="absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t from-[#0f0f0e]/90 via-[#0f0f0e]/55 to-transparent" />
+                  <div className="relative flex flex-col h-full p-5">
+                    <div>
+                      {project.status === "live" ? (
+                        <LiveSticker label={t.statusLabels.live} />
+                      ) : (
+                        <span className="inline-flex px-2 py-0.5 rounded-[3px] bg-white/15 backdrop-blur-sm text-[11px] font-medium text-white/90">
+                          {t.statusLabels[project.status]}
+                        </span>
+                      )}
+                    </div>
+                    <div className="mt-auto">
+                      <h3 className="text-lg leading-snug font-medium tracking-tight text-balance">{project.title}</h3>
+                      <p className="mt-2 text-sm leading-6 text-white/80 line-clamp-3">{project.desc}</p>
+                      <p className="mt-3 font-mono text-[11px] text-white/60">{project.tags.join(" / ")}</p>
+                    </div>
                   </div>
-                  <div className="mt-4 flex items-center justify-between gap-3">
-                    <h3 className="text-lg font-medium tracking-tight">{project.title}</h3>
-                    <LiveSticker label={t.statusLabels.live} />
-                  </div>
-                  <p className="mt-1 text-sm leading-6 text-[var(--n-text-secondary)]">{project.desc}</p>
-                  <p className="mt-2 font-mono text-xs text-[var(--n-text-tertiary)]">{project.tags.join(" / ")}</p>
                 </article>
               ))}
             </Reveal>
-
-            {/* ── More projects: dossier index ── */}
-            <div className="mt-24 md:mt-32 grid gap-10 md:grid-cols-12">
-              <Reveal className="md:col-span-4">
-                <h2 className="text-[clamp(2rem,4vw,3.5rem)] leading-none font-medium tracking-[-0.035em]">{t.more.title}</h2>
-                <p className="mt-5 font-mono text-xs leading-6 text-[var(--n-text-tertiary)]">
-                  {t.statusLabels.dev} ({devCount})<br />
-                  {t.statusLabels.case} ({otherProjects.length - devCount})
-                </p>
-              </Reveal>
-              <Reveal className="md:col-span-8 border-t border-[var(--n-text)]">
-                {otherProjects.map((project) => (
-                  <div
-                    key={project.title}
-                    className="grid gap-1 md:grid-cols-[1fr_15rem] md:gap-8 py-6 px-1 md:px-3 -mx-1 md:-mx-3 hover:bg-[var(--n-bg-hover)] transition-colors"
-                  >
-                    <div>
-                      <h3 className="text-lg font-medium tracking-tight">{project.title}</h3>
-                      <p className="mt-1 text-sm leading-6 text-[var(--n-text-secondary)]">{project.desc}</p>
-                    </div>
-                    <div className="md:text-right">
-                      <p className="text-xs text-[var(--n-text-secondary)]">{t.statusLabels[project.status]}</p>
-                      <p className="mt-1 font-mono text-xs text-[var(--n-text-tertiary)]">{project.tags.join(" / ")}</p>
-                    </div>
-                  </div>
-                ))}
-                <p className="mt-4 text-xs text-[var(--n-text-tertiary)]">{t.more.note}</p>
-              </Reveal>
-            </div>
 
             {/* Link out to the design case studies */}
             <Reveal className="mt-20 md:mt-28">
