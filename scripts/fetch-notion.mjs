@@ -571,9 +571,15 @@ async function main() {
 // original one URL away). Rules match on page title + the heading the image sits under, or its caption.
 // region: [left, top, width, height] as fractions of the image; omitted = whole image.
 const REDACTIONS = [
-  { page: /온라인\s*마케팅/, heading: /마케팅\s*믹스/ },
+  // marketing mix plans: light blur so the layout reads, plus a representative label overlaid on the site
+  {
+    page: /온라인\s*마케팅/,
+    heading: /마케팅\s*믹스/,
+    blur: 160,
+    labels: ["온라인 마케팅 연간 로드맵", "유입 퍼널 세팅", "마케팅 믹스 마인드맵", "IG/FB 콘텐츠 전략"],
+  },
   // media / CTR table: keep media names, blur the CTR column below the header row
-  { page: /^OJT/, caption: /CTR/, region: [0.5, 0.13, 0.5, 0.87] },
+  { page: /^OJT/, caption: /CTR/, region: [0.5, 0.13, 0.5, 0.87], blur: 60 },
 ];
 
 async function redactImages(all) {
@@ -584,32 +590,39 @@ async function redactImages(all) {
   let count = 0;
   for (const p of all) {
     let heading = "";
+    // keep references to the generated blocks so a label can be written back
     const images = [];
     for (const b of p.body ?? []) {
       if (b.type === "heading") heading = b.text;
-      if (b.type === "image") images.push({ ...b, heading });
-      if (b.type === "gallery") images.push(...b.images.map((img) => ({ ...img, heading })));
+      if (b.type === "image") images.push({ block: b, heading });
+      if (b.type === "gallery") images.push(...b.images.map((img) => ({ block: img, heading })));
     }
-    for (const img of images) {
+    const seen = new Map(); // rule -> matched count, for label order
+    for (const { block, heading: h } of images) {
       const rule = REDACTIONS.find(
         (r) =>
           r.page.test(p.title.ko) &&
-          (!r.heading || r.heading.test(img.heading)) &&
-          (!r.caption || r.caption.test(img.caption ?? ""))
+          (!r.heading || r.heading.test(h)) &&
+          (!r.caption || r.caption.test(block.caption ?? ""))
       );
       if (!rule) continue;
-      const file = path.join(ROOT, "public", img.src);
+      const n = seen.get(rule) ?? 0;
+      seen.set(rule, n + 1);
+      if (rule.labels?.[n]) block.label = rule.labels[n];
+
+      const file = path.join(ROOT, "public", block.src);
       const buf = await readFile(file);
       const { width, height } = await sharp(buf).metadata();
-      const sigma = Math.max(10, Math.round(width / 60));
+      // blur divisor: larger = lighter blur
+      const sigma = Math.max(3, Math.round(width / rule.blur));
       let out;
       if (rule.region) {
-        const [l, t, w, h] = rule.region;
+        const [l, t, w, hh] = rule.region;
         const box = {
           left: Math.round(l * width),
           top: Math.round(t * height),
           width: Math.round(w * width),
-          height: Math.round(h * height),
+          height: Math.round(hh * height),
         };
         box.width = Math.min(box.width, width - box.left);
         box.height = Math.min(box.height, height - box.top);

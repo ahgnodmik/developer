@@ -6,6 +6,7 @@ import Link from "next/link";
 import { MotionConfig, motion } from "motion/react";
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUpRight, X } from "lucide-react";
 import { SiteHeader, SiteFooter } from "@/components/site-header";
+import { RedactedLabel } from "@/components/redacted-label";
 import { graphicSections, type GraphicImage, type Lang } from "@/lib/design";
 
 const FONT_STACK = "var(--font-geist-sans), 'Pretendard Variable', Pretendard, system-ui, sans-serif";
@@ -42,7 +43,8 @@ function splitTitle(title: string) {
   return { head, rest: rest.join(" ") };
 }
 
-type FlatImage = GraphicImage & { label: string };
+// title: group/part name shown in the lightbox header (label stays the redaction label)
+type FlatImage = GraphicImage & { title: string };
 
 // Height/width above this = long detail page (sales page, scroll capture). Phone screens (~2.1) stay below.
 const TALL_RATIO = 2.5;
@@ -84,9 +86,9 @@ function Lightbox({
   const btn = "flex items-center justify-center w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors";
 
   return createPortal(
-    <div className="fixed inset-0 z-50 flex flex-col bg-[#0f0f0e]/95" role="dialog" aria-modal="true" aria-label={img.label}>
+    <div className="fixed inset-0 z-50 flex flex-col bg-[#0f0f0e]/95" role="dialog" aria-modal="true" aria-label={img.title}>
       <div className="flex items-center gap-3 h-14 px-5 text-sm text-white/80">
-        <span className="truncate">{img.label}</span>
+        <span className="truncate">{img.title}</span>
         <span className="ml-auto font-mono text-xs tabular-nums text-white/60">
           {index + 1} / {images.length}
         </span>
@@ -101,14 +103,19 @@ function Lightbox({
           className={`absolute inset-0 overflow-y-auto overscroll-contain px-4 md:px-20 pb-6 ${tall ? "" : "flex items-center justify-center"}`}
           onClick={onClose}
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={img.src}
-            alt={img.caption ?? img.label}
-            onLoad={(e) => onMeasure(img.src, isTallImg(e.currentTarget))}
-            className={tall ? "block w-full max-w-[900px] h-auto mx-auto" : "max-w-full max-h-full object-contain"}
+          <span
+            className={tall ? "relative block w-full max-w-[900px] mx-auto" : "relative inline-flex max-w-full max-h-full"}
             onClick={(e) => e.stopPropagation()}
-          />
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={img.src}
+              alt={img.label ?? img.caption ?? img.title}
+              onLoad={(e) => onMeasure(img.src, isTallImg(e.currentTarget))}
+              className={tall ? "block w-full h-auto" : "max-w-full max-h-[calc(100dvh-8rem)] object-contain"}
+            />
+            {img.label && <RedactedLabel label={img.label} large />}
+          </span>
         </div>
         <button type="button" aria-label={t.prev} onClick={() => onMove(-1)} className={`${btn} absolute left-4 top-1/2 -translate-y-1/2 hidden md:flex`}>
           <ArrowLeft className="w-5 h-5" />
@@ -157,8 +164,8 @@ export default function GraphicsPage() {
       for (const group of section.groups) {
         offsets.set(group.slug, flat.length);
         for (const part of group.parts) {
-          const label = part.heading ? `${group.title[lang]} / ${part.heading}` : group.title[lang];
-          for (const img of part.images) flat.push({ ...img, label });
+          const title = part.heading ? `${group.title[lang]} / ${part.heading}` : group.title[lang];
+          for (const img of part.images) flat.push({ ...img, title });
         }
       }
     }
@@ -274,7 +281,7 @@ export default function GraphicsPage() {
                                   type="button"
                                   onClick={() => setOpen(partStart + ii)}
                                   className="group relative flex justify-center w-full mb-3 break-inside-avoid overflow-hidden bg-[var(--n-bg-callout)] focus-visible:outline-2 focus-visible:outline-[var(--n-accent)]"
-                                  aria-label={img.caption ?? `${part.heading ?? group.title[lang]} ${ii + 1}`}
+                                  aria-label={img.label ?? img.caption ?? `${part.heading ?? group.title[lang]} ${ii + 1}`}
                                 >
                                   {/* eslint-disable-next-line @next/next/no-img-element */}
                                   <img
@@ -291,6 +298,7 @@ export default function GraphicsPage() {
                                       tallSrcs[img.src] && !part.row ? "w-full aspect-[3/4] object-cover object-top" : "max-w-full h-auto"
                                     }`}
                                   />
+                                  {img.label && <RedactedLabel label={img.label} />}
                                   {tallSrcs[img.src] && !part.row && (
                                     <span className="absolute inset-x-0 bottom-0 flex items-end justify-center h-28 pb-4 bg-gradient-to-t from-[var(--n-bg)] via-[var(--n-bg)]/80 to-transparent">
                                       <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--n-brand)] text-white text-xs font-medium">

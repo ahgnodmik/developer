@@ -14,8 +14,9 @@ export type DesignBlock =
   | { type: "number"; text: string }
   | { type: "quote"; text: string }
   | { type: "divider" }
-  | { type: "image"; src: string; caption?: string }
-  | { type: "gallery"; cols: number; images: { src: string; caption?: string }[] }
+  // label: representative text overlaid on a redacted (blurred) image
+  | { type: "image"; src: string; caption?: string; label?: string }
+  | { type: "gallery"; cols: number; images: { src: string; caption?: string; label?: string }[] }
   | { type: "video"; provider: "youtube"; embedUrl: string; caption?: string }
   | { type: "videofile"; src: string; caption?: string }
   | { type: "link"; url: string; title?: string }
@@ -231,7 +232,7 @@ export function getDesignProject(slug: string): DesignProject | undefined {
 
 // ── /graphics: image wall aggregated from graphic/GUI cases ──
 
-export type GraphicImage = { src: string; caption?: string };
+export type GraphicImage = { src: string; caption?: string; label?: string };
 /** Images under one Notion heading inside a page (heading omitted before the first heading). */
 export type GraphicPart = {
   heading?: string;
@@ -284,7 +285,7 @@ function bodyParts(p: DesignProject): GraphicPart[] {
   for (const b of p.body ?? []) {
     // Notion headings sometimes carry markdown-ish markers ("*...", "#...")
     if (b.type === "heading") parts.push({ heading: b.text.replace(/^[*#\s]+/, ""), images: [] });
-    if (b.type === "image") add({ src: b.src, caption: b.caption });
+    if (b.type === "image") add({ src: b.src, caption: b.caption, label: b.label });
     if (b.type === "gallery") b.images.forEach(add);
   }
   (p.gallery ?? []).forEach((src) => add({ src }));

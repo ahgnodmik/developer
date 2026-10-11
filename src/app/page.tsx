@@ -277,13 +277,10 @@ export default function Home() {
               <p className="md:col-span-4 text-sm leading-6 text-[var(--n-text-secondary)] md:text-right">{t.work.note}</p>
             </Reveal>
 
-            <Reveal className="grid md:grid-cols-12 md:grid-rows-2 gap-px bg-[var(--n-border)] border border-[var(--n-border)]">
+            <Reveal className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {liveProjects.map((project, i) => (
-                <article
-                  key={project.title}
-                  className={`group flex flex-col bg-[var(--n-bg)] ${i === 0 ? "md:col-span-7 md:row-span-2" : "md:col-span-5"}`}
-                >
-                  <div className={`relative overflow-hidden ${i === 0 ? "aspect-[4/3] md:aspect-auto md:flex-1 md:min-h-[360px]" : "aspect-[16/9]"}`}>
+                <article key={project.title} className="group flex flex-col">
+                  <div className="relative aspect-[4/3] overflow-hidden bg-[var(--n-bg-callout)]">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={liveCovers[i]}
@@ -292,12 +289,12 @@ export default function Home() {
                       className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
                     />
                   </div>
-                  <div className="p-5 md:p-6">
+                  <div className="mt-4 flex items-center justify-between gap-3">
+                    <h3 className="text-lg font-medium tracking-tight">{project.title}</h3>
                     <LiveSticker label={t.statusLabels.live} />
-                    <h3 className={`mt-3 font-medium tracking-tight ${i === 0 ? "text-2xl md:text-3xl" : "text-lg"}`}>{project.title}</h3>
-                    <p className="mt-1.5 text-sm leading-6 text-[var(--n-text-secondary)]">{project.desc}</p>
-                    <p className="mt-3 font-mono text-xs text-[var(--n-text-tertiary)]">{project.tags.join(" / ")}</p>
                   </div>
+                  <p className="mt-1 text-sm leading-6 text-[var(--n-text-secondary)]">{project.desc}</p>
+                  <p className="mt-2 font-mono text-xs text-[var(--n-text-tertiary)]">{project.tags.join(" / ")}</p>
                 </article>
               ))}
             </Reveal>

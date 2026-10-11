@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion } from "motion/react";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import { SiteHeader, SiteFooter } from "@/components/site-header";
+import { RedactedLabel } from "@/components/redacted-label";
 import { visibleDesignProjects, type DesignBlock, type DesignProject, type Lang } from "@/lib/design";
 
 type ImageBlock = Extract<DesignBlock, { type: "image" }>;
@@ -18,14 +19,17 @@ function BodyImage({ b, altBase }: { b: ImageBlock; altBase?: string }) {
       viewport={{ once: true, margin: "-80px" }}
       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
     >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={b.src}
-        alt={b.caption ?? altBase ?? ""}
-        loading="lazy"
-        decoding="async"
-        className="w-full rounded-lg border border-[var(--n-border)]"
-      />
+      <div className="relative">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={b.src}
+          alt={b.label ?? b.caption ?? altBase ?? ""}
+          loading="lazy"
+          decoding="async"
+          className="w-full rounded-lg border border-[var(--n-border)]"
+        />
+        {b.label && <RedactedLabel label={b.label} large />}
+      </div>
       {b.caption && (
         <figcaption className="text-xs text-[var(--n-text-tertiary)] mt-2 text-center">{b.caption}</figcaption>
       )}
