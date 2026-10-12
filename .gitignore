@@ -40,3 +40,6 @@ next-env.d.ts
 
 # backups
 *.tar.gz
+
+# notion build-time downloaded mug photos
+/public/mugs/
