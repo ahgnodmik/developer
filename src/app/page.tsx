@@ -13,7 +13,7 @@ const FONT_STACK = "var(--font-geist-sans), 'Pretendard Variable', Pretendard, s
 const CONTAINER = "max-w-[1400px] mx-auto px-5 md:px-10";
 
 // Career ruler spans 2019 to "now" (Oct 2026); bars and ticks are positioned as % of this range.
-const RULER_START = 2019;
+const RULER_START = 2014;
 const RULER_END = 2026.8;
 const rulerPos = (year: number) => ((year - RULER_START) / (RULER_END - RULER_START)) * 100;
 
@@ -60,10 +60,13 @@ const skillGroups = [
 ];
 
 // Index-aligned with content.{ko,en}.career
+// focus: industrial design / visualization years, drawn solid on the ruler like the current role
 const careerMeta = [
-  { from: 2025, to: RULER_END },
-  { from: 2020, to: 2025 },
-  { from: 2019, to: 2020 },
+  { from: 2025, to: RULER_END, focus: false },
+  { from: 2020, to: 2025, focus: false },
+  { from: 2019, to: 2020, focus: false },
+  { from: 2016.3, to: 2018.25, focus: true },
+  { from: 2014.6, to: 2016, focus: true },
 ];
 
 // Index-aligned with content.{ko,en}.projects
@@ -118,7 +121,10 @@ const content = {
         { period: "2025 - 현재", short: "AI Builder", title: "AI Builder", desc: "Claude, OpenAI API 등 AI를 활용한 웹 서비스 및 앱 기획·개발. Cursor 등 AI 도구 기반 고속 프로토타이핑." },
         { period: "2020 - 2025", short: "UX/UI", title: "UX/UI 디자이너", desc: "모바일·웹 서비스 UX 리서치, UI 디자인, 프로토타이핑. 디자인 시스템 구축 및 개발팀 협업." },
         { period: "2019 - 2020", short: "Marketing", title: "마케팅 디자인, UX/UI 디자인 매니저", desc: "헬스케어 회사에서 마케팅 디자인과 UX/UI 디자인 매니저로 브랜드·프로덕트 디자인 전반을 담당." },
+        { period: "2016 - 2018", short: "Visualization", title: "제품 디자인, 3D 비주얼라이제이션", desc: "드론 개발사(프리랜서)에서 감시·측량 드론 컨셉 기획, 제품 디자인 모델링·렌더링, 전시 부스 디자인을 담당." },
+        { period: "2014 - 2016", short: "Industrial", title: "산업 디자인", desc: "인라인 스케이트 스타트업에서 성인·키즈 제품 디자인과 킥스타터·인디고고 크라우드펀딩 페이지 제작을 담당." },
       ],
+      intro: "2014년 산업 디자인과 3D 비주얼라이제이션으로 시작해 UX/UI, 그리고 AI로 직접 만드는 프로덕트로 영역을 넓혀왔습니다.",
     },
     statusLabels: { live: "LIVE", dev: "개발 중", case: "케이스 스터디" },
     projects: [
@@ -158,7 +164,10 @@ const content = {
         { period: "2025 - Present", short: "AI Builder", title: "AI Builder", desc: "Planning and building AI-powered web services and apps with Claude and OpenAI APIs. Rapid prototyping with AI tools such as Cursor." },
         { period: "2020 - 2025", short: "UX/UI", title: "UX/UI Designer", desc: "UX research, UI design, and prototyping for mobile and web services. Built design systems and collaborated with engineering teams." },
         { period: "2019 - 2020", short: "Marketing", title: "Marketing Design, UX/UI Design Manager", desc: "Led marketing design and UX/UI as design manager at a healthcare company, covering brand and product design." },
+        { period: "2016 - 2018", short: "Visualization", title: "Product Design, 3D Visualization", desc: "Freelance for a drone maker: concept planning for surveillance and survey drones, product modeling and rendering, and exhibition booth design." },
+        { period: "2014 - 2016", short: "Industrial", title: "Industrial Design", desc: "Product design for an inline-skate startup's adult and kids lines, plus Kickstarter and Indiegogo campaign pages." },
       ],
+      intro: "Started in 2014 with industrial design and 3D visualization, then grew into UX/UI and products I build myself with AI.",
     },
     statusLabels: { live: "LIVE", dev: "In development", case: "Case study" },
     projects: [
@@ -348,6 +357,7 @@ export default function Home() {
           <section id="career" className={`${CONTAINER} scroll-mt-14 py-20 md:py-28 border-t border-[var(--n-border)]`}>
             <Reveal>
               <h2 className="text-[clamp(2.4rem,5.5vw,5rem)] leading-none font-medium tracking-[-0.04em]">{t.career.title}</h2>
+              <p className="mt-6 max-w-2xl text-lg leading-8 text-[var(--n-text-secondary)] text-pretty">{t.career.intro}</p>
             </Reveal>
 
             {/* Ruler timeline */}
@@ -360,7 +370,7 @@ export default function Home() {
                     <div key={item.period} className="relative h-8">
                       <div
                         className={`absolute inset-y-0 flex items-center px-3 text-xs font-medium whitespace-nowrap overflow-hidden ${
-                          i === 0 ? "bg-[var(--n-brand)] text-white" : "border border-[var(--n-accent)] text-[var(--n-accent)]"
+                          i === 0 || meta.focus ? "bg-[var(--n-brand)] text-white" : "border border-[var(--n-accent)] text-[var(--n-accent)]"
                         }`}
                         style={{ left: `${rulerPos(meta.from)}%`, width: `${rulerPos(meta.to) - rulerPos(meta.from)}%` }}
                       >
@@ -392,9 +402,13 @@ export default function Home() {
               </div>
             </Reveal>
 
-            <div className="mt-14 grid gap-10 md:grid-cols-3">
+            <div className="mt-14 grid gap-10 md:grid-cols-2 lg:grid-cols-3">
               {t.career.items.map((item, i) => (
-                <Reveal key={item.period} delay={i * 0.08}>
+                <Reveal
+                  key={item.period}
+                  delay={(i % 3) * 0.08}
+                  className={careerMeta[i].focus ? "pl-4 border-l-2 border-[var(--n-brand)]" : ""}
+                >
                   <p className="font-mono text-xs text-[var(--n-text-tertiary)] tabular-nums">{item.period}</p>
                   <h3 className="mt-2 text-xl font-medium tracking-tight">{item.title}</h3>
                   <p className="mt-2 text-sm leading-6 text-[var(--n-text-secondary)]">{item.desc}</p>
