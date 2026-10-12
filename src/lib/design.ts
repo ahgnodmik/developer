@@ -264,6 +264,10 @@ const GRAPHIC_TAG = /graphic|gui|brand|logo|marketing|illustration|print|editori
 
 // Parts left off /graphics (still on the case detail page). Matched against the Notion heading.
 const EXCLUDED_PARTS = [/^마켓\s*파트$/];
+// Individual images left off /graphics: 0-based positions within a heading's part.
+const EXCLUDED_IMAGES: { page: RegExp; heading: RegExp; drop: number[] }[] = [
+  { page: /워크윙\s*1\.0/, heading: /첫\s*스타트/, drop: [1, 2] }, // concept sketches
+];
 // Phone-screen sets (e.g. QSTAG app screens) shown smaller.
 const COMPACT_PARTS = /앱\s*화면|app\s*screen|gui/i;
 // A heading that starts a step sequence: it and every later part of the page merge into one horizontal row.
@@ -294,6 +298,12 @@ function bodyParts(p: DesignProject): GraphicPart[] {
   if (rowStart >= 0) {
     const merged = parts.splice(rowStart);
     parts.push({ heading: merged[0].heading, images: merged.flatMap((part) => part.images), row: true });
+  }
+  for (const rule of EXCLUDED_IMAGES) {
+    if (!rule.page.test(p.title.ko)) continue;
+    for (const part of parts) {
+      if (rule.heading.test(part.heading ?? "")) part.images = part.images.filter((_, i) => !rule.drop.includes(i));
+    }
   }
   return parts
     .filter((part) => part.images.length > 0 && !EXCLUDED_PARTS.some((re) => re.test(part.heading ?? "")))
