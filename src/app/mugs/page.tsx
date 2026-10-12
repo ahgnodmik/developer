@@ -119,7 +119,7 @@ function MugModal({ mug, lang, onClose }: { mug: Mug; lang: Lang; onClose: () =>
 }
 
 export default function MugsPage() {
-  const [lang, setLang] = useState<Lang>("ko");
+  const [lang, setLang] = useState<Lang>("en");
   const [open, setOpen] = useState<Mug | null>(null);
 
   useEffect(() => {

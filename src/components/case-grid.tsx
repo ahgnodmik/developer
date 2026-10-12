@@ -118,7 +118,7 @@ export function CaseGrid({
   /** Optional extra group rendered below the main grid under its own heading. */
   subSection?: { title: Record<Lang, string>; projects: DesignProject[] };
 }) {
-  const [lang, setLang] = useState<Lang>("ko");
+  const [lang, setLang] = useState<Lang>("en");
 
   useEffect(() => {
     const saved = localStorage.getItem("lang");

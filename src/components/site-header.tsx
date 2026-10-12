@@ -24,18 +24,43 @@ const navItems: { href: string; label: Record<Lang, string>; key?: NavActive }[]
   { href: "/#contact", label: { ko: "연락처", en: "Contact" } },
 ];
 
-export function LangToggle({ lang, onToggle }: { lang: Lang; onToggle: () => void }) {
+export function LangToggle({ lang, onToggle, highlight = false }: { lang: Lang; onToggle: () => void; highlight?: boolean }) {
   return (
     <button
       type="button"
       onClick={onToggle}
       aria-label={lang === "ko" ? "Switch to English" : "한국어로 전환"}
-      className="flex items-center gap-1 px-2 h-8 rounded text-xs font-semibold text-[var(--n-text-secondary)] hover:bg-[var(--n-bg-hover)] hover:text-[var(--n-text)] transition-colors"
+      className={`flex items-center gap-1 px-2 h-8 rounded text-xs font-semibold transition-all duration-500 ${
+        highlight
+          ? "bg-[var(--n-brand)] text-white ring-4 ring-[var(--n-accent-border)] motion-safe:animate-pulse"
+          : "text-[var(--n-text-secondary)] hover:bg-[var(--n-bg-hover)] hover:text-[var(--n-text)]"
+      }`}
     >
       <Languages className="w-4 h-4" />
       {lang === "ko" ? "EN" : "한"}
     </button>
   );
+}
+
+// First visit in English: point at the language toggle for ~3s so Korean readers find it.
+// Skipped once a language was chosen, and shown at most once per browser session.
+function useLangNudge(lang: Lang) {
+  const [nudge, setNudge] = useState(false);
+  useEffect(() => {
+    if (lang !== "en") return;
+    try {
+      if (localStorage.getItem("lang") || sessionStorage.getItem("langNudge")) return;
+      sessionStorage.setItem("langNudge", "1");
+    } catch {
+      return;
+    }
+    setNudge(true);
+    const id = setTimeout(() => setNudge(false), 3000);
+    return () => clearTimeout(id);
+    // run once on mount; a later toggle shouldn't re-trigger it
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  return nudge && lang === "en";
 }
 
 function Wordmark() {
@@ -60,6 +85,7 @@ export function SiteHeader({
   children?: React.ReactNode;
 }) {
   const [open, setOpen] = useState(false);
+  const nudge = useLangNudge(lang);
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
@@ -90,7 +116,18 @@ export function SiteHeader({
           ))}
         </nav>
         <div className="flex items-center ml-auto md:ml-2">
-          <LangToggle lang={lang} onToggle={onToggleLang} />
+          <div className="relative">
+            <LangToggle lang={lang} onToggle={onToggleLang} highlight={nudge} />
+            <span
+              role="status"
+              className={`pointer-events-none absolute right-0 top-full mt-2.5 whitespace-nowrap rounded-md bg-[var(--n-brand)] px-2.5 py-1.5 text-xs font-medium text-white shadow-lg transition-all duration-500 ${
+                nudge ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-1"
+              }`}
+            >
+              <span aria-hidden className="absolute -top-1 right-4 h-2 w-2 rotate-45 bg-[var(--n-brand)]" />
+              {nudge ? "한국어로 보기" : ""}
+            </span>
+          </div>
           <ThemeToggle />
           <button
             type="button"

@@ -108,8 +108,8 @@ const content = {
     aboutBody:
       "AI 기술과 Flutter를 활용한 크로스 플랫폼 앱 개발에 집중하며, 웹 서비스와 모바일 앱을 통합한 디지털 솔루션을 제공합니다. 디자인 중심의 개발 철학으로 사용자 친화적인 인터페이스를 구현하고, 지속적인 기술 연구와 혁신을 통해 더 나은 디지털 경험을 만들어갑니다.",
     work: {
-      title: "작업",
-      note: "서비스명과 코드는 비공개입니다. 상세 케이스 스터디와 시연은 문의 시 공유합니다.",
+      title: "바이브코딩 작업",
+      note: "AI와 대화하며 기획부터 디자인, 개발, 출시까지 직접 만든 프로젝트입니다. 서비스명과 코드는 비공개이며, 케이스 스터디와 시연은 문의 시 공유합니다.",
     },
     designCta: { title: "서비스 디자인 케이스 스터디", body: "B2B 관제 시스템, 챗봇, 퍼블리싱 등 디자인 작업 모음", link: "디자인 작업 보기", archive: "More Works" },
     career: {
@@ -148,8 +148,8 @@ const content = {
     aboutBody:
       "I focus on cross-platform app development combining AI and Flutter, delivering digital solutions that unify web services and mobile apps. With a design-driven development philosophy, I craft user-friendly interfaces and keep improving digital experiences through continuous research and innovation.",
     work: {
-      title: "Work",
-      note: "Names and code stay private. Detailed case studies and demos are available on request.",
+      title: "Vibe-coded work",
+      note: "Projects I planned, designed, built, and shipped by pairing with AI. Names and code stay private; case studies and demos are available on request.",
     },
     designCta: { title: "Service design case studies", body: "B2B monitoring systems, chatbots, publishing, and more", link: "View design work", archive: "More works" },
     career: {
@@ -176,7 +176,7 @@ const content = {
 } satisfies Record<Lang, unknown>;
 
 export default function Home() {
-  const [lang, setLang] = useState<Lang>("ko");
+  const [lang, setLang] = useState<Lang>("en");
 
   useEffect(() => {
     const saved = localStorage.getItem("lang");
@@ -289,9 +289,10 @@ export default function Home() {
             </Reveal>
 
             {/* All projects as one image grid; the cover is dimmed and the copy overlaid */}
-            <Reveal className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {/* sized like the /design case grid: 4 square tiles across a 1024px column */}
+            <Reveal className="grid max-w-5xl grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
               {projects.map((project) => (
-                <article key={project.title} className="group relative aspect-[4/3] sm:aspect-[4/5] overflow-hidden bg-[#161616] text-white">
+                <article key={project.title} className="group relative aspect-square overflow-hidden rounded-xl bg-[#161616] text-white">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={project.cover}
@@ -301,7 +302,7 @@ export default function Home() {
                   />
                   <div className="absolute inset-0 bg-[#0f0f0e]/45 transition-colors duration-500 group-hover:bg-[#0f0f0e]/30" />
                   <div className="absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t from-[#0f0f0e]/90 via-[#0f0f0e]/55 to-transparent" />
-                  <div className="relative flex flex-col h-full p-5">
+                  <div className="relative flex flex-col h-full p-3.5 sm:p-4">
                     <div>
                       {project.status === "live" ? (
                         <LiveSticker label={t.statusLabels.live} />
@@ -312,9 +313,10 @@ export default function Home() {
                       )}
                     </div>
                     <div className="mt-auto">
-                      <h3 className="text-lg leading-snug font-medium tracking-tight text-balance">{project.title}</h3>
-                      <p className="mt-2 text-sm leading-6 text-white/80 line-clamp-3">{project.desc}</p>
-                      <p className="mt-3 font-mono text-[11px] text-white/60">{project.tags.join(" / ")}</p>
+                      <h3 className="text-sm sm:text-base leading-snug font-medium tracking-tight text-balance">{project.title}</h3>
+                      {/* small tiles: description and stack only from sm up */}
+                      <p className="hidden sm:line-clamp-2 mt-1.5 text-xs leading-5 text-white/80">{project.desc}</p>
+                      <p className="hidden sm:block mt-2 font-mono text-[10px] text-white/60 truncate">{project.tags.join(" / ")}</p>
                     </div>
                   </div>
                 </article>

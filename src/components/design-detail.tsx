@@ -234,7 +234,7 @@ const copy = {
 } satisfies Record<Lang, unknown>;
 
 export function DesignDetail({ project }: { project: DesignProject }) {
-  const [lang, setLang] = useState<Lang>("ko");
+  const [lang, setLang] = useState<Lang>("en");
 
   useEffect(() => {
     const saved = localStorage.getItem("lang");

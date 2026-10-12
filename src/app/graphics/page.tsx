@@ -131,7 +131,7 @@ function Lightbox({
 }
 
 export default function GraphicsPage() {
-  const [lang, setLang] = useState<Lang>("ko");
+  const [lang, setLang] = useState<Lang>("en");
   const [open, setOpen] = useState<number | null>(null);
   const [tallSrcs, setTallSrcs] = useState<Record<string, boolean>>({});
   const measure = useCallback(
