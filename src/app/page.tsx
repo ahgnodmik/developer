@@ -60,7 +60,7 @@ const skillGroups = [
 ];
 
 // Index-aligned with content.{ko,en}.career
-// focus: industrial design / visualization years, drawn solid on the ruler like the current role
+// focus: industrial / product design years, drawn solid dark gray on the ruler
 const careerMeta = [
   { from: 2025, to: RULER_END, focus: false },
   { from: 2020, to: 2025, focus: false },
@@ -370,7 +370,11 @@ export default function Home() {
                     <div key={item.period} className="relative h-8">
                       <div
                         className={`absolute inset-y-0 flex items-center px-3 text-xs font-medium whitespace-nowrap overflow-hidden ${
-                          i === 0 || meta.focus ? "bg-[var(--n-brand)] text-white" : "border border-[var(--n-accent)] text-[var(--n-accent)]"
+                          i === 0
+                            ? "bg-[var(--n-brand)] text-white"
+                            : meta.focus
+                              ? "bg-[#4a4844] dark:bg-[#5e5c57] text-white"
+                              : "border border-[var(--n-accent)] text-[var(--n-accent)]"
                         }`}
                         style={{ left: `${rulerPos(meta.from)}%`, width: `${rulerPos(meta.to) - rulerPos(meta.from)}%` }}
                       >
@@ -407,7 +411,7 @@ export default function Home() {
                 <Reveal
                   key={item.period}
                   delay={(i % 3) * 0.08}
-                  className={careerMeta[i].focus ? "pl-4 border-l-2 border-[var(--n-brand)]" : ""}
+                  className={careerMeta[i].focus ? "pl-4 border-l-2 border-[#4a4844] dark:border-[#5e5c57]" : ""}
                 >
                   <p className="font-mono text-xs text-[var(--n-text-tertiary)] tabular-nums">{item.period}</p>
                   <h3 className="mt-2 text-xl font-medium tracking-tight">{item.title}</h3>
