@@ -16,6 +16,7 @@ const copy = {
     crumb: "머그컵",
     intro: "여행지와 카페에서 모은 머그, 그리고 직접 디자인한 머그 기록입니다.",
     sampleNote: "일부 사진은 실제 사진으로 교체 전인 Unsplash 샘플 이미지입니다.",
+    designEmpty: "직접 디자인한 머그를 준비하고 있습니다.",
     sections: { collected: "수집한 머그", design: "디자인한 머그" },
     sample: "샘플",
     where: "출처",
@@ -27,6 +28,7 @@ const copy = {
     crumb: "Mugs",
     intro: "Mugs collected from trips and cafes, and mugs I designed myself.",
     sampleNote: "Some photos are Unsplash samples until the real ones are added.",
+    designEmpty: "Original mug designs are in the works.",
     sections: { collected: "Collected", design: "Designed" },
     sample: "Sample",
     where: "From",
@@ -138,9 +140,8 @@ export default function MugsPage() {
   }
 
   const t = copy[lang];
-  const groups = (["collected", "design"] as const)
-    .map((type) => ({ type, items: mugs.filter((m) => m.type === type) }))
-    .filter((g) => g.items.length > 0);
+  // both sections always render; an empty one shows a placeholder (designed mugs are still to come)
+  const groups = (["collected", "design"] as const).map((type) => ({ type, items: mugs.filter((m) => m.type === type) }));
   const hasSample = mugs.some(isSample);
 
   return (
@@ -178,6 +179,11 @@ export default function MugsPage() {
                 {t.sections[group.type]}
                 <span className="font-mono text-sm font-normal tracking-normal text-[var(--n-text-tertiary)] tabular-nums">{group.items.length}</span>
               </h2>
+              {group.items.length === 0 && (
+                <div className="flex items-center justify-center aspect-[3/1] md:aspect-[5/1] border border-dashed border-[var(--n-border)] text-sm text-[var(--n-text-tertiary)]">
+                  {t.designEmpty}
+                </div>
+              )}
               <div className="grid grid-cols-2 gap-x-3 gap-y-8 md:grid-cols-3 lg:grid-cols-4">
                 {group.items.map((mug, i) => (
                   <motion.button
