@@ -112,6 +112,7 @@ const content = {
       "AI 기술과 Flutter를 활용한 크로스 플랫폼 앱 개발에 집중하며, 웹 서비스와 모바일 앱을 통합한 디지털 솔루션을 제공합니다. 디자인 중심의 개발 철학으로 사용자 친화적인 인터페이스를 구현하고, 지속적인 기술 연구와 혁신을 통해 더 나은 디지털 경험을 만들어갑니다.",
     work: {
       title: "바이브코딩 작업",
+      all: "AI Build 전체 보기",
       note: "AI와 대화하며 기획부터 디자인, 개발, 출시까지 직접 만든 프로젝트입니다. 서비스명과 코드는 비공개이며, 케이스 스터디와 시연은 문의 시 공유합니다.",
     },
     designCta: { title: "서비스 디자인 케이스 스터디", body: "B2B 관제 시스템, 챗봇, 퍼블리싱 등 디자인 작업 모음", link: "디자인 작업 보기", archive: "More Works" },
@@ -155,6 +156,7 @@ const content = {
       "I focus on cross-platform app development combining AI and Flutter, delivering digital solutions that unify web services and mobile apps. With a design-driven development philosophy, I craft user-friendly interfaces and keep improving digital experiences through continuous research and innovation.",
     work: {
       title: "Vibe-coded work",
+      all: "See all on AI Build",
       note: "Projects I planned, designed, built, and shipped by pairing with AI. Names and code stay private; case studies and demos are available on request.",
     },
     designCta: { title: "Service design case studies", body: "B2B monitoring systems, chatbots, publishing, and more", link: "View design work", archive: "More works" },
@@ -330,6 +332,15 @@ export default function Home() {
                   </div>
                 </article>
               ))}
+            </Reveal>
+            <Reveal className="mt-6">
+              <Link
+                href="/build"
+                className="group inline-flex items-center gap-1.5 text-sm font-medium underline underline-offset-4 decoration-[var(--n-border)] hover:decoration-[var(--n-accent)] transition-colors"
+              >
+                {t.work.all}
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+              </Link>
             </Reveal>
 
             {/* Link out to the design case studies */}

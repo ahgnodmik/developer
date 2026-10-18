@@ -12,11 +12,12 @@ import type { Lang } from "@/lib/design";
 
 export const SITE_VERSION = "v1.2.0";
 
-export type NavActive = "home" | "design" | "graphics" | "mugs" | "archive";
+export type NavActive = "home" | "build" | "design" | "graphics" | "mugs" | "archive";
 
 const navItems: { href: string; label: Record<Lang, string>; key?: NavActive }[] = [
   { href: "/#projects", label: { ko: "작업", en: "Work" } },
   { href: "/#career", label: { ko: "경력", en: "Career" } },
+  { href: "/build", label: { ko: "AI Build", en: "AI Build" }, key: "build" },
   { href: "/design", label: { ko: "서비스 디자인", en: "Service design" }, key: "design" },
   { href: "/graphics", label: { ko: "그래픽", en: "Graphics" }, key: "graphics" },
   { href: "/mugs", label: { ko: "머그컵", en: "Mugs" }, key: "mugs" },
@@ -179,6 +180,7 @@ export function SiteFooter({ lang }: { lang: Lang }) {
         <span>© 2026 Kim Dongha, {SITE_VERSION}</span>
         <div className="flex gap-5 ml-auto">
           <Link href="/" className="hover:text-[var(--n-text)] transition-colors">{lang === "ko" ? "홈" : "Home"}</Link>
+          <Link href="/build" className="hover:text-[var(--n-text)] transition-colors">AI Build</Link>
           <Link href="/design" className="hover:text-[var(--n-text)] transition-colors">{lang === "ko" ? "서비스 디자인" : "Service design"}</Link>
           <Link href="/graphics" className="hover:text-[var(--n-text)] transition-colors">{lang === "ko" ? "그래픽" : "Graphics"}</Link>
           <Link href="/mugs" className="hover:text-[var(--n-text)] transition-colors">{lang === "ko" ? "머그컵" : "Mugs"}</Link>
