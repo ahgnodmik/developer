@@ -495,7 +495,10 @@ async function main() {
     for (const dbId of childDbs) {
       const dsId = await firstDataSourceId(dbId);
       if (!dsId) continue;
-      const rows = await queryAll(dsId);
+      // sub-case order follows the row's Order property (unset rows go last, in Notion order)
+      const rows = (await queryAll(dsId)).sort(
+        (a, b) => (a.properties["Order"]?.number ?? Number.MAX_SAFE_INTEGER) - (b.properties["Order"]?.number ?? Number.MAX_SAFE_INTEGER)
+      );
       for (let i = 0; i < rows.length; i++) {
         const row = rows[i];
         const rp = row.properties;
