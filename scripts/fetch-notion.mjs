@@ -504,7 +504,8 @@ async function main() {
         const rp = row.properties;
         if (rp["Published"] && !checkbox(rp["Published"])) continue;
         const name = plain(rp["Name"]) || `${title.ko || slug} ${i + 1}`;
-        const subSlug = `${slug}-${slugify(name) || i + 1}`;
+        // stable route: prefer the row's Slug so reordering never moves URLs
+        const subSlug = `${slug}-${slugify(plain(rp["Slug"])) || slugify(name) || i + 1}`;
         const subDir = path.join(PUBLIC_DESIGN, subSlug);
         await mkdir(subDir, { recursive: true });
 
@@ -543,9 +544,10 @@ async function main() {
 
         const subEmoji = row.icon?.type === "emoji" ? row.icon.emoji : emoji;
         const subGradient = GRADIENTS[subColor++ % GRADIENTS.length];
-        const subTitle = { ko: name, en: name };
+        const subTitle = { ko: name, en: plain(rp["Title EN"]) || name };
         const firstPara = subBody.find((b) => b.type === "paragraph");
         const sum = firstPara ? firstPara.text.slice(0, 120) : "";
+        const sumKo = plain(rp["Summary KO"]) || sum;
 
         subProjects.push({
           slug: subSlug,
@@ -555,7 +557,7 @@ async function main() {
           emoji: subEmoji,
           role: { ko: "", en: "" },
           title: subTitle,
-          summary: { ko: sum, en: sum },
+          summary: { ko: sumKo, en: plain(rp["Summary EN"]) || sumKo },
           overview: { ko: "", en: "" },
           tags: multi(rp["Tags"]),
           ...(subBody.length ? { body: subBody } : {}),
