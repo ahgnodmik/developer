@@ -187,13 +187,14 @@ export const generatedBuild: BuildItem[] = [
       "en": "Weekly Keyword Collector"
     },
     "summary": {
-      "ko": "매주 검색·트렌드 소스에서 키워드를 모아 중복을 걸러내고, AI로 묶어 이번 주 핵심 키워드만 정리합니다.",
-      "en": "Collects keywords from search and trend sources every week, removes duplicates, and uses AI to group them into this week's key topics."
+      "ko": "GitHub Actions 주간 크론이 공개 트렌드 소스를 모아 중복 제거 후 경량 LLM 1회 호출로 묶고, 결과를 저장소 JSON으로 커밋해 정적 페이지에 출력. 서버·DB 없이 운영비 거의 0.",
+      "en": "A weekly GitHub Actions cron gathers public trend sources, dedupes them, groups them with one small-LLM call, and commits JSON for a static page. No server or DB; near-zero running cost."
     },
     "tools": [],
     "stack": [
       "Automation",
-      "LLM"
+      "LLM",
+      "Node.js"
     ],
     "year": "2026"
   },
@@ -206,13 +207,14 @@ export const generatedBuild: BuildItem[] = [
       "en": "Market Category Item Digest"
     },
     "summary": {
-      "ko": "마켓 카테고리별 아이템을 수집해 리스트로 정리하고, AI가 카테고리 흐름과 눈에 띄는 아이템을 요약합니다.",
-      "en": "Collects items by marketplace category into a list, then AI summarizes category trends and standout items."
+      "ko": "카테고리별 공개 목록을 주기 수집해 정규화·스냅샷 비교로 신규·변동 아이템만 추리고, 경량 LLM이 요약. 수집·요약·출력 모두 GitHub Actions + 저장소 JSON으로 처리.",
+      "en": "Periodically pulls public category listings, keeps only new or changed items via normalized snapshot diffs, and has a small LLM summarize them. Collection, summary, and output all run on GitHub Actions with JSON in the repo."
     },
     "tools": [],
     "stack": [
       "Automation",
-      "LLM"
+      "LLM",
+      "Node.js"
     ],
     "year": "2026"
   }
