@@ -177,5 +177,43 @@ export const generatedBuild: BuildItem[] = [
     ],
     "year": "",
     "cover": "/work/meal.webp"
+  },
+  {
+    "id": "40c5f884f14b81a69b0ed6c808cf63e4",
+    "order": 10,
+    "category": "workflow",
+    "title": {
+      "ko": "이번 주 핵심 키워드 수집기",
+      "en": "Weekly Keyword Collector"
+    },
+    "summary": {
+      "ko": "매주 검색·트렌드 소스에서 키워드를 모아 중복을 걸러내고, AI로 묶어 이번 주 핵심 키워드만 정리합니다.",
+      "en": "Collects keywords from search and trend sources every week, removes duplicates, and uses AI to group them into this week's key topics."
+    },
+    "tools": [],
+    "stack": [
+      "Automation",
+      "LLM"
+    ],
+    "year": "2026"
+  },
+  {
+    "id": "40c5f884f14b81d4aaf7ef2b6ad8c504",
+    "order": 11,
+    "category": "workflow",
+    "title": {
+      "ko": "마켓 카테고리 아이템 수집·요약",
+      "en": "Market Category Item Digest"
+    },
+    "summary": {
+      "ko": "마켓 카테고리별 아이템을 수집해 리스트로 정리하고, AI가 카테고리 흐름과 눈에 띄는 아이템을 요약합니다.",
+      "en": "Collects items by marketplace category into a list, then AI summarizes category trends and standout items."
+    },
+    "tools": [],
+    "stack": [
+      "Automation",
+      "LLM"
+    ],
+    "year": "2026"
   }
 ];
