@@ -20,7 +20,7 @@ const navItems: { href: string; label: Record<Lang, string>; key?: NavActive }[]
   { href: "/build", label: { ko: "AI Build", en: "AI Build" }, key: "build" },
   { href: "/design", label: { ko: "서비스 디자인", en: "Service design" }, key: "design" },
   { href: "/graphics", label: { ko: "그래픽", en: "Graphics" }, key: "graphics" },
-  { href: "/mugs", label: { ko: "머그컵", en: "Mugs" }, key: "mugs" },
+  // /mugs is hidden for now (route still builds; unlinked and noindex)
   { href: "/archive", label: { ko: "More Works", en: "More works" }, key: "archive" },
   { href: "/#contact", label: { ko: "연락처", en: "Contact" } },
 ];
@@ -183,7 +183,6 @@ export function SiteFooter({ lang }: { lang: Lang }) {
           <Link href="/build" className="hover:text-[var(--n-text)] transition-colors">AI Build</Link>
           <Link href="/design" className="hover:text-[var(--n-text)] transition-colors">{lang === "ko" ? "서비스 디자인" : "Service design"}</Link>
           <Link href="/graphics" className="hover:text-[var(--n-text)] transition-colors">{lang === "ko" ? "그래픽" : "Graphics"}</Link>
-          <Link href="/mugs" className="hover:text-[var(--n-text)] transition-colors">{lang === "ko" ? "머그컵" : "Mugs"}</Link>
           <Link href="/archive" className="hover:text-[var(--n-text)] transition-colors">More Works</Link>
         </div>
       </div>
