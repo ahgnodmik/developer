@@ -115,7 +115,7 @@ const content = {
       all: "AI Build 전체 보기",
       note: "AI와 대화하며 기획부터 디자인, 개발, 출시까지 직접 만든 프로젝트입니다. 서비스명과 코드는 비공개이며, 케이스 스터디와 시연은 문의 시 공유합니다.",
     },
-    designCta: { title: "서비스 디자인 케이스 스터디", body: "B2B 관제 서비스의 등록·전송 개선과 AI 자동화 케이스", link: "디자인 작업 보기", archive: "More Works" },
+    designCta: { title: "서비스 디자인 케이스 스터디", body: "B2B 관제 시스템, 챗봇, 퍼블리싱 등 디자인 작업 모음", link: "디자인 작업 보기", archive: "More Works" },
     career: {
       title: "경력과 도구",
       items: [
@@ -159,7 +159,7 @@ const content = {
       all: "See all on AI Build",
       note: "Projects I planned, designed, built, and shipped by pairing with AI. Names and code stay private; case studies and demos are available on request.",
     },
-    designCta: { title: "Service design case studies", body: "Onboarding and transfer fixes for a B2B fleet service, plus AI automation cases", link: "View design work", archive: "More works" },
+    designCta: { title: "Service design case studies", body: "B2B monitoring systems, chatbots, publishing, and more", link: "View design work", archive: "More works" },
     career: {
       title: "Career and tools",
       items: [
