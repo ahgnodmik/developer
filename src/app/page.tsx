@@ -5,6 +5,7 @@ import Link from "next/link";
 import { MotionConfig, motion } from "motion/react";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { SiteHeader, SITE_VERSION } from "@/components/site-header";
+import { AppIcon } from "@/components/app-icon";
 import type { Lang } from "@/lib/design";
 
 type ProjectStatus = "live" | "dev" | "case";
@@ -324,6 +325,7 @@ export default function Home() {
                       )}
                     </div>
                     <div className="mt-auto">
+                      <AppIcon cover={project.cover} className="mb-2.5" />
                       <h3 className="text-sm sm:text-base leading-snug font-medium tracking-tight text-balance">{project.title}</h3>
                       {/* small tiles: description and stack only from sm up */}
                       <p className="hidden sm:line-clamp-2 mt-1.5 text-xs leading-5 text-white/80">{project.desc}</p>

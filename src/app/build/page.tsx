@@ -5,6 +5,7 @@ import Link from "next/link";
 import { MotionConfig, motion } from "motion/react";
 import { ArrowUpRight } from "lucide-react";
 import { SiteHeader, SiteFooter } from "@/components/site-header";
+import { AppIcon } from "@/components/app-icon";
 import type { Lang } from "@/lib/design";
 import { buildItems, type BuildCategory, type BuildItem, type BuildStatus } from "@/lib/build";
 
@@ -93,6 +94,7 @@ function ProjectTile({ item, lang }: { item: BuildItem; lang: Lang }) {
           {item.link && <ArrowUpRight className="ml-auto w-4 h-4 text-white/70 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />}
         </div>
         <div className="mt-auto">
+          <AppIcon cover={item.cover} className="mb-2.5" />
           <h3 className="text-sm sm:text-base leading-snug font-medium tracking-tight text-balance">{item.title[lang]}</h3>
           <p className="hidden sm:line-clamp-2 mt-1.5 text-xs leading-5 text-white/80">{item.summary[lang]}</p>
           {tags.length > 0 && <p className="hidden sm:block mt-2 font-mono text-[10px] text-white/60 truncate">{tags.join(" / ")}</p>}
