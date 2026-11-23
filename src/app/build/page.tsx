@@ -65,40 +65,29 @@ function StatusBadge({ status, label }: { status: BuildStatus; label: string }) 
       </span>
     );
   }
-  return <span className="inline-flex px-2 py-0.5 rounded-[3px] bg-white/15 backdrop-blur-sm text-[11px] font-medium text-white/90">{label}</span>;
+  return <span className="inline-flex px-2 py-0.5 rounded-[3px] bg-[var(--n-bg-hover)] text-[11px] font-medium text-[var(--n-text-secondary)] whitespace-nowrap">{label}</span>;
 }
 
-// Image tile with dimmed cover and overlaid copy, same treatment as the home work grid.
+// Plain white card led by the launcher icon, same treatment as the home work grid.
 function ProjectTile({ item, lang }: { item: BuildItem; lang: Lang }) {
   const t = copy[lang];
   const tags = [...item.tools, ...item.stack];
   return (
     <MaybeLink
       href={item.link}
-      className="group relative block aspect-square overflow-hidden rounded-xl bg-[#161616] text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--n-accent)]"
+      className="group relative flex flex-col aspect-square overflow-hidden rounded-xl p-3.5 sm:p-4 bg-white dark:bg-[#1f1e1c] border border-[var(--n-border)] text-[var(--n-text)] transition-[transform,box-shadow] duration-300 hover:-translate-y-0.5 hover:shadow-[0_10px_28px_rgba(0,0,0,0.08)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--n-accent)]"
     >
-      {item.cover && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={item.cover}
-          alt=""
-          loading="lazy"
-          className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
-        />
-      )}
-      <div className="absolute inset-0 bg-[#0f0f0e]/45 transition-colors duration-500 group-hover:bg-[#0f0f0e]/30" />
-      <div className="absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t from-[#0f0f0e]/90 via-[#0f0f0e]/55 to-transparent" />
-      <div className="relative flex flex-col h-full p-3.5 sm:p-4">
-        <div className="flex items-start justify-between gap-2">
+      <div className="flex items-start justify-between gap-2">
+        <AppIcon cover={item.cover} />
+        <div className="flex items-center gap-2">
           {item.status && <StatusBadge status={item.status} label={t.status[item.status]} />}
-          {item.link && <ArrowUpRight className="ml-auto w-4 h-4 text-white/70 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />}
+          {item.link && <ArrowUpRight className="w-4 h-4 text-[var(--n-text-tertiary)] transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />}
         </div>
-        <div className="mt-auto">
-          <AppIcon cover={item.cover} className="mb-2.5" />
-          <h3 className="text-sm sm:text-base leading-snug font-medium tracking-tight text-balance">{item.title[lang]}</h3>
-          <p className="hidden sm:line-clamp-2 mt-1.5 text-xs leading-5 text-white/80">{item.summary[lang]}</p>
-          {tags.length > 0 && <p className="hidden sm:block mt-2 font-mono text-[10px] text-white/60 truncate">{tags.join(" / ")}</p>}
-        </div>
+      </div>
+      <div className="mt-auto">
+        <h3 className="text-sm sm:text-base leading-snug font-medium tracking-tight text-balance">{item.title[lang]}</h3>
+        <p className="hidden sm:line-clamp-2 mt-1.5 text-xs leading-5 text-[var(--n-text-secondary)]">{item.summary[lang]}</p>
+        {tags.length > 0 && <p className="hidden sm:block mt-2 font-mono text-[10px] text-[var(--n-text-tertiary)] truncate">{tags.join(" / ")}</p>}
       </div>
     </MaybeLink>
   );

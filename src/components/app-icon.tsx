@@ -1,6 +1,6 @@
 // Launcher-style icon for a vibe-coded project tile, keyed by its cover path (/work/<key>.webp).
 // Shipped apps use their real launcher icon; pipelines and apps without a custom icon get a
-// glyph on the same rounded-square plate so the grid reads consistently.
+// glyph on the same rounded-square plate (paper tone, so it reads on the white card).
 
 import { Newspaper, LayoutGrid, Radar, UtensilsCrossed, type LucideIcon } from "lucide-react";
 
@@ -28,7 +28,7 @@ export function hasAppIcon(cover?: string) {
 export function AppIcon({ cover, className = "" }: { cover?: string; className?: string }) {
   const key = keyOf(cover);
   if (!key) return null;
-  const plate = `block shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-[22%] overflow-hidden shadow-[0_4px_14px_rgba(0,0,0,0.35)] ring-1 ring-white/15 ${className}`;
+  const plate = `block shrink-0 w-11 h-11 sm:w-14 sm:h-14 rounded-[22%] overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.10)] ring-1 ring-black/5 ${className}`;
   const src = LAUNCHER[key];
   if (src) {
     // eslint-disable-next-line @next/next/no-img-element
@@ -37,7 +37,7 @@ export function AppIcon({ cover, className = "" }: { cover?: string; className?:
   const Glyph = GLYPH[key];
   if (!Glyph) return null;
   return (
-    <span aria-hidden className={`${plate} flex items-center justify-center bg-white text-[#0f0f0e]`}>
+    <span aria-hidden className={`${plate} flex items-center justify-center bg-[var(--n-bg)] text-[var(--n-text)]`}>
       <Glyph className="w-1/2 h-1/2" strokeWidth={1.75} />
     </span>
   );

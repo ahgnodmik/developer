@@ -239,7 +239,7 @@ export default function Home() {
             >
               <div className="md:col-span-4 flex items-center gap-3">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/logo.jpeg" alt="" className="w-12 h-12 rounded-lg object-cover ring-1 ring-[var(--n-border)]" />
+                <img src="/avatar.webp" alt="" width={48} height={48} className="w-12 h-12 rounded-full object-cover bg-white ring-1 ring-[var(--n-border)]" />
                 <div className="text-sm leading-5">
                   <p className="font-medium">{t.name}</p>
                   <p className="text-[var(--n-text-secondary)]">{t.role}</p>
@@ -300,37 +300,29 @@ export default function Home() {
               <p className="md:col-span-4 text-sm leading-6 text-[var(--n-text-secondary)] md:text-right">{t.work.note}</p>
             </Reveal>
 
-            {/* All projects as one image grid; the cover is dimmed and the copy overlaid */}
+            {/* All projects as plain white cards led by the launcher icon (cover photos read too busy) */}
             {/* sized like the /design case grid: 4 square tiles across a 1024px column */}
             <Reveal className="grid max-w-5xl grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
               {projects.map((project) => (
-                <article key={project.title} className="group relative aspect-square overflow-hidden rounded-xl bg-[#161616] text-white">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={project.cover}
-                    alt=""
-                    loading="lazy"
-                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
-                  />
-                  <div className="absolute inset-0 bg-[#0f0f0e]/45 transition-colors duration-500 group-hover:bg-[#0f0f0e]/30" />
-                  <div className="absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t from-[#0f0f0e]/90 via-[#0f0f0e]/55 to-transparent" />
-                  <div className="relative flex flex-col h-full p-3.5 sm:p-4">
-                    <div>
-                      {project.status === "live" ? (
-                        <LiveSticker label={t.statusLabels.live} />
-                      ) : (
-                        <span className="inline-flex px-2 py-0.5 rounded-[3px] bg-white/15 backdrop-blur-sm text-[11px] font-medium text-white/90">
-                          {t.statusLabels[project.status]}
-                        </span>
-                      )}
-                    </div>
-                    <div className="mt-auto">
-                      <AppIcon cover={project.cover} className="mb-2.5" />
-                      <h3 className="text-sm sm:text-base leading-snug font-medium tracking-tight text-balance">{project.title}</h3>
-                      {/* small tiles: description and stack only from sm up */}
-                      <p className="hidden sm:line-clamp-2 mt-1.5 text-xs leading-5 text-white/80">{project.desc}</p>
-                      <p className="hidden sm:block mt-2 font-mono text-[10px] text-white/60 truncate">{project.tags.join(" / ")}</p>
-                    </div>
+                <article
+                  key={project.title}
+                  className="group relative flex flex-col aspect-square overflow-hidden rounded-xl p-3.5 sm:p-4 bg-white dark:bg-[#1f1e1c] border border-[var(--n-border)] transition-[transform,box-shadow] duration-300 hover:-translate-y-0.5 hover:shadow-[0_10px_28px_rgba(0,0,0,0.08)]"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <AppIcon cover={project.cover} />
+                    {project.status === "live" ? (
+                      <LiveSticker label={t.statusLabels.live} />
+                    ) : (
+                      <span className="inline-flex px-2 py-0.5 rounded-[3px] bg-[var(--n-bg-hover)] text-[11px] font-medium text-[var(--n-text-secondary)] whitespace-nowrap">
+                        {t.statusLabels[project.status]}
+                      </span>
+                    )}
+                  </div>
+                  <div className="mt-auto">
+                    <h3 className="text-sm sm:text-base leading-snug font-medium tracking-tight text-balance">{project.title}</h3>
+                    {/* small tiles: description and stack only from sm up */}
+                    <p className="hidden sm:line-clamp-2 mt-1.5 text-xs leading-5 text-[var(--n-text-secondary)]">{project.desc}</p>
+                    <p className="hidden sm:block mt-2 font-mono text-[10px] text-[var(--n-text-tertiary)] truncate">{project.tags.join(" / ")}</p>
                   </div>
                 </article>
               ))}
@@ -455,7 +447,7 @@ export default function Home() {
               <p className="text-sm text-white/80">{t.contact.label}</p>
               <a
                 href="mailto:samdongpm@gmail.com"
-                className="group mt-6 inline-flex flex-wrap items-center gap-x-4 text-[clamp(1.6rem,7vw,6.5rem)] leading-none font-medium tracking-[-0.045em] hover:opacity-85 transition-opacity"
+                className="group relative z-10 mt-6 inline-flex flex-wrap items-center gap-x-4 text-[clamp(1.6rem,7vw,6.5rem)] leading-none font-medium tracking-[-0.045em] hover:opacity-85 transition-opacity"
               >
                 samdongpm@gmail.com
                 <ArrowRight className="w-[0.7em] h-[0.7em] transition-transform group-hover:translate-x-2" strokeWidth={1.5} />
@@ -465,6 +457,16 @@ export default function Home() {
                 github.com/ahgnodmik
               </a>
 
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/avatar-bust.webp"
+                alt=""
+                aria-hidden
+                width={710}
+                height={900}
+                loading="lazy"
+                className="hidden lg:block pointer-events-none select-none absolute right-10 bottom-[4.6rem] w-auto h-[200px]"
+              />
               <footer className="mt-24 md:mt-32 flex flex-wrap items-center gap-x-6 gap-y-2 py-6 border-t border-white/25 text-xs text-white/70">
                 <span>© 2026 Kim Dongha, {SITE_VERSION}</span>
                 <div className="flex gap-5 sm:ml-auto">
