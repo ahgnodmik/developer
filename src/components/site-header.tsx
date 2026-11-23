@@ -6,7 +6,7 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
-import { Languages, Menu, X } from "lucide-react";
+import { ChevronDown, Languages, Menu, X } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import type { Lang } from "@/lib/design";
 
@@ -14,16 +14,90 @@ export const SITE_VERSION = "v1.2.0";
 
 export type NavActive = "home" | "build" | "design" | "graphics" | "mugs" | "archive";
 
-const navItems: { href: string; label: Record<Lang, string>; key?: NavActive }[] = [
-  { href: "/#projects", label: { ko: "작업", en: "Work" } },
-  { href: "/#career", label: { ko: "경력", en: "Career" } },
+// Desktop nav: Work opens a dropdown with the four work routes; Career and Contact stay inline.
+type NavLink = { href: string; label: Record<Lang, string>; key?: NavActive };
+
+const workItems: NavLink[] = [
   { href: "/build", label: { ko: "AI Build", en: "AI Build" }, key: "build" },
   { href: "/design", label: { ko: "서비스 디자인", en: "Service design" }, key: "design" },
   { href: "/graphics", label: { ko: "그래픽", en: "Graphics" }, key: "graphics" },
   // /mugs is hidden for now (route still builds; unlinked and noindex)
   { href: "/archive", label: { ko: "More Works", en: "More works" }, key: "archive" },
+];
+
+const workLabel: Record<Lang, string> = { ko: "작업", en: "Work" };
+
+const sideItems: NavLink[] = [
+  { href: "/#career", label: { ko: "경력", en: "Career" } },
   { href: "/#contact", label: { ko: "연락처", en: "Contact" } },
 ];
+
+const linkTone = (on: boolean) =>
+  on
+    ? "text-[var(--n-text)] underline underline-offset-[6px] decoration-[var(--n-accent)] decoration-2"
+    : "text-[var(--n-text-secondary)] hover:text-[var(--n-text)]";
+
+function WorkMenu({ lang, active }: { lang: Lang; active: NavActive }) {
+  const [open, setOpen] = useState(false);
+  const inWork = workItems.some((i) => i.key === active);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [open]);
+
+  return (
+    <div
+      className="relative"
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
+      onFocus={() => setOpen(true)}
+      onBlur={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setOpen(false);
+      }}
+    >
+      <button
+        type="button"
+        aria-expanded={open}
+        aria-haspopup="true"
+        onClick={() => setOpen((v) => !v)}
+        className={`flex items-center gap-1 transition-colors ${linkTone(inWork)}`}
+      >
+        {workLabel[lang]}
+        <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
+      </button>
+      {/* pt bridges the gap so the pointer can travel from the trigger into the panel */}
+      <div
+        className={`absolute left-1/2 top-full -translate-x-1/2 pt-3 transition-all duration-200 ${
+          open ? "opacity-100 visible translate-y-0" : "opacity-0 invisible -translate-y-1"
+        }`}
+      >
+        <ul className="min-w-[11rem] py-1.5 rounded-lg border border-[var(--n-border)] bg-[var(--n-bg)] shadow-[0_12px_32px_rgba(0,0,0,0.12)]">
+          {workItems.map((item) => {
+            const on = item.key === active;
+            return (
+              <li key={item.href}>
+                <Link
+                  href={item.href}
+                  onClick={() => setOpen(false)}
+                  aria-current={on ? "page" : undefined}
+                  className={`flex items-center gap-2 px-3.5 py-2 text-sm transition-colors hover:bg-[var(--n-bg-hover)] ${
+                    on ? "text-[var(--n-text)] font-medium" : "text-[var(--n-text-secondary)] hover:text-[var(--n-text)]"
+                  }`}
+                >
+                  <span aria-hidden className={`w-1.5 h-1.5 rounded-full ${on ? "bg-[var(--n-accent)]" : "bg-transparent"}`} />
+                  {item.label[lang]}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    </div>
+  );
+}
 
 export function LangToggle({ lang, onToggle, highlight = false }: { lang: Lang; onToggle: () => void; highlight?: boolean }) {
   return (
@@ -102,16 +176,9 @@ export function SiteHeader({
         {children && <div className="hidden sm:flex items-center gap-1.5 min-w-0 text-sm">{children}</div>}
 
         <nav className="hidden md:flex items-center gap-6 ml-auto text-sm">
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`transition-colors ${
-                item.key && item.key === active
-                  ? "text-[var(--n-text)] underline underline-offset-[6px] decoration-[var(--n-accent)] decoration-2"
-                  : "text-[var(--n-text-secondary)] hover:text-[var(--n-text)]"
-              }`}
-            >
+          <WorkMenu lang={lang} active={active} />
+          {sideItems.map((item) => (
+            <Link key={item.href} href={item.href} className={`transition-colors ${linkTone(false)}`}>
               {item.label[lang]}
             </Link>
           ))}
@@ -159,7 +226,14 @@ export function SiteHeader({
               <Link href="/" onClick={() => setOpen(false)} className="text-4xl font-medium tracking-tight">
                 {lang === "ko" ? "홈" : "Home"}
               </Link>
-              {navItems.map((item) => (
+              <p className="mt-4 font-mono text-xs uppercase tracking-widest text-white/60">{workLabel[lang]}</p>
+              {workItems.map((item) => (
+                <Link key={item.href} href={item.href} onClick={() => setOpen(false)} className="pl-4 text-3xl font-medium tracking-tight">
+                  {item.label[lang]}
+                </Link>
+              ))}
+              <span className="mt-2" />
+              {sideItems.map((item) => (
                 <Link key={item.href} href={item.href} onClick={() => setOpen(false)} className="text-4xl font-medium tracking-tight">
                   {item.label[lang]}
                 </Link>
