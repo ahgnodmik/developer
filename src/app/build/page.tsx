@@ -201,7 +201,7 @@ export default function BuildPage() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: "-60px" }}
                     transition={{ duration: 0.5, ease: EASE }}
-                    className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4"
+                    className="grid max-w-5xl grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4"
                   >
                     {group.items.map((item) => (
                       <ProjectTile key={item.id} item={item} lang={lang} />
