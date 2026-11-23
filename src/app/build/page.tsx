@@ -78,7 +78,7 @@ function ProjectTile({ item, lang }: { item: BuildItem; lang: Lang }) {
       className="group relative flex flex-col aspect-square overflow-hidden rounded-xl p-3.5 sm:p-4 bg-white dark:bg-[#1f1e1c] border border-[var(--n-border)] text-[var(--n-text)] transition-[transform,box-shadow] duration-300 hover:-translate-y-0.5 hover:shadow-[0_10px_28px_rgba(0,0,0,0.08)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--n-accent)]"
     >
       <div className="flex items-start justify-between gap-2">
-        <AppIcon cover={item.cover} />
+        <AppIcon cover={item.cover} id={item.id} />
         <div className="flex items-center gap-2">
           {item.status && <StatusBadge status={item.status} label={t.status[item.status]} />}
           {item.link && <ArrowUpRight className="w-4 h-4 text-[var(--n-text-tertiary)] transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />}
@@ -89,37 +89,6 @@ function ProjectTile({ item, lang }: { item: BuildItem; lang: Lang }) {
         <p className="hidden sm:line-clamp-2 mt-1.5 text-xs leading-5 text-[var(--n-text-secondary)]">{item.summary[lang]}</p>
         {tags.length > 0 && <p className="hidden sm:block mt-2 font-mono text-[10px] text-[var(--n-text-tertiary)] truncate">{tags.join(" / ")}</p>}
       </div>
-    </MaybeLink>
-  );
-}
-
-// Text-first row for workflows and design cases: they rarely have a meaningful cover.
-function ItemRow({ item, lang, index }: { item: BuildItem; lang: Lang; index: number }) {
-  const t = copy[lang];
-  const tags = [...item.tools, ...item.stack];
-  return (
-    <MaybeLink
-      href={item.link}
-      className="group grid gap-3 md:grid-cols-12 md:gap-6 py-6 md:py-8 border-b border-[var(--n-border)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--n-accent)]"
-    >
-      <span className="md:col-span-1 font-mono text-xs text-[var(--n-text-tertiary)] tabular-nums pt-1">{String(index + 1).padStart(2, "0")}</span>
-      <div className="md:col-span-4">
-        <h3 className="flex items-start gap-1.5 text-xl md:text-2xl leading-tight font-medium tracking-[-0.02em] group-hover:text-[var(--n-accent)] transition-colors">
-          {item.title[lang]}
-          {item.link && <ArrowUpRight className="shrink-0 mt-1 w-4 h-4" />}
-        </h3>
-        {item.year && <p className="mt-1 font-mono text-xs text-[var(--n-text-tertiary)]">{item.year}</p>}
-      </div>
-      <p className="md:col-span-4 text-sm leading-6 text-[var(--n-text-secondary)]">{item.summary[lang]}</p>
-      {tags.length > 0 && (
-        <p className="md:col-span-3 flex flex-wrap content-start gap-1.5 md:justify-end" aria-label={t.tools}>
-          {tags.map((tag) => (
-            <span key={tag} className="px-2 py-0.5 rounded-[4px] bg-[var(--n-bg-hover)] text-xs text-[var(--n-text-secondary)]">
-              {tag}
-            </span>
-          ))}
-        </p>
-      )}
     </MaybeLink>
   );
 }
@@ -150,7 +119,7 @@ export default function BuildPage() {
       items.sort((a, b) => STATUS_ORDER.indexOf(a.status ?? "case") - STATUS_ORDER.indexOf(b.status ?? "case"));
     }
     return { category, items };
-  });
+  }).filter((g) => g.items.length > 0); // empty sections (AI design for now) stay hidden
 
   return (
     <MotionConfig reducedMotion="user">
@@ -190,32 +159,18 @@ export default function BuildPage() {
                 <span className="font-mono text-sm font-normal tracking-normal text-[var(--n-text-tertiary)] tabular-nums">{group.items.length}</span>
               </h2>
 
-              {group.items.length === 0 ? (
-                <div className="flex items-center justify-center aspect-[3/1] md:aspect-[5/1] border border-dashed border-[var(--n-border)] text-sm text-[var(--n-text-tertiary)]">
-                  {t.empty[group.category]}
-                </div>
-              ) : group.category === "project" ? (
-                <>
-                  <motion.div
-                    initial={{ opacity: 0, y: 16 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-60px" }}
-                    transition={{ duration: 0.5, ease: EASE }}
-                    className="grid max-w-5xl grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4"
-                  >
-                    {group.items.map((item) => (
-                      <ProjectTile key={item.id} item={item} lang={lang} />
-                    ))}
-                  </motion.div>
-                  <p className="mt-6 text-xs text-[var(--n-text-tertiary)]">{t.note}</p>
-                </>
-              ) : (
-                <div className="border-t border-[var(--n-border)]">
-                  {group.items.map((item, i) => (
-                    <ItemRow key={item.id} item={item} lang={lang} index={i} />
-                  ))}
-                </div>
-              )}
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-60px" }}
+                transition={{ duration: 0.5, ease: EASE }}
+                className="grid max-w-5xl grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4"
+              >
+                {group.items.map((item) => (
+                  <ProjectTile key={item.id} item={item} lang={lang} />
+                ))}
+              </motion.div>
+              {group.category === "project" && <p className="mt-6 text-xs text-[var(--n-text-tertiary)]">{t.note}</p>}
             </section>
           ))}
         </main>
